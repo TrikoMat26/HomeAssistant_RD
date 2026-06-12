@@ -1,0 +1,179 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+########### Yaml file locations   ##########
+
+#template: !include_dir_merge_list includes/templates
+
+########### DUCK DNS   ##########
+http:
+  #  ssl_certificate: /ssl/fullchain.pem
+  #  ssl_key: /ssl/privkey.pem
+  ########### NGINX   ##########
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - 172.30.33.0/24
+
+########## Arlo  ##################
+# aarlo:
+#   tfa_source: imap
+#   tfa_type: email
+#   tfa_host: imap.gmail.com
+#   tfa_username: !secret tfa_gmail_username
+#   tfa_password: !secret tfa_gmail_app_password
+#   username: !secret arlo_username
+#   password: !secret arlo_password
+#   backend: sse
+
+# alarm_control_panel:
+#   - platform: aarlo
+#     away_mode_name: armed
+#     home_mode_name: home
+#     night_mode_name: night
+#     trigger_time: 30
+#     alarm_volume: 8
+
+# camera:
+#   - platform: aarlo
+
+# binary_sensor:
+#   - platform: aarlo
+#     monitored_conditions:
+#       - motion
+#       - sound
+#       - ding
+#       - cry
+#       - connectivity
+
+sensor:
+  ######### Foobot  ##########
+  - platform: foobot
+    token: !secret "FOOBOT_SECRET_KEY"
+    username: !secret "FOOBOT_USERNAME"
+
+  # Historique de la production sur 15 min via statistics
+  - platform: statistics
+    name: "Solaire stabilité stats"
+    entity_id: sensor.total_solaire
+    state_characteristic: standard_deviation
+    max_age:
+      minutes: 15
+    sampling_size: 30
+    precision: 0
+
+  - platform: statistics
+    name: "chauffe_eau_opportunite_stats"
+    entity_id: binary_sensor.lancement_chauffe_eau_opportun
+    state_characteristic: mean
+    max_age:
+      minutes: 30
+    sampling_size: 60
+
+wake_on_lan:
+
+switch:
+  - platform: wake_on_lan
+    mac: 24:4B:FE:48:2D:77
+    name: "PC_Bureau"
+    host: 192.168.1.43
+    turn_off:
+      service: hassio.addon_stdin
+      data:
+        addon: core_rpc_shutdown
+        input: PC_Bureau
+  - platform: wake_on_lan
+    mac: F8:B1:56:9D:EE:0D
+    name: "Uptobox"
+    host: 192.168.1.12
+    turn_off:
+      service: hassio.addon_stdin
+      data:
+        addon: core_rpc_shutdown
+        input: Uptobox
+
+media_player:
+  - platform: kef
+    host: 192.168.1.57
+    type: LS50
+    name: My KEF speakers
+    maximum_volume: 0.6
+    volume_step: 0.05
+
+google_assistant:
+  project_id: trikohome-56807
+  service_account: !include SERVICE_ACCOUNT.JSON
+  report_state: true
+  exposed_domains:
+    - script
+    - input_boolean
+    - button
+    - switch
+logger:
+  default: info
+  logs:
+    homeassistant.components.webhook: debug
+
+homeassistant:
+  external_url: "https://triko26.duckdns.org"
+  internal_url: "http://192.168.1.79:8123"
+
+template:
+  - binary_sensor:
+      - name: "Lancement chauffe-eau opportun"
+        unique_id: lancement_chauffe_eau_opportun
+        device_class: power
+        icon: >
+          {% if this.state == 'on' %}mdi:water-boiler{% else %}mdi:water-boiler-off{% endif %}
+        state: >
+          {% set production = states('sensor.total_solaire') | float(0) %}
+          {% set ecart_type = states('sensor.solaire_stabilite_stats') | float(9999) %}
+          {% set heure = now().hour + now().minute / 60 %}
+
+          {# Seuils ajustables #}
+          {% set seuil_puissance = 1500 %}     {# Watts min pour lancer le CET #}
+          {% set seuil_stabilite = 150 %}      {# Ecart-type max accepté (W) #}
+          {% set heure_debut = 9.5 %}          {# Pas avant 9h30 #}
+          {% set heure_fin = 16.5 %}           {# Pas après 16h30 #}
+
+          {{ production >= seuil_puissance 
+          and ecart_type <= seuil_stabilite
+          and heure >= heure_debut
+          and heure <= heure_fin }}
+
+        attributes:
+          production_actuelle: "{{ states('sensor.total_solaire') | float(0) | round(0) }} W"
+          stabilite: "{{ states('sensor.solaire_stabilite_stats') | float(0) | round(0) }} W écart-type"
+          motif_blocage: >
+            {% set production = states('sensor.total_solaire') | float(0) %}
+            {% set ecart_type = states('sensor.solaire_stabilite_stats') | float(9999) %}
+            {% if production < 1500 %}Production insuffisante ({{ production | round(0) }}W < 1500W)
+            {% elif ecart_type > 150 %}Production instable - nuages (σ={{ ecart_type | round(0) }}W)
+            {% else %}Conditions favorables ✓{% endif %}
+  - sensor:
+      - name: "Solaire auto-consomme"
+        unique_id: solaire_auto_consomme
+        unit_of_measurement: "kWh"
+        device_class: energy
+        state_class: measurement
+        icon: mdi:solar-power-variant
+        state: >-
+          {% set prod = states('sensor.beem_quotidien') | float(0) + states('sensor.beemnquotidien') | float(0) %}
+          {% set export = states('sensor.beauvallon_mainstogrid_1d') | float(0) %}
+          {{ [prod - export, 0] | max | round(2) }}
+shell_command:
+  export_solaire_csv: "/bin/bash /config/scripts/export_solaire.sh"
+  upload_solaire_gdrive: "/bin/bash /config/scripts/upload_gdrive.sh"
+  emporia_weekly_export: >-
+    python3 /config/python_scripts/emporia/export_emporia_weekly.py
+    >> /config/python_scripts/emporia/logs/shell.log 2>&1
+  emporia_fetch_to_drive: >-
+    python3 /config/python_scripts/emporia/fetch_emporia_to_drive.py
+    >> /config/python_scripts/emporia/logs/shell_fetch.log 2>&1

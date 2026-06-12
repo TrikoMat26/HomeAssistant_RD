@@ -1,0 +1,276 @@
+{
+  "views": [
+    {
+      "title": "Home",
+      "cards": [
+        {
+          "height": 640,
+          "unit_prefix": "",
+          "round": 0,
+          "convert_units_to": "",
+          "co2_intensity_entity": "sensor.co2_signal_co2_intensity",
+          "gas_co2_intensity": 2351.6459999999997,
+          "min_box_height": 3,
+          "min_box_distance": 5,
+          "show_states": true,
+          "show_units": true,
+          "sections": [
+            {
+              "entities": [
+                {
+                  "type": "entity",
+                  "children": [
+                    "sensor.beauvallon_totalusage_1min"
+                  ],
+                  "entity_id": "sensor.consommation_net",
+                  "name": "EDF",
+                  "color": "rgb(255,0,0)"
+                },
+                {
+                  "type": "entity",
+                  "children": [
+                    "sensor.beauvallon_totalusage_1min"
+                  ],
+                  "entity_id": "sensor.smart_switch_2312075875450151080948e1e9e5a5e0_power",
+                  "name": "UpWatt_14K",
+                  "color": "rgb(255,255,0)"
+                },
+                {
+                  "type": "entity",
+                  "entity_id": "sensor.smart_switch_2312070251113551080948e1e9e5b52f_power",
+                  "children": [
+                    "sensor.beauvallon_totalusage_1min"
+                  ],
+                  "name": "Beem",
+                  "color": "Rgb(150,255,51)"
+                },
+                {
+                  "type": "entity",
+                  "entity_id": "sensor.smart_switch_2312074614100551080148e1e9e52089_power",
+                  "children": [
+                    "sensor.beauvallon_totalusage_1min"
+                  ],
+                  "color": "rgb(155,128,210)"
+                }
+              ]
+            },
+            {
+              "entities": [
+                {
+                  "type": "entity",
+                  "children": [
+                    "sensor.cuisine_chauffe_eau_8_1min",
+                    "sensor.systeme_pc_bureau_power",
+                    "sensor.smart_plug_2008146345173351802148e1e92b5ecb_power",
+                    "sensor.smart_plug_2008146668406351802148e1e92b5e3e_power",
+                    "sensor.smart_plug_2008141416403851802148e1e92b5821_power",
+                    "sensor.cuisine_four_12_1min",
+                    "sensor.cuisine_frigo_micro_onde_7_1min",
+                    "sensor.cuisine_lave_vaisselle_13_1min",
+                    "sensor.cuisine_plaque_induction_11_1min",
+                    "sensor.hall_chambre_clim_10_1min",
+                    "sensor.pompe_piscine_ph3_3_1min",
+                    "sensor.salon_clim_14_1min",
+                    "sensor.surpresseur_ph1_4_1min",
+                    "sensor.pompe_piscine_ph1_1_1min",
+                    "sensor.atelier_ph1_power_minute_average",
+                    "sensor.surpresseur_ph2_5_1min",
+                    "sensor.prise_tv_power"
+                  ],
+                  "entity_id": "sensor.beauvallon_totalusage_1min",
+                  "name": "Consommation Total",
+                  "color": "rgb(255,0,255)"
+                }
+              ]
+            },
+            {
+              "entities": [
+                {
+                  "type": "entity",
+                  "children": [],
+                  "entity_id": "sensor.systeme_pc_bureau_power",
+                  "name": "Bureau / PC"
+                },
+                {
+                  "type": "entity",
+                  "children": [],
+                  "entity_id": "sensor.smart_plug_2008146345173351802148e1e92b5ecb_power",
+                  "name": "zone TV"
+                },
+                {
+                  "type": "entity",
+                  "children": [],
+                  "entity_id": "sensor.smart_plug_2008146668406351802148e1e92b5e3e_power",
+                  "name": "PC Arthur"
+                },
+                {
+                  "type": "entity",
+                  "children": [],
+                  "entity_id": "sensor.smart_plug_2008141416403851802148e1e92b5821_power",
+                  "name": "zone réseau + Ciné"
+                },
+                {
+                  "type": "entity",
+                  "children": [],
+                  "entity_id": "sensor.cuisine_chauffe_eau_8_1min",
+                  "name": "cuisine/chauffe-eau"
+                },
+                {
+                  "type": "entity",
+                  "children": [],
+                  "entity_id": "sensor.cuisine_four_12_1min",
+                  "name": "cuisine/four"
+                },
+                {
+                  "type": "entity",
+                  "children": [],
+                  "entity_id": "sensor.cuisine_frigo_micro_onde_7_1min",
+                  "name": "cuisine/frigo/micro-onde"
+                },
+                {
+                  "type": "entity",
+                  "children": [],
+                  "entity_id": "sensor.cuisine_lave_vaisselle_13_1min",
+                  "name": "cuisine/lave-vaisselle"
+                },
+                {
+                  "type": "entity",
+                  "children": [],
+                  "entity_id": "sensor.cuisine_plaque_induction_11_1min",
+                  "name": "cuisine/plaque induction"
+                },
+                {
+                  "type": "entity",
+                  "children": [],
+                  "entity_id": "sensor.hall_chambre_clim_10_1min",
+                  "name": "hall chambre / clim"
+                },
+                {
+                  "type": "entity",
+                  "children": [],
+                  "entity_id": "sensor.pompe_piscine_ph3_3_1min",
+                  "name": "pompe piscine"
+                },
+                {
+                  "type": "entity",
+                  "children": [],
+                  "entity_id": "sensor.salon_clim_14_1min",
+                  "name": "salon / clim"
+                },
+                {
+                  "type": "entity",
+                  "children": [],
+                  "entity_id": "sensor.surpresseur_ph1_4_1min",
+                  "name": "surpresseur"
+                },
+                {
+                  "type": "entity",
+                  "children": [],
+                  "entity_id": "sensor.pompe_piscine_ph1_1_1min",
+                  "name": "VMC / lumière Hall cuisine"
+                },
+                {
+                  "type": "entity",
+                  "children": [
+                    "sensor.lave_linge_seche_linge_power"
+                  ],
+                  "entity_id": "sensor.atelier_ph1_power_minute_average",
+                  "name": "Atelier Ph1"
+                },
+                {
+                  "type": "entity",
+                  "children": [],
+                  "entity_id": "sensor.surpresseur_ph1_4_1min",
+                  "name": "Atelier Ph2"
+                },
+                {
+                  "type": "entity",
+                  "children": [],
+                  "entity_id": "sensor.surpresseur_ph2_5_1min",
+                  "name": "Atelier Ph3"
+                },
+                "sensor.prise_tv_power"
+              ]
+            },
+            {
+              "entities": [
+                "sensor.lave_linge_seche_linge_power"
+              ],
+              "sort_dir": "desc",
+              "sort_by": "state"
+            }
+          ],
+          "type": "custom:sankey-chart",
+          "min_state": 0,
+          "show_names": true,
+          "show_icons": false,
+          "view_layout": {
+            "position": "main"
+          }
+        },
+        {
+          "type": "energy-usage-graph"
+        },
+        {
+          "type": "custom:apexcharts-card",
+          "graph_span": "24h",
+          "span": {
+            "start": "day"
+          },
+          "header": {
+            "show": true,
+            "title": "Conso",
+            "show_states": true,
+            "colorize_states": true
+          },
+          "series": [
+            {
+              "entity": "sensor.beauvallon_totalusage_1min",
+              "type": "column",
+              "stroke_width": 2,
+              "group_by": {
+                "func": "avg",
+                "duration": "1h"
+              }
+            }
+          ],
+          "apex_config": {
+            "chart": {
+              "height": "400px"
+            }
+          }
+        },
+        {
+          "type": "custom:apexcharts-card",
+          "graph_span": "24h",
+          "span": {
+            "start": "day"
+          },
+          "header": {
+            "show": true,
+            "title": "Conso",
+            "show_states": true,
+            "colorize_states": true
+          },
+          "series": [
+            {
+              "entity": "sensor.consommation_net",
+              "type": "column",
+              "stroke_width": 2,
+              "group_by": {
+                "func": "avg",
+                "duration": "1h"
+              }
+            }
+          ],
+          "apex_config": {
+            "chart": {
+              "height": "400px"
+            }
+          }
+        }
+      ],
+      "type": "sidebar"
+    }
+  ]
+}

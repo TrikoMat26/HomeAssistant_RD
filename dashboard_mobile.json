@@ -1,0 +1,305 @@
+{
+  "views": [
+    {
+      "title": "Home",
+      "type": "sections",
+      "sections": [
+        {
+          "type": "grid",
+          "cards": [
+            {
+              "show_name": true,
+              "show_icon": true,
+              "type": "button",
+              "tap_action": {
+                "action": "toggle"
+              },
+              "entity": "script.rm_portail",
+              "name": "Portail",
+              "icon": "mdi:gate"
+            },
+            {
+              "show_name": true,
+              "show_icon": true,
+              "type": "button",
+              "tap_action": {
+                "action": "toggle"
+              },
+              "entity": "light.eclairages_exterieur"
+            },
+            {
+              "graph": "line",
+              "type": "sensor",
+              "entity": "sensor.beauvallon_totalusage_1min",
+              "detail": 1
+            },
+            {
+              "graph": "line",
+              "type": "sensor",
+              "entity": "sensor.smart_switch_2312075875450151080948e1e9e5a5e0_power",
+              "detail": 1
+            },
+            {
+              "graph": "line",
+              "type": "sensor",
+              "detail": 1,
+              "entity": "sensor.total_solaire"
+            },
+            {
+              "graph": "line",
+              "type": "sensor",
+              "entity": "sensor.smart_switch_2312074614100551080148e1e9e52089_power",
+              "detail": 1,
+              "name": "Power_1600W"
+            },
+            {
+              "graph": "line",
+              "type": "sensor",
+              "detail": 1,
+              "unit": "W",
+              "entity": "sensor.puissance_3ct"
+            },
+            {
+              "graph": "line",
+              "type": "sensor",
+              "entity": "sensor.smart_switch_2312070251113551080948e1e9e5b52f_power",
+              "detail": 1,
+              "name": "Power_800W"
+            },
+            {
+              "graph": "line",
+              "type": "sensor",
+              "entity": "sensor.hms_1600_voltage",
+              "detail": 1
+            },
+            {
+              "graph": "line",
+              "type": "sensor",
+              "entity": "sensor.hms_1600_temperature",
+              "detail": 1
+            },
+            {
+              "type": "button",
+              "entity": "button.hms_1600_restart_inverter",
+              "name": "Restart Inverter",
+              "icon": "mdi:restart",
+              "show_name": true,
+              "show_icon": true,
+              "tap_action": {
+                "action": "call-service",
+                "service": "button.press",
+                "service_data": {
+                  "entity_id": "button.hms_1600_restart_inverter"
+                }
+              }
+            },
+            {
+              "type": "custom:button-card",
+              "entity": "automation.hms_1600_ecreteur_1100w_anti_surtension",
+              "name": "[[[\n  if (entity.state === 'off') return 'Écrêteur ❌ ÉTEINT';\n  const limit = parseFloat(hass.states['number.hms_1600_limit_nonpersistent_absolute']?.state || 1600);\n  return limit < 1600 ? 'Écrêteur ⚠️ ACTIF' : 'Écrêteur (Surveillance)';\n]]]\n",
+              "show_name": true,
+              "show_icon": true,
+              "show_label": true,
+              "icon": "[[[\n  if (entity.state === 'off') return 'mdi:shield-off';\n  const limit = parseFloat(hass.states['number.hms_1600_limit_nonpersistent_absolute']?.state || 1600);\n  return limit < 1600 ? 'mdi:shield-alert' : 'mdi:shield-sun';\n]]]\n",
+              "label": "[[[\n  const limit = parseFloat(hass.states['number.hms_1600_limit_nonpersistent_absolute']?.state || 1600);\n  const voltage = parseFloat(hass.states['sensor.hms_1600_voltage']?.state || 0);\n  const power = parseFloat(hass.states['sensor.hms_1600_power']?.state || 0);\n  const isEcreting = limit < 1600;\n  const status = isEcreting ? `⚠️ LIMITE : ${limit} W` : '✅ Inactif';\n  return `Tension : ${voltage.toFixed(1)} V\\nProd : ${power.toFixed(0)} W\\n${status}`;\n]]]\n",
+              "styles": {
+                "card": [
+                  {
+                    "background": "[[[\n  if (entity.state === 'off') return 'linear-gradient(135deg, #37415122, #1f293722)';\n  const limit = parseFloat(hass.states['number.hms_1600_limit_nonpersistent_absolute']?.state || 1600);\n  return limit < 1600\n    ? 'linear-gradient(135deg, #f59e0b22, #ef444422)'\n    : 'linear-gradient(135deg, #10b98111, #05966911)';\n]]]\n"
+                  },
+                  {
+                    "border": "[[[\n  if (entity.state === 'off') return '1px solid #4b5563';\n  const limit = parseFloat(hass.states['number.hms_1600_limit_nonpersistent_absolute']?.state || 1600);\n  return limit < 1600 ? '2px solid #ef4444' : '1px solid #10b981';\n]]]\n"
+                  },
+                  {
+                    "border-radius": "16px"
+                  },
+                  {
+                    "padding": "12px"
+                  }
+                ],
+                "icon": [
+                  {
+                    "color": "[[[\n  if (entity.state === 'off') return '#6b7280';\n  const limit = parseFloat(hass.states['number.hms_1600_limit_nonpersistent_absolute']?.state || 1600);\n  return limit < 1600 ? '#f59e0b' : '#10b981';\n]]]\n"
+                  },
+                  {
+                    "width": "32px"
+                  }
+                ],
+                "name": [
+                  {
+                    "font-weight": "bold"
+                  },
+                  {
+                    "font-size": "13px"
+                  }
+                ],
+                "label": [
+                  {
+                    "font-size": "10px"
+                  },
+                  {
+                    "white-space": "pre-line"
+                  },
+                  {
+                    "color": "var(--secondary-text-color)"
+                  }
+                ]
+              },
+              "tap_action": {
+                "action": "more-info"
+              }
+            },
+            {
+              "show_state": true,
+              "show_name": true,
+              "camera_view": "auto",
+              "type": "picture-entity",
+              "entity": "camera.camera_exterieure_intelligente"
+            },
+            {
+              "type": "custom:aarlo-glance",
+              "entity": "camera.aarlo_porche",
+              "name": "Porche",
+              "show": [
+                "motion",
+                "sound",
+                "library",
+                "snapshot",
+                "battery level",
+                "signal_strength",
+                "capture_today",
+                "image_date"
+              ],
+              "top_title": true,
+              "top_status": true,
+              "top_date": true,
+              "image_click": "play"
+            }
+          ]
+        },
+        {
+          "type": "grid",
+          "cards": [
+            {
+              "type": "horizontal-stack",
+              "cards": [
+                {
+                  "type": "custom:mushroom-template-card",
+                  "primary": "Uptobox",
+                  "icon": "mdi:desktop-tower",
+                  "entity": "switch.uptobox",
+                  "icon_color": "{{ 'green' if states(entity) == 'on' else 'red' }}",
+                  "tap_action": {
+                    "action": "toggle"
+                  }
+                },
+                {
+                  "type": "custom:mushroom-template-card",
+                  "primary": "PC Bureau",
+                  "icon": "mdi:desktop-tower",
+                  "entity": "switch.pc_bureau",
+                  "icon_color": "{{ 'green' if states(entity) == 'on' else 'red' }}",
+                  "tap_action": {
+                    "action": "toggle"
+                  }
+                }
+              ]
+            },
+            {
+              "type": "thermostat",
+              "entity": "climate.salon",
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 4
+              }
+            },
+            {
+              "type": "thermostat",
+              "entity": "climate.chambres",
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 4
+              }
+            },
+            {
+              "type": "horizontal-stack",
+              "cards": [
+                {
+                  "type": "custom:mushroom-template-card",
+                  "primary": "Uptobox",
+                  "icon": "mdi:desktop-tower",
+                  "entity": "switch.uptobox",
+                  "icon_color": "{{ 'green' if states(entity) == 'on' else 'red' }}",
+                  "tap_action": {
+                    "action": "toggle"
+                  }
+                },
+                {
+                  "type": "custom:mushroom-template-card",
+                  "primary": "PC Bureau",
+                  "icon": "mdi:desktop-tower",
+                  "entity": "switch.pc_bureau",
+                  "icon_color": "{{ 'green' if is_state('switch.pc_bureau','on') else 'red' }}",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "script.turn_on",
+                    "target": {
+                      "entity_id": "script.pc_bureau_remote_toggle"
+                    }
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "cards": [
+        {
+          "show_state": true,
+          "show_name": true,
+          "camera_view": "auto",
+          "type": "picture-entity",
+          "entity": "camera.camera_exterieure_intelligente"
+        },
+        {
+          "type": "custom:aarlo-glance",
+          "entity": "camera.aarlo_porche",
+          "name": "Porche",
+          "show": [
+            "motion",
+            "sound",
+            "library",
+            "snapshot",
+            "battery level",
+            "signal_strength",
+            "capture_today",
+            "image_date"
+          ],
+          "top_title": true,
+          "top_status": true,
+          "top_date": true,
+          "image_click": "play"
+        },
+        {
+          "type": "custom:aarlo-glance",
+          "entity": "camera.aarlo_piscine",
+          "name": "Piscine",
+          "show": [
+            "motion",
+            "sound",
+            "library",
+            "snapshot",
+            "battery level",
+            "signal_strength",
+            "capture_today",
+            "image_date"
+          ],
+          "top_title": true,
+          "top_status": true,
+          "top_date": true,
+          "image_click": "play"
+        }
+      ]
+    }
+  ]
+}

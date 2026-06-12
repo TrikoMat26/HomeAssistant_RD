@@ -1,0 +1,120 @@
+rm_eclairage_exterieur:
+  sequence:
+  - service: remote.send_command
+    target:
+      entity_id: remote.rm_pro
+    data:
+      command: b64:sgDMABoMGhgNDRkZDRkNDBoZDA0ZDRkZDRkNGQwAAagNDBoMGRkNDBoZDQwaGQ0MGQ0ZGQ0NGRkNGQ0MGRkNDRkNGRkNGQwZDQABqAwNGQ0ZGQ0MGhkMDRkZDQ0ZDRkZDQwaGQ0YDQ0ZGQ0MGgwaGQwZDhgNAAGoDA0ZDBoZDQwZGgwNGRkNDBoMGhkMDRoYDRkNDRkZDQwaDBoZDBkNGQ0AAacNDBoMGhgODBkZDQwaGQ0MGgwaGA0NGRkNGQ0MGhgODBkNGRkNGQ0ZDQAF3AAAAAAAAAAAAAAAAA==
+rm_portail:
+  sequence:
+  - service: remote.send_command
+    target:
+      entity_id: remote.rm_pro
+    data:
+      command: b64:shEsABoOGhkODRsaDhoNDRoaDQ4aDRoaDg0bDRsAAagODRoOGhoODRoaDg0bGg0NAAAAAAAAAAAAAAAA
+pc_bureau_remote_turn_on:
+  alias: PC Bureau - Remote ON (écrans OFF + WOL)
+  sequence:
+  - service: switch.turn_off
+    target:
+      entity_id:
+      - switch.switch_1
+      - switch.switch_2
+  - delay: 00:00:01
+  - service: switch.turn_on
+    target:
+      entity_id: switch.pc_bureau
+pc_bureau_remote_turn_off:
+  alias: PC Bureau - Remote OFF (shutdown + écrans ON)
+  sequence:
+  - service: switch.turn_off
+    target:
+      entity_id: switch.pc_bureau
+  - wait_template: '{{ is_state(''switch.pc_bureau'', ''off'') }}'
+    timeout: 00:02:00
+    continue_on_timeout: true
+  - service: switch.turn_on
+    target:
+      entity_id:
+      - switch.switch_1
+      - switch.switch_2
+pc_bureau_remote_toggle:
+  alias: PC Bureau - Remote TOGGLE (ON/OFF automatique)
+  sequence:
+  - choose:
+    - conditions:
+      - condition: state
+        entity_id: switch.pc_bureau
+        state: 'on'
+      sequence:
+      - service: script.turn_on
+        target:
+          entity_id: script.pc_bureau_remote_turn_off
+    default:
+    - service: script.turn_on
+      target:
+        entity_id: script.pc_bureau_remote_turn_on
+lancer_minuterie_chauffe_eau_cuisine:
+  alias: Lancer minuterie Chauffe-eau cuisine (durée custom)
+  description: Lit input_number.duree_custom_chauffe_eau_cuisine (minutes) et démarre
+    le timer correspondant.
+  mode: restart
+  icon: mdi:timer-play-outline
+  sequence:
+  - variables:
+      minutes: '{{ states(''input_number.duree_custom_chauffe_eau_cuisine'') | int(0)
+        }}'
+  - target:
+      entity_id: timer.minuterie_chauffe_eau_cuisine
+    data:
+      duration: '{{ ''%02d:%02d:00'' % (minutes // 60, minutes % 60) }}'
+    action: timer.start
+lancer_minuterie_chauffe_eau_principal:
+  alias: Lancer minuterie Chauffe-eau principal (durée custom)
+  description: Lit input_number.duree_custom_chauffe_eau_principal (minutes) et démarre
+    le timer correspondant.
+  mode: restart
+  icon: mdi:timer-play-outline
+  sequence:
+  - variables:
+      minutes: '{{ states(''input_number.duree_custom_chauffe_eau_principal'') | int(0)
+        }}'
+  - target:
+      entity_id: timer.minuterie_chauffe_eau_principal
+    data:
+      duration: '{{ ''%02d:%02d:00'' % (minutes // 60, minutes % 60) }}'
+    action: timer.start
+lancer_minuterie_pompe_piscine:
+  alias: Lancer minuterie Pompe piscine (durée custom)
+  description: Lit input_number.duree_custom_pompe_piscine (minutes) et démarre le
+    timer correspondant.
+  mode: restart
+  icon: mdi:timer-play-outline
+  sequence:
+  - variables:
+      minutes: '{{ states(''input_number.duree_custom_pompe_piscine'') | int(0) }}'
+  - target:
+      entity_id: timer.minuterie_pompe_piscine
+    data:
+      duration: '{{ ''%02d:%02d:00'' % (minutes // 60, minutes % 60) }}'
+    action: timer.start
+cast_apercu_cuisine:
+  alias: Cast — Aperçu sur Cuisine Hub
+  icon: mdi:cast
+  mode: single
+  sequence:
+  - action: cast.show_lovelace_view
+    data:
+      entity_id: media_player.cuisine
+      dashboard_path: lovelace
+      view_path: '0'
+cast_energie_cuisine:
+  alias: Cast — Énergie sur Cuisine Hub
+  icon: mdi:cast
+  mode: single
+  sequence:
+  - action: cast.show_lovelace_view
+    data:
+      entity_id: media_player.cuisine
+      dashboard_path: energie-detail
+      view_path: '0'

@@ -1,0 +1,748 @@
+{
+  "views": [
+    {
+      "title": "Home",
+      "cards": [
+        {
+          "type": "grid",
+          "columns": 1,
+          "square": false,
+          "cards": [
+            {
+              "type": "tile",
+              "entity": "switch.chauffe_eau_cuisine",
+              "name": "Chauffe-eau cuisine",
+              "icon": "mdi:water-boiler",
+              "color": "orange",
+              "icon_tap_action": {
+                "action": "toggle"
+              },
+              "tap_action": {
+                "action": "navigate",
+                "navigation_path": "/lovelace/programmation_cuisine"
+              },
+              "hold_action": {
+                "action": "more-info"
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "switch.0x00124b0024c79699",
+              "name": "Chauffe-eau principal",
+              "icon": "mdi:water-boiler",
+              "color": "orange",
+              "icon_tap_action": {
+                "action": "toggle"
+              },
+              "tap_action": {
+                "action": "navigate",
+                "navigation_path": "/lovelace/programmation_principal"
+              },
+              "hold_action": {
+                "action": "more-info"
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "switch.pompe_piscine_zigbee",
+              "name": "Pompe piscine",
+              "icon": "mdi:pool",
+              "color": "blue",
+              "icon_tap_action": {
+                "action": "toggle"
+              },
+              "tap_action": {
+                "action": "navigate",
+                "navigation_path": "/lovelace/programmation_piscine"
+              },
+              "hold_action": {
+                "action": "more-info"
+              }
+            }
+          ]
+        },
+        {
+          "type": "custom:apexcharts-card",
+          "graph_span": "16h",
+          "span": {
+            "start": "day",
+            "offset": "+6h"
+          },
+          "header": {
+            "show": true,
+            "show_states": true
+          },
+          "yaxis": [
+            {
+              "min": 0
+            }
+          ],
+          "series": [
+            {
+              "entity": "sensor.total_solaire",
+              "name": "Solaire",
+              "type": "line",
+              "color": "orange",
+              "stroke_width": 2,
+              "extend_to": false
+            }
+          ]
+        },
+        {
+          "type": "custom:apexcharts-card",
+          "graph_span": "16h",
+          "span": {
+            "start": "day",
+            "offset": "+6h"
+          },
+          "header": {
+            "show": true,
+            "show_states": true
+          },
+          "yaxis": [
+            {
+              "min": -2000
+            }
+          ],
+          "apex_config": {
+            "annotations": {
+              "yaxis": [
+                {
+                  "y": 0,
+                  "borderColor": "#888888",
+                  "borderWidth": 1,
+                  "strokeDashArray": 0
+                }
+              ]
+            }
+          },
+          "series": [
+            {
+              "entity": "sensor.puissance_3ct",
+              "name": "consommation",
+              "type": "line",
+              "color": "orange",
+              "stroke_width": 2,
+              "extend_to": false
+            }
+          ]
+        },
+        {
+          "type": "vertical-stack",
+          "cards": [
+            {
+              "type": "markdown",
+              "content": "## ⚡ SolarFlow 800 Plus\n"
+            },
+            {
+              "type": "glance",
+              "show_name": true,
+              "show_icon": true,
+              "show_state": true,
+              "entities": [
+                {
+                  "entity": "sensor.solarflow_800_plus_electric_level",
+                  "name": "Batterie",
+                  "icon": "mdi:battery"
+                },
+                {
+                  "entity": "sensor.solarflow_800_plus_bat_in_out",
+                  "name": "Puissance",
+                  "icon": "mdi:lightning-bolt"
+                },
+                {
+                  "entity": "sensor.solarflow_800_plus_hyper_tmp",
+                  "name": "Temp. SolarFlow",
+                  "icon": "mdi:thermometer"
+                },
+                {
+                  "entity": "sensor.ab2000_06618_max_temp",
+                  "name": "Temp. Batterie",
+                  "icon": "mdi:thermometer"
+                }
+              ]
+            },
+            {
+              "type": "entities",
+              "title": "🔋 Charge (0–1000 W)",
+              "entities": [
+                {
+                  "entity": "input_select.solarflow_limite_charge",
+                  "name": "Limite charge",
+                  "icon": "mdi:battery-arrow-up"
+                }
+              ]
+            },
+            {
+              "type": "entities",
+              "title": "🔋 Décharge (0–800 W)",
+              "entities": [
+                {
+                  "entity": "input_select.solarflow_limite_decharge",
+                  "name": "Limite décharge",
+                  "icon": "mdi:battery-arrow-down"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "energy-date-selection"
+        },
+        {
+          "type": "custom:button-card",
+          "entity": "input_boolean.simulation_chauffe_eau_solaire",
+          "name": "Chauffe-eau solaire",
+          "show_state": true,
+          "show_label": true,
+          "icon": "mdi:water-boiler-off",
+          "label": "[[[\n  const prod = parseFloat(hass.states['sensor.total_solaire']?.state || 0);\n  const sigma = parseFloat(hass.states['sensor.solaire_stabilite_stats']?.state || 0);\n  const taux = hass.states['sensor.chauffe_eau_opportunite_stats']?.state;\n  const tauxStr = (taux && taux !== 'unknown' && taux !== 'unavailable') ? `fiab. ${parseFloat(taux).toFixed(0)}%` : 'fiab. --';\n  const motif = hass.states['binary_sensor.lancement_chauffe_eau_opportun']\n                ?.attributes?.motif_blocage || '';\n  return `${prod} W · σ=${sigma} W · ${tauxStr}\\n${motif}`;\n]]]\n",
+          "styles": {
+            "card": [
+              {
+                "background": "[[[\n  return entity.state === 'on'\n    ? 'linear-gradient(135deg, #f59e0b22, #10b98122)'\n    : 'linear-gradient(135deg, #64748b11, #94a3b811)';\n]]]\n"
+              },
+              {
+                "border": "[[[\n  return entity.state === 'on'\n    ? '2px solid #10b981' : '2px solid #94a3b8';\n]]]\n"
+              },
+              {
+                "border-radius": "16px"
+              },
+              {
+                "padding": "16px"
+              }
+            ],
+            "icon": [
+              {
+                "color": "[[[\n  return entity.state === 'on' ? '#f59e0b' : '#94a3b8';\n]]]\n"
+              },
+              {
+                "width": "48px"
+              }
+            ],
+            "name": [
+              {
+                "font-weight": "bold"
+              },
+              {
+                "font-size": "14px"
+              }
+            ],
+            "label": [
+              {
+                "font-size": "11px"
+              },
+              {
+                "white-space": "pre-line"
+              },
+              {
+                "color": "var(--secondary-text-color)"
+              }
+            ]
+          },
+          "state": [
+            {
+              "value": "on",
+              "icon": "mdi:water-boiler",
+              "name": "Chauffe-eau ✅ EN MARCHE"
+            },
+            {
+              "value": "off",
+              "icon": "mdi:water-boiler-off",
+              "name": "Chauffe-eau ⏸ EN VEILLE"
+            }
+          ]
+        },
+        {
+          "type": "horizontal-stack",
+          "cards": [
+            {
+              "type": "button",
+              "name": "Aperçu",
+              "icon": "mdi:cast",
+              "tap_action": {
+                "action": "call-service",
+                "service": "script.cast_apercu_cuisine"
+              }
+            },
+            {
+              "type": "button",
+              "name": "Énergie",
+              "icon": "mdi:cast",
+              "tap_action": {
+                "action": "call-service",
+                "service": "script.cast_energie_cuisine"
+              }
+            }
+          ],
+          "title": "📺 Envoyer sur Cuisine Hub"
+        }
+      ],
+      "badges": [
+        {
+          "type": "entity",
+          "show_name": false,
+          "show_state": true,
+          "show_icon": true,
+          "entity": "input_boolean.cycle_chauffes_eaux"
+        }
+      ]
+    },
+    {
+      "title": "Programmation Chauffe-eau cuisine",
+      "path": "programmation_cuisine",
+      "subview": true,
+      "icon": "mdi:calendar-clock",
+      "cards": [
+        {
+          "type": "tile",
+          "entity": "switch.chauffe_eau_cuisine",
+          "name": "Chauffe-eau cuisine",
+          "icon": "mdi:water-boiler",
+          "color": "orange",
+          "features": [
+            {
+              "type": "toggle"
+            }
+          ]
+        },
+        {
+          "type": "conditional",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity": "switch.chauffe_eau_cuisine",
+              "state": "on"
+            }
+          ],
+          "card": {
+            "type": "markdown",
+            "content": "{% set dt = now() - states.switch.chauffe_eau_cuisine.last_changed %}\n{% set h = (dt.seconds // 3600) | int %}\n{% set m = ((dt.seconds % 3600) // 60) | int %}\n{% if h > 0 %}🕐 Actif depuis **{{ h }}h {{ m }} min**{% else %}🕐 Actif depuis **{{ m }} min**{% endif %}\n\n{% set wh_now = states('sensor.chauffe_eau_cuisine') | float(0) %}\n{% set wh_start = states('input_number.chauffe_eau_cuisine_wh_debut_de_cycle') | float(0) %}\n{% set delta = [wh_now - wh_start, 0] | max | round(0) | int %}\n⚡ **{% if delta >= 1000 %}{{ (delta / 1000) | round(2) }} kWh{% else %}{{ delta }} Wh{% endif %}** consommés ce cycle"
+          }
+        },
+        {
+          "type": "custom:scheduler-card",
+          "include": [
+            "switch.chauffe_eau_cuisine"
+          ],
+          "title": "📅 Programmation hebdomadaire",
+          "show_header_toggle": false
+        },
+        {
+          "type": "markdown",
+          "content": "### ⏱ Minuterie\n\nÉtat : **{% if is_state('timer.minuterie_chauffe_eau_cuisine', 'active') %}🟢 En cours{% else %}⏸ Arrêtée{% endif %}**{% if state_attr('timer.minuterie_chauffe_eau_cuisine', 'finishes_at') %} — termine à **{{ as_timestamp(state_attr('timer.minuterie_chauffe_eau_cuisine', 'finishes_at')) | timestamp_custom('%H:%M:%S') }}**{% endif %}"
+        },
+        {
+          "type": "horizontal-stack",
+          "cards": [
+            {
+              "type": "button",
+              "show_icon": false,
+              "name": "15 min",
+              "tap_action": {
+                "action": "call-service",
+                "service": "timer.start",
+                "service_data": {
+                  "entity_id": "timer.minuterie_chauffe_eau_cuisine",
+                  "duration": "00:15:00"
+                }
+              }
+            },
+            {
+              "type": "button",
+              "show_icon": false,
+              "name": "30 min",
+              "tap_action": {
+                "action": "call-service",
+                "service": "timer.start",
+                "service_data": {
+                  "entity_id": "timer.minuterie_chauffe_eau_cuisine",
+                  "duration": "00:30:00"
+                }
+              }
+            },
+            {
+              "type": "button",
+              "show_icon": false,
+              "name": "1 h",
+              "tap_action": {
+                "action": "call-service",
+                "service": "timer.start",
+                "service_data": {
+                  "entity_id": "timer.minuterie_chauffe_eau_cuisine",
+                  "duration": "01:00:00"
+                }
+              }
+            },
+            {
+              "type": "button",
+              "show_icon": false,
+              "name": "2 h",
+              "tap_action": {
+                "action": "call-service",
+                "service": "timer.start",
+                "service_data": {
+                  "entity_id": "timer.minuterie_chauffe_eau_cuisine",
+                  "duration": "02:00:00"
+                }
+              }
+            },
+            {
+              "type": "button",
+              "show_icon": false,
+              "name": "4 h",
+              "tap_action": {
+                "action": "call-service",
+                "service": "timer.start",
+                "service_data": {
+                  "entity_id": "timer.minuterie_chauffe_eau_cuisine",
+                  "duration": "04:00:00"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "entities",
+          "title": "Durée custom",
+          "entities": [
+            {
+              "entity": "input_number.duree_custom_chauffe_eau_cuisine",
+              "name": "Durée"
+            }
+          ]
+        },
+        {
+          "type": "horizontal-stack",
+          "cards": [
+            {
+              "type": "button",
+              "name": "Lancer minuterie",
+              "icon": "mdi:play",
+              "tap_action": {
+                "action": "call-service",
+                "service": "script.lancer_minuterie_chauffe_eau_cuisine"
+              }
+            },
+            {
+              "type": "button",
+              "name": "Annuler",
+              "icon": "mdi:stop",
+              "tap_action": {
+                "action": "call-service",
+                "service": "timer.cancel",
+                "service_data": {
+                  "entity_id": "timer.minuterie_chauffe_eau_cuisine"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Programmation Chauffe-eau principal",
+      "path": "programmation_principal",
+      "subview": true,
+      "icon": "mdi:calendar-clock",
+      "cards": [
+        {
+          "type": "tile",
+          "entity": "switch.0x00124b0024c79699",
+          "name": "Chauffe-eau principal",
+          "icon": "mdi:water-boiler",
+          "color": "orange",
+          "features": [
+            {
+              "type": "toggle"
+            }
+          ]
+        },
+        {
+          "type": "conditional",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity": "switch.0x00124b0024c79699",
+              "state": "on"
+            }
+          ],
+          "card": {
+            "type": "markdown",
+            "content": "{% set dt = now() - states['switch.0x00124b0024c79699'].last_changed %}\n{% set h = (dt.seconds // 3600) | int %}\n{% set m = ((dt.seconds % 3600) // 60) | int %}\n{% if h > 0 %}🕐 Actif depuis **{{ h }}h {{ m }} min**{% else %}🕐 Actif depuis **{{ m }} min**{% endif %}\n\n{% set p = states('sensor.puissance_chauffe_eau_principal') | float(0) | round(0) | int %}\n{% set ts = states('input_number.chauffe_eau_principal_timestamp_debut_de_cycle') | float(0) %}\n{% set kwh = (3 * (now().timestamp() - ts) / 3600) | round(2) if ts > 0 else 0 %}\n⚡ **{{ p }} W** | **{{ kwh }} kWh** estimés ce cycle"
+          }
+        },
+        {
+          "type": "custom:scheduler-card",
+          "include": [
+            "switch.0x00124b0024c79699"
+          ],
+          "title": "📅 Programmation hebdomadaire",
+          "show_header_toggle": false
+        },
+        {
+          "type": "markdown",
+          "content": "### ⏱ Minuterie\n\nÉtat : **{% if is_state('timer.minuterie_chauffe_eau_principal', 'active') %}🟢 En cours{% else %}⏸ Arrêtée{% endif %}**{% if state_attr('timer.minuterie_chauffe_eau_principal', 'finishes_at') %} — termine à **{{ as_timestamp(state_attr('timer.minuterie_chauffe_eau_principal', 'finishes_at')) | timestamp_custom('%H:%M:%S') }}**{% endif %}"
+        },
+        {
+          "type": "horizontal-stack",
+          "cards": [
+            {
+              "type": "button",
+              "show_icon": false,
+              "name": "15 min",
+              "tap_action": {
+                "action": "call-service",
+                "service": "timer.start",
+                "service_data": {
+                  "entity_id": "timer.minuterie_chauffe_eau_principal",
+                  "duration": "00:15:00"
+                }
+              }
+            },
+            {
+              "type": "button",
+              "show_icon": false,
+              "name": "30 min",
+              "tap_action": {
+                "action": "call-service",
+                "service": "timer.start",
+                "service_data": {
+                  "entity_id": "timer.minuterie_chauffe_eau_principal",
+                  "duration": "00:30:00"
+                }
+              }
+            },
+            {
+              "type": "button",
+              "show_icon": false,
+              "name": "1 h",
+              "tap_action": {
+                "action": "call-service",
+                "service": "timer.start",
+                "service_data": {
+                  "entity_id": "timer.minuterie_chauffe_eau_principal",
+                  "duration": "01:00:00"
+                }
+              }
+            },
+            {
+              "type": "button",
+              "show_icon": false,
+              "name": "2 h",
+              "tap_action": {
+                "action": "call-service",
+                "service": "timer.start",
+                "service_data": {
+                  "entity_id": "timer.minuterie_chauffe_eau_principal",
+                  "duration": "02:00:00"
+                }
+              }
+            },
+            {
+              "type": "button",
+              "show_icon": false,
+              "name": "4 h",
+              "tap_action": {
+                "action": "call-service",
+                "service": "timer.start",
+                "service_data": {
+                  "entity_id": "timer.minuterie_chauffe_eau_principal",
+                  "duration": "04:00:00"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "entities",
+          "title": "Durée custom",
+          "entities": [
+            {
+              "entity": "input_number.duree_custom_chauffe_eau_principal",
+              "name": "Durée"
+            }
+          ]
+        },
+        {
+          "type": "horizontal-stack",
+          "cards": [
+            {
+              "type": "button",
+              "name": "Lancer minuterie",
+              "icon": "mdi:play",
+              "tap_action": {
+                "action": "call-service",
+                "service": "script.lancer_minuterie_chauffe_eau_principal"
+              }
+            },
+            {
+              "type": "button",
+              "name": "Annuler",
+              "icon": "mdi:stop",
+              "tap_action": {
+                "action": "call-service",
+                "service": "timer.cancel",
+                "service_data": {
+                  "entity_id": "timer.minuterie_chauffe_eau_principal"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Programmation Pompe piscine",
+      "path": "programmation_piscine",
+      "subview": true,
+      "icon": "mdi:calendar-clock",
+      "cards": [
+        {
+          "type": "tile",
+          "entity": "switch.pompe_piscine_zigbee",
+          "name": "Pompe piscine",
+          "icon": "mdi:pool",
+          "color": "blue",
+          "features": [
+            {
+              "type": "toggle"
+            }
+          ]
+        },
+        {
+          "type": "conditional",
+          "conditions": [
+            {
+              "condition": "state",
+              "entity": "switch.pompe_piscine_zigbee",
+              "state": "on"
+            }
+          ],
+          "card": {
+            "type": "markdown",
+            "content": "{% set dt = now() - states.switch.pompe_piscine_zigbee.last_changed %}\n{% set h = (dt.seconds // 3600) | int %}\n{% set m = ((dt.seconds % 3600) // 60) | int %}\n{% if h > 0 %}🕐 Active depuis **{{ h }}h {{ m }} min**{% else %}🕐 Active depuis **{{ m }} min**{% endif %}\n\n{% set p = states('sensor.pompe_piscine_ph3_3_1min') | float(0) | round(0) | int %}\n{% set kwh = (p * dt.seconds / 3600000) | round(3) %}\n⚡ **{{ p }} W** | **{{ kwh }} kWh** estimés ce cycle"
+          }
+        },
+        {
+          "type": "custom:scheduler-card",
+          "include": [
+            "switch.pompe_piscine_zigbee"
+          ],
+          "title": "📅 Programmation hebdomadaire",
+          "show_header_toggle": false
+        },
+        {
+          "type": "markdown",
+          "content": "### ⏱ Minuterie\n\nÉtat : **{% if is_state('timer.minuterie_pompe_piscine', 'active') %}🟢 En cours{% else %}⏸ Arrêtée{% endif %}**{% if state_attr('timer.minuterie_pompe_piscine', 'finishes_at') %} — termine à **{{ as_timestamp(state_attr('timer.minuterie_pompe_piscine', 'finishes_at')) | timestamp_custom('%H:%M:%S') }}**{% endif %}"
+        },
+        {
+          "type": "horizontal-stack",
+          "cards": [
+            {
+              "type": "button",
+              "show_icon": false,
+              "name": "15 min",
+              "tap_action": {
+                "action": "call-service",
+                "service": "timer.start",
+                "service_data": {
+                  "entity_id": "timer.minuterie_pompe_piscine",
+                  "duration": "00:15:00"
+                }
+              }
+            },
+            {
+              "type": "button",
+              "show_icon": false,
+              "name": "30 min",
+              "tap_action": {
+                "action": "call-service",
+                "service": "timer.start",
+                "service_data": {
+                  "entity_id": "timer.minuterie_pompe_piscine",
+                  "duration": "00:30:00"
+                }
+              }
+            },
+            {
+              "type": "button",
+              "show_icon": false,
+              "name": "1 h",
+              "tap_action": {
+                "action": "call-service",
+                "service": "timer.start",
+                "service_data": {
+                  "entity_id": "timer.minuterie_pompe_piscine",
+                  "duration": "01:00:00"
+                }
+              }
+            },
+            {
+              "type": "button",
+              "show_icon": false,
+              "name": "2 h",
+              "tap_action": {
+                "action": "call-service",
+                "service": "timer.start",
+                "service_data": {
+                  "entity_id": "timer.minuterie_pompe_piscine",
+                  "duration": "02:00:00"
+                }
+              }
+            },
+            {
+              "type": "button",
+              "show_icon": false,
+              "name": "4 h",
+              "tap_action": {
+                "action": "call-service",
+                "service": "timer.start",
+                "service_data": {
+                  "entity_id": "timer.minuterie_pompe_piscine",
+                  "duration": "04:00:00"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "type": "entities",
+          "title": "Durée custom",
+          "entities": [
+            {
+              "entity": "input_number.duree_custom_pompe_piscine",
+              "name": "Durée"
+            }
+          ]
+        },
+        {
+          "type": "horizontal-stack",
+          "cards": [
+            {
+              "type": "button",
+              "name": "Lancer minuterie",
+              "icon": "mdi:play",
+              "tap_action": {
+                "action": "call-service",
+                "service": "script.lancer_minuterie_pompe_piscine"
+              }
+            },
+            {
+              "type": "button",
+              "name": "Annuler",
+              "icon": "mdi:stop",
+              "tap_action": {
+                "action": "call-service",
+                "service": "timer.cancel",
+                "service_data": {
+                  "entity_id": "timer.minuterie_pompe_piscine"
+                }
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

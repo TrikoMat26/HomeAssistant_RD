@@ -1,0 +1,35 @@
+{
+  "strategy": {
+    "type": "original-states",
+    "areas": {
+      "hidden": [
+        "atelier",
+        "hall_atelier",
+        "hall_cine",
+        "hall_sous_sol",
+        "salle_cine",
+        "salle_de_bain",
+        "toilette",
+        "tv"
+      ],
+      "order": [
+        "energie",
+        "salon",
+        "bureau",
+        "chambre",
+        "chambre_arthur",
+        "chambre_des_jumeaux",
+        "chambres",
+        "cuisine",
+        "exterieur",
+        "hall_cuisine",
+        "hall_d_entree",
+        "hall_de_chambres",
+        "lustre_table",
+        "maison",
+        "porte_d_entree",
+        "salle_a_manger"
+      ]
+    }
+  }
+}

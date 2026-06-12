@@ -1,0 +1,90 @@
+{
+  "views": [
+    {
+      "title": "CAMERAS",
+      "cards": [
+        {
+          "type": "picture-entity",
+          "entity": "camera.camera_exterieure_intelligente"
+        },
+        {
+          "type": "custom:aarlo-glance",
+          "entity": "camera.aarlo_porche",
+          "name": "Porche",
+          "show": [
+            "motion",
+            "sound",
+            "library",
+            "snapshot",
+            "battery level",
+            "signal_strength",
+            "capture_today",
+            "image_date"
+          ],
+          "top_title": true,
+          "top_status": true,
+          "top_date": true,
+          "image_click": "play"
+        },
+        {
+          "type": "custom:aarlo-glance",
+          "entity": "camera.aarlo_piscine",
+          "name": "Piscine",
+          "show": [
+            "motion",
+            "sound",
+            "library",
+            "snapshot",
+            "battery level",
+            "signal_strength",
+            "capture_today",
+            "image_date"
+          ],
+          "top_title": true,
+          "top_status": true,
+          "top_date": true,
+          "image_click": "play"
+        },
+        {
+          "type": "custom:aarlo-glance",
+          "entity": "camera.aarlo_atelier",
+          "name": "Atelier",
+          "show": [
+            "motion",
+            "sound",
+            "library",
+            "snapshot",
+            "battery level",
+            "signal_strength",
+            "capture_today",
+            "image_date"
+          ],
+          "top_title": true,
+          "top_status": true,
+          "top_date": true,
+          "image_click": "play"
+        },
+        {
+          "type": "custom:aarlo-glance",
+          "entity": "camera.aarlo_pompe_piscine",
+          "name": "Pompe Piscine",
+          "show": [
+            "motion",
+            "sound",
+            "library",
+            "snapshot",
+            "battery level",
+            "signal_strength",
+            "capture_today",
+            "image_date"
+          ],
+          "top_title": true,
+          "top_status": true,
+          "top_date": true,
+          "image_click": "play"
+        }
+      ]
+    }
+  ],
+  "title": "CAMERAS"
+}
