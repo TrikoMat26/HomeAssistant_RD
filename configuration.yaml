@@ -187,12 +187,12 @@ template:
         state: >-
           {% set p = state_attr('sensor.edf_tempo_prices', 'hc_bleu') is not none %}
           {% if p %}
-            {% set hc_bleu = states('sensor.solarflow_discharge_by_tariff_hc_bleu') | float(0) * state_attr('sensor.edf_tempo_prices', 'hc_bleu') %}
-            {% set hp_bleu = states('sensor.solarflow_discharge_by_tariff_hp_bleu') | float(0) * state_attr('sensor.edf_tempo_prices', 'hp_bleu') %}
-            {% set hc_blanc = states('sensor.solarflow_discharge_by_tariff_hc_blanc') | float(0) * state_attr('sensor.edf_tempo_prices', 'hc_blanc') %}
-            {% set hp_blanc = states('sensor.solarflow_discharge_by_tariff_hp_blanc') | float(0) * state_attr('sensor.edf_tempo_prices', 'hp_blanc') %}
-            {% set hc_rouge = states('sensor.solarflow_discharge_by_tariff_hc_rouge') | float(0) * state_attr('sensor.edf_tempo_prices', 'hc_rouge') %}
-            {% set hp_rouge = states('sensor.solarflow_discharge_by_tariff_hp_rouge') | float(0) * state_attr('sensor.edf_tempo_prices', 'hp_rouge') %}
+            {% set hc_bleu = states('sensor.solarflow_discharge_by_tariff_hc_bleu') | float(0) * (state_attr('sensor.edf_tempo_prices', 'hc_bleu') | float(0)) %}
+            {% set hp_bleu = states('sensor.solarflow_discharge_by_tariff_hp_bleu') | float(0) * (state_attr('sensor.edf_tempo_prices', 'hp_bleu') | float(0)) %}
+            {% set hc_blanc = states('sensor.solarflow_discharge_by_tariff_hc_blanc') | float(0) * (state_attr('sensor.edf_tempo_prices', 'hc_blanc') | float(0)) %}
+            {% set hp_blanc = states('sensor.solarflow_discharge_by_tariff_hp_blanc') | float(0) * (state_attr('sensor.edf_tempo_prices', 'hp_blanc') | float(0)) %}
+            {% set hc_rouge = states('sensor.solarflow_discharge_by_tariff_hc_rouge') | float(0) * (state_attr('sensor.edf_tempo_prices', 'hc_rouge') | float(0)) %}
+            {% set hp_rouge = states('sensor.solarflow_discharge_by_tariff_hp_rouge') | float(0) * (state_attr('sensor.edf_tempo_prices', 'hp_rouge') | float(0)) %}
             {{ (hc_bleu + hp_bleu + hc_blanc + hp_blanc + hc_rouge + hp_rouge) | round(2) }}
           {% else %}
             0.0
@@ -219,18 +219,18 @@ utility_meter:
       - hc_rouge
       - hp_rouge
   solarflow_discharge_cost_saved_daily:
-    source: sensor.solarflow_discharge_cost_saved_total
+    source: sensor.economies_solarflow_total
     name: "Économies SolarFlow Jour"
     cycle: daily
   solarflow_discharge_cost_saved_weekly:
-    source: sensor.solarflow_discharge_cost_saved_total
+    source: sensor.economies_solarflow_total
     name: "Économies SolarFlow Semaine"
     cycle: weekly
   solarflow_discharge_cost_saved_monthly:
-    source: sensor.solarflow_discharge_cost_saved_total
+    source: sensor.economies_solarflow_total
     name: "Économies SolarFlow Mois"
     cycle: monthly
   solarflow_discharge_cost_saved_yearly:
-    source: sensor.solarflow_discharge_cost_saved_total
+    source: sensor.economies_solarflow_total
     name: "Économies SolarFlow Année"
     cycle: yearly
