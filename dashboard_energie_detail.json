@@ -29,28 +29,41 @@
                 {
                   "type": "entity",
                   "children": [
-                    "sensor.beauvallon_totalusage_1min"
+                    "sensor.beauvallon_totalusage_1min",
+                    "sensor.solarflow_800_plus_output_pack_power"
                   ],
                   "entity_id": "sensor.smart_switch_2312075875450151080948e1e9e5a5e0_power",
-                  "name": "UpWatt_14K",
+                  "name": "Power_1400W",
                   "color": "rgb(255,255,0)"
                 },
                 {
                   "type": "entity",
-                  "entity_id": "sensor.smart_switch_2312070251113551080948e1e9e5b52f_power",
                   "children": [
-                    "sensor.beauvallon_totalusage_1min"
+                    "sensor.beauvallon_totalusage_1min",
+                    "sensor.solarflow_800_plus_output_pack_power"
                   ],
-                  "name": "Beem",
-                  "color": "Rgb(150,255,51)"
+                  "entity_id": "sensor.smart_switch_2312074614100551080148e1e9e52089_power",
+                  "name": "Power_800W",
+                  "color": "rgb(155,128,210)"
                 },
                 {
                   "type": "entity",
-                  "entity_id": "sensor.smart_switch_2312074614100551080148e1e9e52089_power",
+                  "children": [
+                    "sensor.beauvallon_totalusage_1min",
+                    "sensor.solarflow_800_plus_output_pack_power"
+                  ],
+                  "entity_id": "sensor.smart_switch_2312070251113551080948e1e9e5b52f_power",
+                  "name": "Power_300W",
+                  "color": "rgb(150,255,51)"
+                },
+                {
+                  "type": "entity",
                   "children": [
                     "sensor.beauvallon_totalusage_1min"
                   ],
-                  "color": "rgb(155,128,210)"
+                  "entity_id": "sensor.solarflow_800_plus_pack_input_power",
+                  "name": "Batterie (Décharge)",
+                  "color": "rgb(0,191,255)"
                 }
               ]
             },
@@ -189,6 +202,13 @@
                   "entity_id": "sensor.surpresseur_ph2_5_1min",
                   "name": "Atelier Ph3"
                 },
+                {
+                  "type": "entity",
+                  "entity_id": "sensor.solarflow_800_plus_output_pack_power",
+                  "name": "Batterie (Charge)",
+                  "color": "rgb(50,205,50)",
+                  "children": []
+                },
                 "sensor.prise_tv_power"
               ]
             },
@@ -266,6 +286,39 @@
           "apex_config": {
             "chart": {
               "height": "400px"
+            }
+          }
+        },
+        {
+          "type": "custom:apexcharts-card",
+          "graph_span": "10d",
+          "span": {
+            "end": "day"
+          },
+          "header": {
+            "show": true,
+            "title": "Énergie solaire exportée (10 derniers jours)",
+            "show_states": true,
+            "colorize_states": true
+          },
+          "series": [
+            {
+              "entity": "sensor.beauvallon_mainstogrid_1d",
+              "type": "column",
+              "name": "Perdu",
+              "color": "#f59e0b",
+              "group_by": {
+                "func": "max",
+                "duration": "1d"
+              },
+              "show": {
+                "datalabels": true
+              }
+            }
+          ],
+          "apex_config": {
+            "chart": {
+              "height": "250px"
             }
           }
         }

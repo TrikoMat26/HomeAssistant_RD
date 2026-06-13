@@ -755,6 +755,12 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 
 ## 9. Changelog
 
+### 2026-06-13 v13
+
+- 🛠 **Correction du Dashboard Énergie** : Prise en compte du retrait de `sensor.beauvallon_mainstogrid_1d` de l'export réseau de la connexion `@Bleu_HC` afin que les calculs de coût de grille se basent sur les imports réels uniquement.
+- 🆕 **Dashboard 2.Energie Détail — Graphique d'export** : Remplacement de la simple carte historique de l'export par un graphique à colonnes (`custom:apexcharts-card`) sur les 10 derniers jours avec affichage direct des valeurs quotidiennes en kWh via `datalabels`.
+- 🛠 **Dashboard 2.Energie Détail — Sankey Chart** : Réorganisation complète de la première carte pour aligner toutes les sources (EDF, Power_1400W, Power_800W, Power_300W et Batterie Décharge) dans la même colonne de gauche (première section). Le flux de charge de la batterie (`sensor.solarflow_800_plus_output_pack_power`) a été branché comme récepteur direct du surplus des trois kits solaires uniquement (bypassant la consommation générale et le réseau grid).
+
 ### 2026-06-13 v12
 
 - 🆕 **Écrêteur thermique SolarFlow 800+ (Charge & Décharge)** : Mise en place d'une régulation automatique et progressive des puissances maximales de charge et de décharge en fonction de la température de l'appareil (`sensor.solarflow_800_plus_hyper_tmp`).
