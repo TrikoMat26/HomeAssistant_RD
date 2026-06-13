@@ -38,8 +38,10 @@ Ces entités représentent les configurations matérielles écrites directement 
 | Entity ID | État | Nom | Description / Utilité |
 | --- | --- | --- | --- |
 | `select.solarflow_800_plus_ac_mode` | `output` | SolarFlow 800 Plus Mode de fonctionnement AC | Bascule le mode de fonctionnement physique du convertisseur AC : `"input"` (la batterie absorbe l'énergie du secteur/HMS) ou `"output"` (la batterie injecte vers la maison). Géré automatiquement par vos automatisations de synchronisation. |
-| `number.solarflow_800_plus_input_limit` | `0.0` | SolarFlow 800 Plus Limite d'entrée | Consigne physique de la puissance maximale de charge autorisée (en W, de 0 à 1000 W). |
-| `number.solarflow_800_plus_output_limit` | `800.0` | SolarFlow 800 Plus Limite de sortie | Consigne physique de la puissance maximale injectée vers le micro-onduleur (en W, de 0 à 800 W). |
+| `number.solarflow_800_plus_input_limit` | `0.0` | SolarFlow 800 Plus Limite d'entrée | Consigne physique transitoire de la puissance maximale de charge (facilement écrasée par le HEMS). |
+| `number.solarflow_800_plus_output_limit` | `800.0` | SolarFlow 800 Plus Limite de sortie | Consigne physique transitoire de la puissance maximale de décharge (facilement écrasée par le HEMS). |
+| `number.solarflow_800_plus_charge_max_limit` | `1000.0` | SolarFlow 800 Plus chargeMaxLimit | Plafond matériel de la puissance maximale de charge (0-1200 W) — utilisé pour contourner le HEMS lors de l'écrêtage thermique. |
+| `number.solarflow_800_plus_inverse_max_power` | `800.0` | SolarFlow 800 Plus inverseMaxPower | Plafond matériel de la puissance maximale de décharge (0-1200 W) — utilisé pour contourner le HEMS lors de l'écrêtage thermique. |
 | `number.solarflow_800_plus_min_soc` | `20.0` | SolarFlow 800 Plus SOC minimum | Seuil de décharge minimum (%) en dessous duquel la décharge se coupe pour protéger la batterie d'une décharge profonde. |
 | `number.solarflow_800_plus_soc_set` | `80.0` | SolarFlow 800 Plus SOC maximum | Seuil de charge maximum (%) à partir duquel la charge s'arrête (utile pour prolonger la durée de vie des cellules lithium). |
 | `select.solarflow_800_plus_connection` | `cloud` | SolarFlow 800 Plus Mode de connexion | Permet de choisir le canal de communication privilégié (`cloud` via serveurs Zendure ou `local` MQTT). |
@@ -106,8 +108,6 @@ Ces capteurs sont principalement destinés au débogage, à la surveillance rés
 | `sensor.solarflow_800_plus_ac_status` | `0` | SolarFlow 800 Plus acStatus | Code d'état de l'étage de conversion alternative (AC). |
 | `sensor.solarflow_800_plus_grid_state` | `1` | SolarFlow 800 Plus gridState | Statut de synchronisation avec la fréquence du réseau électrique. |
 | `sensor.solarflow_800_plus_grid_standard` | `1` | SolarFlow 800 Plus gridStandard | Norme réseau enregistrée (ex: DIN VDE 0126, EN 50549). |
-| `sensor.solarflow_800_plus_inverse_max_power` | `800` | SolarFlow 800 Plus Puissance limite de sortie AC | Limite physique maximale absolue supportée pour l'injection (800 W). |
-| `sensor.solarflow_800_plus_charge_max_limit` | `1000` | SolarFlow 800 Plus chargeMaxLimit | Puissance physique maximale absolue supportée pour la charge (1000 W). |
 | `sensor.solarflow_800_plus_smart_mode` | `0` | SolarFlow 800 Plus smartMode | Flag de statut pour le mode de puissance dynamique. |
 | `sensor.solarflow_800_plus_phase_switch` | `1` | SolarFlow 800 Plus phaseSwitch | Indique la configuration de phase sélectionnée pour le chargeur/onduleur. |
 | `sensor.solarflow_800_plus_volt_wakeup` | `0` | SolarFlow 800 Plus VoltWakeup | Indicateur lié au réveil automatique par tension solaire. |

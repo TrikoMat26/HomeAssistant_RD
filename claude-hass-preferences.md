@@ -389,8 +389,10 @@ Deux familles d'entités coexistent : `opendtu_4c9028_*` (gateway OpenDTU) et `h
 | Puissance batterie | `sensor.solarflow_800_plus_bat_in_out` | sensor | W — négatif = charge, positif = décharge |
 | Température | `sensor.solarflow_800_plus_hyper_tmp` | sensor | °C |
 | Mode AC | `select.solarflow_800_plus_ac_mode` | select | "Mode entrée AC" / "Mode sortie AC" — **piloté automatiquement** (ne pas toucher manuellement) |
-| Limite d'entrée (charge) | `number.solarflow_800_plus_input_limit` | number | 0–1000 W — **piloté via `input_select.solarflow_limite_charge`** |
-| Limite de sortie (décharge) | `number.solarflow_800_plus_output_limit` | number | 0–800 W — **piloté via `input_select.solarflow_limite_decharge`** |
+| Limite d'entrée (charge) | `number.solarflow_800_plus_input_limit` | number | 0–1000 W — Consigne transitoire (écrasée par HEMS Cloud). |
+| Limite de sortie (décharge) | `number.solarflow_800_plus_output_limit` | number | 0–800 W — Consigne transitoire (écrasée par HEMS Cloud). |
+| Limite physique de charge | `number.solarflow_800_plus_charge_max_limit` | number | Plafond matériel de charge (0–1200 W). Utilisé pour l'écrêtage thermique. |
+| Limite physique de décharge | `number.solarflow_800_plus_inverse_max_power` | number | Plafond matériel de décharge (0–1200 W). Utilisé pour l'écrêtage thermique. |
 
 ### 2quater.3 Helpers de contrôle (interface utilisateur)
 
@@ -399,17 +401,17 @@ Deux familles d'entités coexistent : `opendtu_4c9028_*` (gateway OpenDTU) et `h
 | Limite charge | `input_select.solarflow_limite_charge` | 0 W … 1000 W (pas 100 W) | Dropdown charge — source de vérité UI |
 | Limite décharge | `input_select.solarflow_limite_decharge` | 0 W … 800 W (pas 100 W) | Dropdown décharge — source de vérité UI |
 
-**Ne jamais écrire directement sur `number.solarflow_800_plus_input_limit` / `output_limit`** depuis le dashboard — passer toujours par les `input_select`.
+**Ne jamais écrire directement sur `number.solarflow_800_plus_charge_max_limit` / `inverse_max_power`** depuis le dashboard — passer toujours par les `input_select`.
 
 ### 2quater.4 Automations de contrôle
 
 | Automation | entity_id | config_hash | Logique |
 |---|---|---|---|
-| Sync limite charge | `automation.solarflow_sync_limite_charge` | `14a5ba6b496d0021` | Select charge → `input_limit` bridé par température. Si > 0 : mode `"input"` + décharge forcée à 0 W |
-| Sync limite décharge | `automation.solarflow_sync_limite_decharge` | `d043b4286e7248a6` | Select décharge → `output_limit` bridé par température. Si > 0 : mode `"output"` + charge forcée à 0 W |
+| Sync limite charge | `automation.solarflow_sync_limite_charge` | `14a5ba6b496d0021` | Select charge → `charge_max_limit` bridé par température. Si > 0 : mode `"input"` + décharge forcée à 0 W |
+| Sync limite décharge | `automation.solarflow_sync_limite_decharge` | `d043b4286e7248a6` | Select décharge → `inverse_max_power` bridé par température. Si > 0 : mode `"output"` + charge forcée à 0 W |
 | Alerte température | `automation.solarflow_alerte_temperature_elevee` | — | > 45 °C pendant 2 min → notif persistante. Dismiss auto < 42 °C (hystérésis 3 °C) |
-| Écrêteur temp. (charge) | `automation.solarflow_ecreteur_temperature_batterie` | `1779624839201` | Régule la limite de charge max (700W/300W/100W) selon la température (47/49/51 °C). Notif + Hystérésis 5 min. |
-| Écrêteur temp. (décharge) | `automation.solarflow_ecreteur_temperature_batterie_decharge` | `1779624839202` | Régule la limite de décharge max (600W/300W/100W) selon la température (47/49/51 °C). Notif + Hystérésis 5 min. |
+| Écrêteur temp. (charge) | `automation.solarflow_ecreteur_temperature_batterie` | `1779624839201` | Régule le plafond `charge_max_limit` (700W/300W/100W) selon la température (47/49/51 °C). Notif + Hystérésis 5 min. |
+| Écrêteur temp. (décharge) | `automation.solarflow_ecreteur_temperature_batterie_decharge` | `1779624839202` | Régule le plafond `inverse_max_power` (600W/300W/100W) selon la température (47/49/51 °C). Notif + Hystérésis 5 min. |
 
 **⚠️ Valeurs du `select.solarflow_800_plus_ac_mode`** : l'intégration Zendure utilise `"input"` et `"output"` (pas de labels français). Si les commandes du dashboard cessent de fonctionner après une mise à jour HACS, vérifier en premier que ces valeurs n'ont pas changé :
 ```
@@ -770,6 +772,12 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 ---
 
 ## 9. Changelog
+
+### 2026-06-13 v14
+
+- 🛠 **Correction de l'Écrêtage Thermique SolarFlow** : Exposition de `inverseMaxPower` (plafond de décharge) et `chargeMaxLimit` (plafond de charge) comme entités `ZendureNumber` éditables pour contourner la réécriture continue du HEMS Cloud.
+- 🛠 **Mises à jour des Automations** : Mise à jour de `automation.solarflow_sync_limite_charge`, `automation.solarflow_sync_limite_decharge`, `automation.solarflow_ecreteur_temperature_batterie` et `automation.solarflow_ecreteur_temperature_batterie_decharge` pour cibler ces nouvelles entités `number` au lieu des consignes transitoires (`input_limit` / `output_limit`).
+- 🆕 **Amélioration du Skill Home Assistant** : Ajout du subcommand `call-service` à `ha_tool.py` permettant d'appeler des services à chaud avec des payloads JSON depuis la ligne de commande.
 
 ### 2026-06-13 v13
 

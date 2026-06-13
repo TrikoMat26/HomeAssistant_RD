@@ -1566,7 +1566,7 @@
         {{ [valeur_charge, limite_thermique] | min }}
   - action: number.set_value
     target:
-      entity_id: number.solarflow_800_plus_input_limit
+      entity_id: number.solarflow_800_plus_charge_max_limit
     data:
       value: '{{ valeur_finale }}'
   - choose:
@@ -1612,7 +1612,7 @@
         {{ [valeur_decharge, limite_thermique] | min }}
   - action: number.set_value
     target:
-      entity_id: number.solarflow_800_plus_output_limit
+      entity_id: number.solarflow_800_plus_inverse_max_power
     data:
       value: '{{ valeur_finale }}'
   - choose:
@@ -1734,7 +1734,7 @@
     # Appliquer la consigne sur la batterie
     - action: number.set_value
       target:
-        entity_id: number.solarflow_800_plus_input_limit
+        entity_id: number.solarflow_800_plus_charge_max_limit
       data:
         value: "{{ consigne_finale }}"
     # Gestion des notifications persistantes
@@ -1810,7 +1810,7 @@
     # Appliquer la consigne sur la batterie
     - action: number.set_value
       target:
-        entity_id: number.solarflow_800_plus_output_limit
+        entity_id: number.solarflow_800_plus_inverse_max_power
       data:
         value: "{{ consigne_finale }}"
     # Gestion des notifications persistantes
