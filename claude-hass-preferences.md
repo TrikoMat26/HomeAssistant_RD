@@ -439,6 +439,22 @@ Le bloc "Mode de fonctionnement" a été supprimé — le mode est géré automa
 - **Décharge automatique au coucher du soleil** : quand production < 100 W + SOC > 20% → décharge select à une valeur configurable (récupère le soir ce qui a été stocké le jour).
 - **Coordination écrêteur HMS** : voir §2ter.7.
 
+### 2quater.7 Suivi de rentabilité (Tempo)
+
+- **Capteur de prix** : `sensor.edf_tempo_prices` stocke les tarifs EDF Tempo dans ses attributs (évite les répétitions et centralise la configuration) :
+  - `hc_bleu` = 0.1325 €, `hp_bleu` = 0.1612 €
+  - `hc_blanc` = 0.1499 €, `hp_blanc` = 0.1871 €
+  - `hc_rouge` = 0.1575 €, `hp_rouge` = 0.7060 €
+- **Ventilation de la décharge** : `utility_meter.solarflow_discharge_by_tariff` (source `sensor.solarflow_800_plus_aggr_discharge`) répartit la décharge de la batterie dans 6 sous-registres.
+- **Synchronisation du tarif** : `automation.solarflow_synchronisation_tarif_decharge` écoute les variations du tarif Tempo (`sensor.leexi_current_price`) et bascule le tarif du compteur de décharge.
+- **Économies totales** : `sensor.solarflow_discharge_cost_saved_total` fait la somme pondérée par tarif des kWh déchargés pour calculer l'économie totale en €.
+- **Cumuls temporels** : 4 utility meters dérivés suivent la rentabilité sur différentes périodes :
+  - Jour : `sensor.solarflow_discharge_cost_saved_daily`
+  - Semaine : `sensor.solarflow_discharge_cost_saved_weekly`
+  - Mois : `sensor.solarflow_discharge_cost_saved_monthly`
+  - Année : `sensor.solarflow_discharge_cost_saved_yearly`
+- **Dashboard** : affichage dans le dashboard "Énergie détail" (`lovelace.energie-detail`) avec une carte verticale principale (total économisé) et une grille à 4 colonnes pour le Jour, Semaine, Mois, Année.
+
 ---
 
 ## 3. Automations clés
@@ -448,7 +464,7 @@ Les automations HA se répartissent en familles :
 - **Solaire/chauffe-eau** : §2.4 et §2.6
 - **Emporia** : §2bis.4
 - **HMS-1600 écrêteur** : §2ter.5 (`automation.hms_1600_ecreteur_1100w_anti_surtension` — alias "800W anti-surtension")
-- **SolarFlow contrôle** : §2quater.4 (`automation.solarflow_sync_limite_charge`, `automation.solarflow_sync_limite_decharge`, `automation.solarflow_alerte_temperature_elevee`)
+- **SolarFlow contrôle** : §2quater.4 et §2quater.7 (`automation.solarflow_sync_limite_charge`, `automation.solarflow_sync_limite_decharge`, `automation.solarflow_alerte_temperature_elevee`, `automation.solarflow_synchronisation_tarif_decharge`)
 - **Santé système (auto-heal)** : §3.bis (🔧 Auto-heal Tado)
 - **Programmation/Minuterie switches Aperçu** : §3.ter
 - **Cast Nest Hub Cuisine** : §3quater (`script.cast_apercu_cuisine`, `script.cast_energie_cuisine`)
@@ -774,6 +790,14 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 
 - 🛠 **Refonte écrêteur HMS-1600 (Option A)** : Mise en place d'une remontée progressive par paliers de 10 min (800 W ➔ 1000 W ➔ 1200 W ➔ 1600 W) avec maintien sécurisé par mode `restart`. Ajout de la réinitialisation automatique à 1600 W au démarrage de HA si la tension est normale. Config_hash : `9ee97c47804acd63`.
 - 🆕 **Dashboard Aperçu** : Ajout d'une carte d'état dynamique de l'écrêteur (grille à 2 colonnes avec le Chauffe-eau solaire). Affiche en temps réel le statut (surveillance vs actif), la tension réseau, la production, et permet d'activer/désactiver le bridage en un clic.
+
+### 2026-06-13 v11
+
+- 🆕 **Suivi de rentabilité SolarFlow (Tempo)** :
+  - Centralisation des tarifs EDF Tempo via `sensor.edf_tempo_prices` (HC/HP Bleu, Blanc, Rouge).
+  - Ventilation de la décharge batterie par tarif via `utility_meter.solarflow_discharge_by_tariff` synchronisé via `automation.solarflow_synchronisation_tarif_decharge`.
+  - Calcul et cumul des économies financières en € via `sensor.solarflow_discharge_cost_saved_total` et ses compteurs d'utilité Jour, Semaine, Mois, Année.
+  - Déploiement d'une carte d'affichage dans le dashboard "Énergie détail" (`lovelace.energie-detail`) avec Mushroom Cards.
 
 ### 2026-05-28 v10
 

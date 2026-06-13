@@ -168,6 +168,35 @@ template:
           {% set prod = states('sensor.beem_quotidien') | float(0) + states('sensor.beemnquotidien') | float(0) %}
           {% set export = states('sensor.beauvallon_mainstogrid_1d') | float(0) %}
           {{ [prod - export, 0] | max | round(2) }}
+      - name: "EDF Tempo Prices"
+        unique_id: edf_tempo_prices
+        state: "active"
+        attributes:
+          hc_bleu: 0.1325
+          hp_bleu: 0.1612
+          hc_blanc: 0.1499
+          hp_blanc: 0.1871
+          hc_rouge: 0.1575
+          hp_rouge: 0.7060
+      - name: "Économies SolarFlow Total"
+        unique_id: solarflow_discharge_cost_saved_total
+        unit_of_measurement: "EUR"
+        device_class: monetary
+        state_class: total_increasing
+        icon: mdi:piggy-bank
+        state: >-
+          {% set p = state_attr('sensor.edf_tempo_prices', 'hc_bleu') is not none %}
+          {% if p %}
+            {% set hc_bleu = states('sensor.solarflow_discharge_by_tariff_hc_bleu') | float(0) * state_attr('sensor.edf_tempo_prices', 'hc_bleu') %}
+            {% set hp_bleu = states('sensor.solarflow_discharge_by_tariff_hp_bleu') | float(0) * state_attr('sensor.edf_tempo_prices', 'hp_bleu') %}
+            {% set hc_blanc = states('sensor.solarflow_discharge_by_tariff_hc_blanc') | float(0) * state_attr('sensor.edf_tempo_prices', 'hc_blanc') %}
+            {% set hp_blanc = states('sensor.solarflow_discharge_by_tariff_hp_blanc') | float(0) * state_attr('sensor.edf_tempo_prices', 'hp_blanc') %}
+            {% set hc_rouge = states('sensor.solarflow_discharge_by_tariff_hc_rouge') | float(0) * state_attr('sensor.edf_tempo_prices', 'hc_rouge') %}
+            {% set hp_rouge = states('sensor.solarflow_discharge_by_tariff_hp_rouge') | float(0) * state_attr('sensor.edf_tempo_prices', 'hp_rouge') %}
+            {{ (hc_bleu + hp_bleu + hc_blanc + hp_blanc + hc_rouge + hp_rouge) | round(2) }}
+          {% else %}
+            0.0
+          {% endif %}
 shell_command:
   export_solaire_csv: "/bin/bash /config/scripts/export_solaire.sh"
   upload_solaire_gdrive: "/bin/bash /config/scripts/upload_gdrive.sh"
@@ -177,3 +206,31 @@ shell_command:
   emporia_fetch_to_drive: >-
     python3 /config/python_scripts/emporia/fetch_emporia_to_drive.py
     >> /config/python_scripts/emporia/logs/shell_fetch.log 2>&1
+
+utility_meter:
+  solarflow_discharge_by_tariff:
+    source: sensor.solarflow_800_plus_aggr_discharge
+    name: "SolarFlow Décharge par Tarif"
+    tariffs:
+      - hc_bleu
+      - hp_bleu
+      - hc_blanc
+      - hp_blanc
+      - hc_rouge
+      - hp_rouge
+  solarflow_discharge_cost_saved_daily:
+    source: sensor.solarflow_discharge_cost_saved_total
+    name: "Économies SolarFlow Jour"
+    cycle: daily
+  solarflow_discharge_cost_saved_weekly:
+    source: sensor.solarflow_discharge_cost_saved_total
+    name: "Économies SolarFlow Semaine"
+    cycle: weekly
+  solarflow_discharge_cost_saved_monthly:
+    source: sensor.solarflow_discharge_cost_saved_total
+    name: "Économies SolarFlow Mois"
+    cycle: monthly
+  solarflow_discharge_cost_saved_yearly:
+    source: sensor.solarflow_discharge_cost_saved_total
+    name: "Économies SolarFlow Année"
+    cycle: yearly

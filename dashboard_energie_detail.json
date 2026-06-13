@@ -4,6 +4,58 @@
       "title": "Home",
       "cards": [
         {
+          "type": "vertical-stack",
+          "cards": [
+            {
+              "type": "custom:mushroom-template-card",
+              "primary": "Rentabilité SolarFlow",
+              "secondary": "Total économisé : {{ states('sensor.solarflow_discharge_cost_saved_total') }} €",
+              "icon": "mdi:battery-arrow-down",
+              "icon_color": "amber",
+              "layout": "horizontal"
+            },
+            {
+              "type": "grid",
+              "columns": 4,
+              "square": false,
+              "cards": [
+                {
+                  "type": "custom:mushroom-template-card",
+                  "primary": "Jour",
+                  "secondary": "{{ states('sensor.solarflow_discharge_cost_saved_daily') }} €",
+                  "icon": "mdi:piggy-bank",
+                  "icon_color": "green",
+                  "layout": "vertical"
+                },
+                {
+                  "type": "custom:mushroom-template-card",
+                  "primary": "Semaine",
+                  "secondary": "{{ states('sensor.solarflow_discharge_cost_saved_weekly') }} €",
+                  "icon": "mdi:calendar-week",
+                  "icon_color": "blue",
+                  "layout": "vertical"
+                },
+                {
+                  "type": "custom:mushroom-template-card",
+                  "primary": "Mois",
+                  "secondary": "{{ states('sensor.solarflow_discharge_cost_saved_monthly') }} €",
+                  "icon": "mdi:calendar-month",
+                  "icon_color": "indigo",
+                  "layout": "vertical"
+                },
+                {
+                  "type": "custom:mushroom-template-card",
+                  "primary": "Année",
+                  "secondary": "{{ states('sensor.solarflow_discharge_cost_saved_yearly') }} €",
+                  "icon": "mdi:calendar-range",
+                  "icon_color": "purple",
+                  "layout": "vertical"
+                }
+              ]
+            }
+          ]
+        },
+        {
           "height": 640,
           "unit_prefix": "",
           "round": 0,

@@ -1835,3 +1835,28 @@
             - action: persistent_notification.dismiss
               data:
                 notification_id: solarflow_ecretage_temp_decharge
+- id: '1778194112300'
+  alias: "🔋 SolarFlow — Synchronisation Tarif Décharge"
+  description: "Bascule le tarif actif du compteur de décharge SolarFlow en fonction du tarif EDF Tempo actuel."
+  triggers:
+    - platform: state
+      entity_id: sensor.leexi_current_price
+  conditions:
+    - condition: template
+      value_template: "{{ states('sensor.leexi_current_price') in ['HC BLEU', 'HP BLEU', 'HC BLANC', 'HP BLANC', 'HC ROUGE', 'HP ROUGE'] }}"
+  actions:
+    - action: select.select_option
+      target:
+        entity_id: select.solarflow_discharge_by_tariff
+      data:
+        option: >-
+          {% set mapping = {
+            'HC BLEU': 'hc_bleu',
+            'HP BLEU': 'hp_bleu',
+            'HC BLANC': 'hc_blanc',
+            'HP BLANC': 'hp_blanc',
+            'HC ROUGE': 'hc_rouge',
+            'HP ROUGE': 'hp_rouge'
+          } %}
+          {{ mapping.get(states('sensor.leexi_current_price'), 'hp_bleu') }}
+  mode: single
