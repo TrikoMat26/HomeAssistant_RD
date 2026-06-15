@@ -1719,7 +1719,6 @@
   actions:
     - variables:
         temp: "{{ states('sensor.solarflow_800_plus_hyper_tmp') | float(0) }}"
-        consigne_user: "{{ states('input_select.solarflow_limite_charge') | replace(' W', '') | int(0) }}"
         limite_thermique: >-
           {% if temp >= 51 %}
             100
@@ -1730,13 +1729,12 @@
           {% else %}
             1000
           {% endif %}
-        consigne_finale: "{{ [consigne_user, limite_thermique] | min }}"
     # Appliquer la consigne sur la batterie
     - action: number.set_value
       target:
         entity_id: number.solarflow_800_plus_charge_max_limit
       data:
-        value: "{{ consigne_finale }}"
+        value: "{{ limite_thermique }}"
     # Gestion des notifications persistantes
     - choose:
         # Cas où le bridage est théoriquement actif
@@ -1749,7 +1747,7 @@
                 title: "🌡️ SolarFlow — Écrêtage thermique actif"
                 message: >-
                   Température SolarFlow à {{ temp | round(1) }} °C.
-                  Charge bridée à {{ limite_thermique }} W maximum (Consigne utilisateur : {{ consigne_user }} W, Appliquée : {{ consigne_finale }} W).
+                  Charge bridée à {{ limite_thermique }} W maximum.
                 notification_id: solarflow_ecretage_temp
         # Cas normal
         - conditions:
@@ -1795,7 +1793,6 @@
   actions:
     - variables:
         temp: "{{ states('sensor.solarflow_800_plus_hyper_tmp') | float(0) }}"
-        consigne_user: "{{ states('input_select.solarflow_limite_decharge') | replace(' W', '') | int(0) }}"
         limite_thermique: >-
           {% if temp >= 51 %}
             100
@@ -1806,13 +1803,12 @@
           {% else %}
             800
           {% endif %}
-        consigne_finale: "{{ [consigne_user, limite_thermique] | min }}"
     # Appliquer la consigne sur la batterie
     - action: number.set_value
       target:
         entity_id: number.solarflow_800_plus_inverse_max_power
       data:
-        value: "{{ consigne_finale }}"
+        value: "{{ limite_thermique }}"
     # Gestion des notifications persistantes
     - choose:
         # Cas où le bridage est théoriquement actif
@@ -1825,7 +1821,7 @@
                 title: "🌡️ SolarFlow — Écrêtage thermique décharge actif"
                 message: >-
                   Température SolarFlow à {{ temp | round(1) }} °C.
-                  Décharge bridée à {{ limite_thermique }} W maximum (Consigne utilisateur : {{ consigne_user }} W, Appliquée : {{ consigne_finale }} W).
+                  Décharge bridée à {{ limite_thermique }} W maximum.
                 notification_id: solarflow_ecretage_temp_decharge
         # Cas normal
         - conditions:

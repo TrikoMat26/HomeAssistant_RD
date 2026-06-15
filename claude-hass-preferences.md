@@ -773,6 +773,10 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 
 ## 9. Changelog
 
+### 2026-06-16 v15
+
+- 🛠 **Découplage Consigne Utilisateur / Écrêteurs Thermiques SolarFlow** : Modification de `automation.solarflow_ecreteur_temperature_batterie` et `automation.solarflow_ecreteur_temperature_batterie_decharge` pour qu'elles appliquent strictement les limites physiques absolues (`charge_max_limit` et `inverse_max_power`) basées sur la température, sans faire de calcul de minimum avec les consignes des `input_select` utilisateur. Cela empêche le verrouillage à 0 W causé par l'exclusion mutuelle des modes charge et décharge.
+
 ### 2026-06-13 v14
 
 - 🛠 **Correction de l'Écrêtage Thermique SolarFlow** : Exposition de `inverseMaxPower` (plafond de décharge) et `chargeMaxLimit` (plafond de charge) comme entités `ZendureNumber` éditables pour contourner la réécriture continue du HEMS Cloud.
