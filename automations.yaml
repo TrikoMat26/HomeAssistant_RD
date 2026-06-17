@@ -1542,7 +1542,8 @@
   max_exceeded: silent
 - id: '1779174125486'
   alias: SolarFlow — Sync limite charge
-  description: 'Sync charge → Zendure en appliquant le bridage thermique si nécessaire.'
+  description: 'Sync charge → consigne transitoire Zendure (input_limit). Les plafonds
+    de sécurité (charge_max_limit) sont gérés exclusivement par l''écrêteur thermique.'
   triggers:
   - platform: state
     entity_id: input_select.solarflow_limite_charge
@@ -1550,25 +1551,11 @@
   - variables:
       valeur_charge: >-
         {{ states('input_select.solarflow_limite_charge') | replace(' W', '') | int(0) }}
-      temp: >-
-        {{ states('sensor.solarflow_800_plus_hyper_tmp') | float(0) }}
-      limite_thermique: >-
-        {% if temp >= 51 %}
-          100
-        {% elif temp >= 49 %}
-          300
-        {% elif temp >= 47 %}
-          700
-        {% else %}
-          1000
-        {% endif %}
-      valeur_finale: >-
-        {{ [valeur_charge, limite_thermique] | min }}
   - action: number.set_value
     target:
-      entity_id: number.solarflow_800_plus_charge_max_limit
+      entity_id: number.solarflow_800_plus_input_limit
     data:
-      value: '{{ valeur_finale }}'
+      value: '{{ valeur_charge }}'
   - choose:
     - conditions:
       - condition: template
@@ -1588,7 +1575,8 @@
   max_exceeded: silent
 - id: '1779174130202'
   alias: SolarFlow — Sync limite décharge
-  description: 'Sync décharge → Zendure en appliquant le bridage thermique si nécessaire.'
+  description: 'Sync décharge → consigne transitoire Zendure (output_limit). Les plafonds
+    de sécurité (inverse_max_power) sont gérés exclusivement par l''écrêteur thermique.'
   triggers:
   - platform: state
     entity_id: input_select.solarflow_limite_decharge
@@ -1596,25 +1584,11 @@
   - variables:
       valeur_decharge: >-
         {{ states('input_select.solarflow_limite_decharge') | replace(' W', '') | int(0) }}
-      temp: >-
-        {{ states('sensor.solarflow_800_plus_hyper_tmp') | float(0) }}
-      limite_thermique: >-
-        {% if temp >= 51 %}
-          100
-        {% elif temp >= 49 %}
-          300
-        {% elif temp >= 47 %}
-          600
-        {% else %}
-          800
-        {% endif %}
-      valeur_finale: >-
-        {{ [valeur_decharge, limite_thermique] | min }}
   - action: number.set_value
     target:
-      entity_id: number.solarflow_800_plus_inverse_max_power
+      entity_id: number.solarflow_800_plus_output_limit
     data:
-      value: '{{ valeur_finale }}'
+      value: '{{ valeur_decharge }}'
   - choose:
     - conditions:
       - condition: template

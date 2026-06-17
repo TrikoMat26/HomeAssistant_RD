@@ -407,11 +407,14 @@ Deux familles d'entités coexistent : `opendtu_4c9028_*` (gateway OpenDTU) et `h
 
 | Automation | entity_id | config_hash | Logique |
 |---|---|---|---|
-| Sync limite charge | `automation.solarflow_sync_limite_charge` | `14a5ba6b496d0021` | Select charge → `charge_max_limit` bridé par température. Si > 0 : mode `"input"` + décharge forcée à 0 W |
-| Sync limite décharge | `automation.solarflow_sync_limite_decharge` | `d043b4286e7248a6` | Select décharge → `inverse_max_power` bridé par température. Si > 0 : mode `"output"` + charge forcée à 0 W |
+| Sync limite charge | `automation.solarflow_sync_limite_charge` | — | Select charge → `input_limit` (consigne transitoire). Si > 0 : mode `"input"` + décharge forcée à 0 W. **Ne touche plus aux plafonds de sécurité.** |
+| Sync limite décharge | `automation.solarflow_sync_limite_decharge` | — | Select décharge → `output_limit` (consigne transitoire). Si > 0 : mode `"output"` + charge forcée à 0 W. **Ne touche plus aux plafonds de sécurité.** |
 | Alerte température | `automation.solarflow_alerte_temperature_elevee` | — | > 45 °C pendant 2 min → notif persistante. Dismiss auto < 42 °C (hystérésis 3 °C) |
-| Écrêteur temp. (charge) | `automation.solarflow_ecreteur_temperature_batterie` | `1779624839201` | Régule le plafond `charge_max_limit` (700W/300W/100W) selon la température (47/49/51 °C). Notif + Hystérésis 5 min. |
-| Écrêteur temp. (décharge) | `automation.solarflow_ecreteur_temperature_batterie_decharge` | `1779624839202` | Régule le plafond `inverse_max_power` (600W/300W/100W) selon la température (47/49/51 °C). Notif + Hystérésis 5 min. |
+| Écrêteur temp. (charge) | `automation.solarflow_ecreteur_temperature_batterie` | `1779624839201` | Régule **exclusivement** le plafond `charge_max_limit` (700W/300W/100W) selon la température (47/49/51 °C). Notif + Hystérésis 5 min. |
+| Écrêteur temp. (décharge) | `automation.solarflow_ecreteur_temperature_batterie_decharge` | `1779624839202` | Régule **exclusivement** le plafond `inverse_max_power` (600W/300W/100W) selon la température (47/49/51 °C). Notif + Hystérésis 5 min. |
+
+> [!IMPORTANT]
+> **Séparation des responsabilités critique** : Les sync écrivent sur les consignes transitoires (`input_limit`/`output_limit`), les écrêteurs thermiques écrivent **uniquement** sur les plafonds matériels (`charge_max_limit`/`inverse_max_power`). Ne jamais mélanger ces deux niveaux sous peine de verrouillage à 0 W.
 
 **⚠️ Valeurs du `select.solarflow_800_plus_ac_mode`** : l'intégration Zendure utilise `"input"` et `"output"` (pas de labels français). Si les commandes du dashboard cessent de fonctionner après une mise à jour HACS, vérifier en premier que ces valeurs n'ont pas changé :
 ```
@@ -772,6 +775,10 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 ---
 
 ## 9. Changelog
+
+### 2026-06-17 v16
+
+- 🐛 **Fix critique : verrouillage 0 W des plafonds SolarFlow** : Les automations `Sync limite charge` et `Sync limite décharge` écrasaient les plafonds matériels (`charge_max_limit` / `inverse_max_power`) à 0 W via `min(consigne_user, limite_thermique)` quand l'exclusion mutuelle mettait les `input_select` à 0 W. Correction : les sync écrivent désormais sur les consignes transitoires (`input_limit` / `output_limit`) uniquement. Les plafonds de sécurité sont gérés **exclusivement** par les écrêteurs thermiques.
 
 ### 2026-06-16 v15
 
