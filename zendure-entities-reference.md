@@ -2,6 +2,8 @@
 
 Ce document répertorie toutes les entités liées à votre batterie Zendure SolarFlow 800 Plus et au Zendure Manager disponibles dans Home Assistant. Chaque entité est accompagnée d'une description détaillée de son utilité.
 
+> Dernière mise à jour : 2026-06-17 — 8 nouvelles entités ajoutées suite à la mise à jour firmware.
+
 ---
 
 ## 🎛️ 1. Contrôles de l'Interface Utilisateur (Helpers & Automations)
@@ -70,6 +72,10 @@ Ces capteurs remontent les flux d'énergie et les états physiques de l'installa
 | `sensor.solarflow_800_plus_remaining_time` | `0` | SolarFlow 800 Plus Temps de restant | Temps restant estimé (en minutes) avant que la batterie ne soit vide (en décharge) ou pleine (en charge). |
 | `sensor.solarflow_800_plus_available_kwh` | `0.0` | SolarFlow 800 Plus Énergie disponible | Quantité d'énergie stockée réellement exploitable (en kWh), calculée selon le SOC actuel et la capacité totale. |
 | `sensor.solarflow_800_plus_total_kwh` | `1.92` | SolarFlow 800 Plus Total Battery Capacity | Capacité énergétique nominale totale de la batterie connectée (1.92 kWh pour un pack AB2000). |
+| `sensor.solarflow_800_plus_soc_status` | `0` | SolarFlow 800 Plus État du SOC | Code d'état du suivi du State of Charge. `0` = normal. *(Ajouté par firmware récent)* |
+| `sensor.solarflow_800_plus_soc_limit` | `0` | SolarFlow 800 Plus SoC Limit State | Code d'état de la limitation SOC, indique si les seuils min/max SOC sont actuellement actifs et limitent le flux. `0` = pas de limitation active. *(Ajouté par firmware récent)* |
+| `sensor.solarflow_800_plus_pass` | `0` | SolarFlow 800 Plus Dérivation (bypass) | Indique si le mode bypass/dérivation solaire est actif (`0` = inactif). Quand actif, le flux solaire contourne la batterie pour alimenter directement la sortie. *(Ajouté par firmware récent)* |
+| `sensor.solarflow_800_plus_data_ready` | `1` | SolarFlow 800 Plus dataReady | Flag indiquant que les données de l'appareil sont complètement chargées après connexion. `1` = prêt, `0` = en cours de synchronisation. *(Ajouté par firmware récent)* |
 | `binary_sensor.solarflow_800_plus_heat_state` | `off` | SolarFlow 800 Plus chauffage de batterie | Indique si le film chauffant interne de la batterie est actif (utile en hiver pour permettre la charge lorsque la température ambiante est inférieure à 0 °C). |
 | `binary_sensor.solarflow_800_plus_hems_state` | `on` | SolarFlow 800 Plus HEMS Active | Indique si le système de gestion d'énergie HEMS Zendure est actif. |
 | `binary_sensor.solarflow_800_plus_reverse_state` | `off` | SolarFlow 800 Plus Reverse Flow State | Indique s'il y a un retour anormal de courant détecté (flux inverse). |
@@ -116,4 +122,8 @@ Ces capteurs sont principalement destinés au débogage, à la surveillance rés
 | `sensor.solarflow_800_plus_otastate` | `0` | SolarFlow 800 Plus OTAState | Statut de téléchargement ou d'installation d'une mise à jour de firmware. |
 | `sensor.solarflow_800_plus_lcnstate` | `0` | SolarFlow 800 Plus LCNState | État de la boucle de contrôle locale (Local Control Network). |
 | `sensor.solarflow_800_plus_write_rsp` | `0` | SolarFlow 800 Plus writeRsp | Code de réponse de la dernière écriture MQTT (sert à confirmer la bonne réception d'une consigne). |
+| `sensor.solarflow_800_plus_bat_cal_time` | `60` | SolarFlow 800 Plus batCalTime | Timer de calibration de la batterie (en minutes). Indique le temps restant ou l'intervalle entre les cycles de calibration SOC. *(Ajouté par firmware récent)* |
+| `sensor.solarflow_800_plus_soc_comp_switch` | `0` | SolarFlow 800 Plus socCompSwitch | Flag de compensation SOC. `0` = désactivé. Quand activé, l'appareil applique une correction de dérive sur le pourcentage de batterie affiché. *(Ajouté par firmware récent)* |
+| `sensor.solarflow_800_plus_local_apienable` | `True` | SolarFlow 800 Plus localAPIEnable | Indique si l'API locale (zenSDK / MQTT local) est activée sur l'appareil. `True` = contrôle local possible. *(Ajouté par firmware récent)* |
+| `sensor.solarflow_800_plus_net` | `0` | SolarFlow 800 Plus net | Puissance nette mesurée par l'appareil (en W). Peut refléter le bilan net entre production, consommation et flux batterie. *(Ajouté par firmware récent)* |
 | `update.zendure_home_assistant_integration_update` | `off` | Zendure Home Assistant Integration Update | Indique si une nouvelle version de l'intégration HACS de FireSon est disponible au téléchargement. |
