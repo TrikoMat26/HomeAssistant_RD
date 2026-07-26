@@ -776,6 +776,13 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 
 ## 9. Changelog
 
+### 2026-07-26 v17
+
+- 🛠 **Correction et réalignement de l'Écrêtage Thermique SolarFlow 800+** :
+  - **Mise à jour des entités cibles** : Adaptation des automatisations d'écrêtage thermique (`automation.solarflow_ecreteur_temperature_batterie` et `automation.solarflow_ecreteur_temperature_batterie_decharge`) pour cibler `number.solarflow_800_plus_input_limit` (charge) et `number.solarflow_800_plus_output_limit` (décharge), suite au passage des entités `charge_max_limit` et `inverse_max_power` en capteurs en lecture seule (`sensor.*`).
+  - **Calcul dynamique des consignes** : Application de la formule `min(valeur_user, limite_thermique)` (lorsque `valeur_user > 0`) pour respecter les préférences du dashboard sans verrouiller la charge/décharge à 0 W.
+  - **Audit complet des entités SolarFlow** : Validation que 100% des entités SolarFlow utilisées dans les automatisations de Home Assistant sont actives et opérationnelles.
+
 ### 2026-06-17 v16
 
 - 🐛 **Fix critique : verrouillage 0 W des plafonds SolarFlow** : Les automations `Sync limite charge` et `Sync limite décharge` écrasaient les plafonds matériels (`charge_max_limit` / `inverse_max_power`) à 0 W via `min(consigne_user, limite_thermique)` quand l'exclusion mutuelle mettait les `input_select` à 0 W. Correction : les sync écrivent désormais sur les consignes transitoires (`input_limit` / `output_limit`) uniquement. Les plafonds de sécurité sont gérés **exclusivement** par les écrêteurs thermiques.

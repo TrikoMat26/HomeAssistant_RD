@@ -1542,8 +1542,7 @@
   max_exceeded: silent
 - id: '1779174125486'
   alias: SolarFlow — Sync limite charge
-  description: 'Sync charge → consigne transitoire Zendure (input_limit). Les plafonds
-    de sécurité (charge_max_limit) sont gérés exclusivement par l''écrêteur thermique.'
+  description: 'Sync charge → consigne transitoire Zendure (input_limit).'
   triggers:
   - platform: state
     entity_id: input_select.solarflow_limite_charge
@@ -1575,8 +1574,7 @@
   max_exceeded: silent
 - id: '1779174130202'
   alias: SolarFlow — Sync limite décharge
-  description: 'Sync décharge → consigne transitoire Zendure (output_limit). Les plafonds
-    de sécurité (inverse_max_power) sont gérés exclusivement par l''écrêteur thermique.'
+  description: 'Sync décharge → consigne transitoire Zendure (output_limit).'
   triggers:
   - platform: state
     entity_id: input_select.solarflow_limite_decharge
@@ -1659,7 +1657,7 @@
   mode: single
 - id: '1779624839201'
   alias: "SolarFlow — Écrêteur température batterie"
-  description: "Régule la limite de charge en fonction de la température de l'appareil (sensor.solarflow_800_plus_hyper_tmp) pour éviter la surchauffe. Hystérésis temporelle de 5 min en descente."
+  description: "Régule la limite de charge (input_limit) en fonction de la température de l'appareil (sensor.solarflow_800_plus_hyper_tmp) pour éviter la surchauffe. Hystérésis temporelle de 5 min en descente."
   mode: restart
   triggers:
     - platform: homeassistant
@@ -1693,6 +1691,7 @@
   actions:
     - variables:
         temp: "{{ states('sensor.solarflow_800_plus_hyper_tmp') | float(0) }}"
+        valeur_user: "{{ states('input_select.solarflow_limite_charge') | replace(' W', '') | int(0) }}"
         limite_thermique: >-
           {% if temp >= 51 %}
             100
@@ -1703,12 +1702,13 @@
           {% else %}
             1000
           {% endif %}
+        valeur_effective: "{{ [valeur_user, limite_thermique] | min if valeur_user > 0 else 0 }}"
     # Appliquer la consigne sur la batterie
     - action: number.set_value
       target:
-        entity_id: number.solarflow_800_plus_charge_max_limit
+        entity_id: number.solarflow_800_plus_input_limit
       data:
-        value: "{{ limite_thermique }}"
+        value: "{{ valeur_effective }}"
     # Gestion des notifications persistantes
     - choose:
         # Cas où le bridage est théoriquement actif
@@ -1733,7 +1733,7 @@
                 notification_id: solarflow_ecretage_temp
 - id: '1779624839202'
   alias: "SolarFlow — Écrêteur température batterie décharge"
-  description: "Régule la limite de décharge en fonction de la température de l'appareil (sensor.solarflow_800_plus_hyper_tmp) pour éviter la surchauffe. Hystérésis temporelle de 5 min en descente."
+  description: "Régule la limite de décharge (output_limit) en fonction de la température de l'appareil (sensor.solarflow_800_plus_hyper_tmp) pour éviter la surchauffe. Hystérésis temporelle de 5 min en descente."
   mode: restart
   triggers:
     - platform: homeassistant
@@ -1767,6 +1767,7 @@
   actions:
     - variables:
         temp: "{{ states('sensor.solarflow_800_plus_hyper_tmp') | float(0) }}"
+        valeur_user: "{{ states('input_select.solarflow_limite_decharge') | replace(' W', '') | int(0) }}"
         limite_thermique: >-
           {% if temp >= 51 %}
             100
@@ -1777,12 +1778,13 @@
           {% else %}
             800
           {% endif %}
+        valeur_effective: "{{ [valeur_user, limite_thermique] | min if valeur_user > 0 else 0 }}"
     # Appliquer la consigne sur la batterie
     - action: number.set_value
       target:
-        entity_id: number.solarflow_800_plus_inverse_max_power
+        entity_id: number.solarflow_800_plus_output_limit
       data:
-        value: "{{ limite_thermique }}"
+        value: "{{ valeur_effective }}"
     # Gestion des notifications persistantes
     - choose:
         # Cas où le bridage est théoriquement actif

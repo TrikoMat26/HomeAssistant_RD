@@ -2,7 +2,7 @@
 
 Ce document répertorie toutes les entités liées à votre batterie Zendure SolarFlow 800 Plus et au Zendure Manager disponibles dans Home Assistant. Chaque entité est accompagnée d'une description détaillée de son utilité.
 
-> Dernière mise à jour : 2026-06-17 — 8 nouvelles entités ajoutées suite à la mise à jour firmware.
+> Dernière mise à jour : 2026-07-26 — Réalignement des entités suite au passage de chargeMaxLimit et inverseMaxPower en capteurs en lecture seule (sensor.*).
 
 ---
 
@@ -40,10 +40,10 @@ Ces entités représentent les configurations matérielles écrites directement 
 | Entity ID | État | Nom | Description / Utilité |
 | --- | --- | --- | --- |
 | `select.solarflow_800_plus_ac_mode` | `output` | SolarFlow 800 Plus Mode de fonctionnement AC | Bascule le mode de fonctionnement physique du convertisseur AC : `"input"` (la batterie absorbe l'énergie du secteur/HMS) ou `"output"` (la batterie injecte vers la maison). Géré automatiquement par vos automatisations de synchronisation. |
-| `number.solarflow_800_plus_input_limit` | `0.0` | SolarFlow 800 Plus Limite d'entrée | Consigne physique transitoire de la puissance maximale de charge (facilement écrasée par le HEMS). |
-| `number.solarflow_800_plus_output_limit` | `800.0` | SolarFlow 800 Plus Limite de sortie | Consigne physique transitoire de la puissance maximale de décharge (facilement écrasée par le HEMS). |
-| `number.solarflow_800_plus_charge_max_limit` | `1000.0` | SolarFlow 800 Plus chargeMaxLimit | Plafond matériel de la puissance maximale de charge (0-1200 W) — utilisé pour contourner le HEMS lors de l'écrêtage thermique. |
-| `number.solarflow_800_plus_inverse_max_power` | `800.0` | SolarFlow 800 Plus inverseMaxPower | Plafond matériel de la puissance maximale de décharge (0-1200 W) — utilisé pour contourner le HEMS lors de l'écrêtage thermique. |
+| `number.solarflow_800_plus_input_limit` | `0.0` | SolarFlow 800 Plus Limite d'entrée | Consigne physique de la puissance maximale de charge (utilisée pour l'écrêtage thermique et le contrôle du débit d'entrée). |
+| `number.solarflow_800_plus_output_limit` | `800.0` | SolarFlow 800 Plus Limite de sortie | Consigne physique de la puissance maximale de décharge (utilisée pour l'écrêtage thermique et le contrôle du débit de sortie). |
+| `sensor.solarflow_800_plus_charge_max_limit` | `1000.0` | SolarFlow 800 Plus chargeMaxLimit | Capteur d'état du plafond matériel maximal de charge (0-1200 W) remonté par le firmware Zendure. |
+| `sensor.solarflow_800_plus_inverse_max_power` | `800.0` | SolarFlow 800 Plus inverseMaxPower | Capteur d'état du plafond matériel maximal de décharge (0-1200 W) remonté par le firmware Zendure. |
 | `number.solarflow_800_plus_min_soc` | `20.0` | SolarFlow 800 Plus SOC minimum | Seuil de décharge minimum (%) en dessous duquel la décharge se coupe pour protéger la batterie d'une décharge profonde. |
 | `number.solarflow_800_plus_soc_set` | `80.0` | SolarFlow 800 Plus SOC maximum | Seuil de charge maximum (%) à partir duquel la charge s'arrête (utile pour prolonger la durée de vie des cellules lithium). |
 | `select.solarflow_800_plus_connection` | `cloud` | SolarFlow 800 Plus Mode de connexion | Permet de choisir le canal de communication privilégié (`cloud` via serveurs Zendure ou `local` MQTT). |
