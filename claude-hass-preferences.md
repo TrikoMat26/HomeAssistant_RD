@@ -616,6 +616,7 @@ Foobot, Statistics, Wake-on-LAN, KEF. *(Bloc `aarlo:` commenté.)*
 
 | Problème | Résolution | Date |
 |---|---|---|
+| Interrupteurs Zigbee (chauffe-eau cuisine, principal, pompe piscine) indisponibles (`unavailable` avec point d'exclamation) | Déconnexion Zigbee2MQTT suite au redémarrage de Mosquitto Broker (`ENOTFOUND core-mosquitto`). Fix : Redémarrer l'add-on **Zigbee2MQTT** (Paramètres ➔ Modules complémentaires ➔ Zigbee2MQTT ➔ Redémarrer) + rafraîchir IHM (`Ctrl+F5`). | 2026-08-01 |
 | Templates helpers `puissance_edf`, `puissance_phase1/2/3` cassaient sur `unknown`/`unavailable` | Fix `\|float` → `\|float(0)` dans les 4 helpers via `ha_config_set_helper`. Entry IDs dans §5.3. | 2026-05-22 |
 | Harmony Hub 3 (192.168.1.42) — 1804+ erreurs OSError 113 | Intégration désactivée via MCP (`ha_set_integration_enabled`). | 2026-05-22 |
 | Pronote — 3 intégrations en erreur (`NoneType...`) | 3 intégrations désactivées via MCP (Arthur, Mathieu, Raphaël). | 2026-05-22 |
@@ -628,6 +629,7 @@ Foobot, Statistics, Wake-on-LAN, KEF. *(Bloc `aarlo:` commenté.)*
 
 ### 5.3 Rappels utiles
 
+- **Points d'exclamation sur les chauffe-eau / pompe piscine (Zigbee2MQTT)** : si Mosquitto Broker redémarre ou est mis à jour, Zigbee2MQTT perd la connexion (`ENOTFOUND core-mosquitto`). Procédure : Redémarrer l'add-on **Zigbee2MQTT** (Paramètres ➔ Modules complémentaires ➔ Zigbee2MQTT ➔ Redémarrer) puis forcer le rafraîchissement de l'UI (`Ctrl+F5` ou glisser vers le bas sur App mobile).
 - **Tado en erreur manuellement** : `ha_call_service("homeassistant", "reload_config_entry", data={"entry_id": "01KR406D3HNSDFXENFP3TKN9AX"})`.
 - **Tado OAuth en boucle d'échec** : delete config entry + re-add depuis l'UI.
 - **Arlo Cloudflare 429** : `ssh hass "rm /config/.aarlo/session.pickle"` + redémarrer HA.
@@ -847,6 +849,10 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
   - 🔧 **`number.set_value` remplace `mqtt.publish` brut** : entité HA native `number.hms_1600_limit_nonpersistent_absolute`.
   - 📌 **Entités `hms_1600_*` documentées** (§2ter.2) : `sensor.hms_1600_voltage`, `number.hms_1600_limit_nonpersistent_absolute`, `binary_sensor.hms_1600_producing`, etc.
   - Config_hash : `dd09da9dfc6cbac4` → `0a04db722440aa8c`
+
+### 2026-08-01 v1
+
+- 🛠 **Zigbee2MQTT / Mosquitto Broker — Déconnexion & points d'exclamation** (§5.2, §5.3) : documenté l'indisponibilité des interrupteurs Zigbee (`switch.chauffe_eau_cuisine`, `switch.0x00124b0024c79699`, `switch.pompe_piscine_zigbee`) causée par l'arrêt/redémarrage du broker Mosquitto (`ENOTFOUND core-mosquitto`). Procédure de dépannage ajoutée : redémarrer l'add-on **Zigbee2MQTT** via l'UI Home Assistant puis forcer le rafraîchissement (`Ctrl+F5` / app reload).
 
 ### 2026-05-22 v6
 
