@@ -851,6 +851,10 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
   - 📌 **Entités `hms_1600_*` documentées** (§2ter.2) : `sensor.hms_1600_voltage`, `number.hms_1600_limit_nonpersistent_absolute`, `binary_sensor.hms_1600_producing`, etc.
   - Config_hash : `dd09da9dfc6cbac4` → `0a04db722440aa8c`
 
+### 2026-08-01 v3
+
+- 🛠 **Chauffe-eau principal — Temporisation d'extinction 5 min** ([automations.yaml line 1078](file:///c:/Users/kriko/GitHub/HomeAssistant_RD/automations.yaml#L1078)) : ajout d'une temporisation `for: minutes: 5` sur le déclencheur d'extinction de `automation.extinction_chauffe_eau_principal` (passage de `binary_sensor.chauffe_eau_principal_actif` de `on` à `off`). Évite les extinctions intempestives lors des oscillations de consommation ou coupures brèves tout en préservant le calcul exact du bilan de cycle (mesuré immédiatement dès l'arrêt de la chauffe).
+
 ### 2026-08-01 v2
 
 - 🛠 **Fix `sensor.puissance_3ct` & Mosquitto Recovery** (§5.2, `zendure-entities-reference.md` §7) : résolution du problème d'affichage (0 W plat) dans le dashboard **1.Mobile**. Publication des statuts `online` avec rétention (`retain: true`) sur `Zendure/sensor/TE31NJN8N386922/L.../availability` et réordonnancement de `automation.recovery_smartmeter_3ct_mosquitto_au_demarrage` dans `automations.yaml` (publications `online` déplacées avant l'attente du trigger).

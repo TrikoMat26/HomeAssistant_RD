@@ -1087,8 +1087,8 @@
     - 'off'
     for:
       hours: 0
-      minutes: 0
-      seconds: 1
+      minutes: 5
+      seconds: 0
   conditions: []
   actions:
   - action: switch.turn_off
