@@ -127,3 +127,18 @@ Ces capteurs sont principalement destinés au débogage, à la surveillance rés
 | `sensor.solarflow_800_plus_local_apienable` | `True` | SolarFlow 800 Plus localAPIEnable | Indique si l'API locale (zenSDK / MQTT local) est activée sur l'appareil. `True` = contrôle local possible. *(Ajouté par firmware récent)* |
 | `sensor.solarflow_800_plus_net` | `0` | SolarFlow 800 Plus net | Puissance nette mesurée par l'appareil (en W). Peut refléter le bilan net entre production, consommation et flux batterie. *(Ajouté par firmware récent)* |
 | `update.zendure_home_assistant_integration_update` | `off` | Zendure Home Assistant Integration Update | Indique si une nouvelle version de l'intégration HACS de FireSon est disponible au téléchargement. |
+
+---
+
+## ⚡ 7. SmartMeter Zendure 3CT & Puissance Totale
+
+Le SmartMeter Zendure 3CT mesure la puissance sur les 3 phases de l'installation électrique et transmet les métriques au broker MQTT Mosquitto local.
+
+| Entity ID | État Exemple | Nom | Description / Utilité |
+| --- | --- | --- | --- |
+| `sensor.puissance_3ct` | `-59.1` W | puissance_3CT | Helper Template (UI) calculant la somme des puissances instantanées des 3 phases (`L1_p + L2_p + L3_p`). Affiché sur le dashboard **1.Mobile**. |
+| `sensor.te31njn8n386922_l1_p` | `820.9` W | TE31NJN8N386922 L1_p | Puissance active mesurée sur la phase 1 via MQTT. |
+| `sensor.te31njn8n386922_l2_p` | `0.0` W | TE31NJN8N386922 L2_p | Puissance active mesurée sur la phase 2 via MQTT. |
+| `sensor.te31njn8n386922_l3_p` | `371.1` W | TE31NJN8N386922 L3_p | Puissance active mesurée sur la phase 3 via MQTT. |
+| `automation.recovery_smartmeter_3ct_mosquitto_au_demarrage` | `on` | Recovery SmartMeter 3CT — Mosquitto au démarrage | Automatisation au démarrage de HA pour redémarrer Mosquitto, recharger l'intégration MQTT, et publier `online` avec rétention (`retain: true`) sur `Zendure/sensor/TE31NJN8N386922/L.../availability`. |
+

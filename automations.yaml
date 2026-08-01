@@ -1623,23 +1623,26 @@
   - action: homeassistant.reload_config_entry
     data:
       entry_id: b36151823b7a40e2951b294987caaeea
+  - action: mqtt.publish
+    data:
+      topic: Zendure/sensor/TE31NJN8N386922/L1_p/availability
+      payload: online
+      retain: true
+  - action: mqtt.publish
+    data:
+      topic: Zendure/sensor/TE31NJN8N386922/L2_p/availability
+      payload: online
+      retain: true
+  - action: mqtt.publish
+    data:
+      topic: Zendure/sensor/TE31NJN8N386922/L3_p/availability
+      payload: online
+      retain: true
   - wait_for_trigger:
     - trigger: template
       value_template: '{{ has_value(''sensor.te31njn8n386922_l3_p'') }}'
     timeout: 00:01:30
     continue_on_timeout: true
-  - action: mqtt.publish
-    data:
-      topic: Zendure/sensor/TE31NJN8N386922/L1_p/availability
-      payload: online
-  - action: mqtt.publish
-    data:
-      topic: Zendure/sensor/TE31NJN8N386922/L2_p/availability
-      payload: online
-  - action: mqtt.publish
-    data:
-      topic: Zendure/sensor/TE31NJN8N386922/L3_p/availability
-      payload: online
   mode: single
 - id: '1779698186713'
   alias: SolarFlow - Notification batterie > 70%
