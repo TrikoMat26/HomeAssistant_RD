@@ -616,6 +616,7 @@ Foobot, Statistics, Wake-on-LAN, KEF. *(Bloc `aarlo:` commenté.)*
 
 | Problème | Résolution | Date |
 |---|---|---|
+| Pic de 372 032 kWh sur la carte Électricité du Dashboard Énergie (02/08/2026) | Faux saut d'index sur `sensor.leexi_easf02` (@Bleu_HP) à minuit (+371 994.7 kWh). Correction statistique appliquée à chaud via WS API (`recorder/adjust_sum_statistics`). Tarifs EDF Tempo 1er août 2026 mis à jour dans `energy/save_prefs` (HC Bleu: 0.1356€, HP Bleu: 0.1654€, HC Blanc: 0.1536€, HP Blanc: 0.1921€, HC Rouge: 0.1615€, HP Rouge: 0.7295€). | 2026-08-02 |
 | `sensor.puissance_3ct` sans valeur (0 W plat) dans Dashboard 1.Mobile | Déconnexion/perte de rétention des topics de disponibilité MQTT (`Zendure/sensor/TE31NJN8N386922/L.../availability`) et blocage dans l'automation de recovery. Fix : publication `online` avec `retain: true` et réordonnancement de `automation.recovery_smartmeter_3ct_mosquitto_au_demarrage` dans `automations.yaml`. | 2026-08-01 |
 | Interrupteurs Zigbee (chauffe-eau cuisine, principal, pompe piscine) indisponibles (`unavailable` avec point d'exclamation) | Déconnexion Zigbee2MQTT suite au redémarrage de Mosquitto Broker (`ENOTFOUND core-mosquitto`). Fix : Redémarrer l'add-on **Zigbee2MQTT** (Paramètres ➔ Modules complémentaires ➔ Zigbee2MQTT ➔ Redémarrer) + rafraîchir IHM (`Ctrl+F5`). | 2026-08-01 |
 | Templates helpers `puissance_edf`, `puissance_phase1/2/3` cassaient sur `unknown`/`unavailable` | Fix `\|float` → `\|float(0)` dans les 4 helpers via `ha_config_set_helper`. Entry IDs dans §5.3. | 2026-05-22 |
@@ -850,6 +851,12 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
   - 🔧 **`number.set_value` remplace `mqtt.publish` brut** : entité HA native `number.hms_1600_limit_nonpersistent_absolute`.
   - 📌 **Entités `hms_1600_*` documentées** (§2ter.2) : `sensor.hms_1600_voltage`, `number.hms_1600_limit_nonpersistent_absolute`, `binary_sensor.hms_1600_producing`, etc.
   - Config_hash : `dd09da9dfc6cbac4` → `0a04db722440aa8c`
+
+### 2026-08-02 v1
+
+- 🛠 **Fix Pic 372 000 kWh & Tarifs EDF Tempo au 1er août 2026** (§5.2) :
+  - **Correction d'anomalie statistique Électricité** : résolution du pic géant de 372 032,14 kWh au 2 août à 00:00 provoqué par un saut d'index erroné (+371 994,7 kWh) sur `sensor.leexi_easf02` (@Bleu_HP). Ajustement appliqué à chaud en base de données via l'API WebSocket (`recorder/adjust_sum_statistics`).
+  - **Mise à jour des tarifs EDF Tempo au 1er août 2026** : enregistrement et sauvegarde via `energy/save_prefs` des nouveaux prix TTC par kWh dans le Dashboard Énergie (HC Bleu: 0,1356 €, HP Bleu: 0,1654 €, HC Blanc: 0,1536 €, HP Blanc: 0,1921 €, HC Rouge: 0,1615 €, HP Rouge: 0,7295 €).
 
 ### 2026-08-01 v3
 
