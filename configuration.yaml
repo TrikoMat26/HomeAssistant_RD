@@ -13,15 +13,6 @@ scene: !include scenes.yaml
 
 #template: !include_dir_merge_list includes/templates
 
-########### DUCK DNS   ##########
-http:
-  #  ssl_certificate: /ssl/fullchain.pem
-  #  ssl_key: /ssl/privkey.pem
-  ########### NGINX   ##########
-  use_x_forwarded_for: true
-  trusted_proxies:
-    - 172.30.33.0/24
-
 ########## Arlo  ##################
 # aarlo:
 #   tfa_source: imap

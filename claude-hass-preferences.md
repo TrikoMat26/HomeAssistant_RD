@@ -2,7 +2,7 @@
 
 <!--
   Fichier de contexte persistant. Version stockée sur HA : /config/claude-hass-preferences.md
-  Dernière mise à jour : 2026-05-28 v10 (voir Changelog en bas pour détails)
+  Dernière mise à jour : 2026-08-06 v18 (voir Changelog en bas pour détails)
   Optimisé pour Claude Cowork (desktop/mobile/web) ET Claude Code.
 -->
 
@@ -616,6 +616,7 @@ Foobot, Statistics, Wake-on-LAN, KEF. *(Bloc `aarlo:` commenté.)*
 
 | Problème | Résolution | Date |
 |---|---|---|
+| Avertissement "La configuration YAML HTTP est obsolète" | Suppression du bloc `http:` de `configuration.yaml` suite à l'importation automatique des paramètres proxy inverse (`use_x_forwarded_for` & `trusted_proxies`) dans le stockage/UI interne de Home Assistant. | 2026-08-06 |
 | Pic de 372 032 kWh sur la carte Électricité du Dashboard Énergie (02/08/2026) | Faux saut d'index sur `sensor.leexi_easf02` (@Bleu_HP) à minuit (+371 994.7 kWh). Correction statistique appliquée à chaud via WS API (`recorder/adjust_sum_statistics`). Tarifs EDF Tempo 1er août 2026 mis à jour dans `energy/save_prefs` (HC Bleu: 0.1356€, HP Bleu: 0.1654€, HC Blanc: 0.1536€, HP Blanc: 0.1921€, HC Rouge: 0.1615€, HP Rouge: 0.7295€). | 2026-08-02 |
 | `sensor.puissance_3ct` sans valeur (0 W plat) dans Dashboard 1.Mobile | Déconnexion/perte de rétention des topics de disponibilité MQTT (`Zendure/sensor/TE31NJN8N386922/L.../availability`) et blocage dans l'automation de recovery. Fix : publication `online` avec `retain: true` et réordonnancement de `automation.recovery_smartmeter_3ct_mosquitto_au_demarrage` dans `automations.yaml`. | 2026-08-01 |
 | Interrupteurs Zigbee (chauffe-eau cuisine, principal, pompe piscine) indisponibles (`unavailable` avec point d'exclamation) | Déconnexion Zigbee2MQTT suite au redémarrage de Mosquitto Broker (`ENOTFOUND core-mosquitto`). Fix : Redémarrer l'add-on **Zigbee2MQTT** (Paramètres ➔ Modules complémentaires ➔ Zigbee2MQTT ➔ Redémarrer) + rafraîchir IHM (`Ctrl+F5`). | 2026-08-01 |
@@ -779,6 +780,12 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 ---
 
 ## 9. Changelog
+
+### 2026-08-06 v18
+
+- 🛠 **Suppression de la configuration YAML HTTP dépréciée** :
+  - **Suppression du bloc `http:`** dans `configuration.yaml` (`use_x_forwarded_for: true` et `trusted_proxies: 172.30.33.0/24`).
+  - **Prise en charge UI / stockage interne** : Validation que les paramètres du proxy inverse (NGINX) ont bien été importés automatiquement par Home Assistant dans l'UI/stockage interne (Paramètres ➔ Système ➔ Réseau), résolvant le message d'avertissement de dépréciation pour la version 2027.2.0.
 
 ### 2026-07-26 v17
 
