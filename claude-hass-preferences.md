@@ -2,7 +2,7 @@
 
 <!--
   Fichier de contexte persistant. Version stockée sur HA : /config/claude-hass-preferences.md
-  Dernière mise à jour : 2026-08-06 v18 (voir Changelog en bas pour détails)
+  Dernière mise à jour : 2026-08-10 v19 (voir Changelog en bas pour détails)
   Optimisé pour Claude Cowork (desktop/mobile/web) ET Claude Code.
 -->
 
@@ -616,6 +616,8 @@ Foobot, Statistics, Wake-on-LAN, KEF. *(Bloc `aarlo:` commenté.)*
 
 | Problème | Résolution | Date |
 |---|---|---|
+| Bloquage de la puissance instantanée 3CT (`sensor.puissance_3ct`) à 111 W suite à une micro-coupure Wi-Fi | Le Smart Meter 3CT Zendure s'était figé en émission locale (épuisement de ses 30 essais de connexion MQTT après micro-coupure Wi-Fi du routeur le 9 août à 09:20:10). Résolu par un redémarrage électrique physique du boîtier 3CT. | 2026-08-10 |
+| Courbe de consommation électrique incorrecte (spike négatif de -2571.78 kWh) sur `sensor.lixee_easf05` | Correction de la statistique à 15h00 heure de Paris par un ajustement via la WebSocket API (`recorder/adjust_sum_statistics`), rétablissant la somme cumulative cumulée lisse de 1090.927 kWh. | 2026-08-10 |
 | Avertissement "La configuration YAML HTTP est obsolète" | Suppression du bloc `http:` de `configuration.yaml` suite à l'importation automatique des paramètres proxy inverse (`use_x_forwarded_for` & `trusted_proxies`) dans le stockage/UI interne de Home Assistant. | 2026-08-06 |
 | Pic de 372 032 kWh sur la carte Électricité du Dashboard Énergie (02/08/2026) | Faux saut d'index sur `sensor.leexi_easf02` (@Bleu_HP) à minuit (+371 994.7 kWh). Correction statistique appliquée à chaud via WS API (`recorder/adjust_sum_statistics`). Tarifs EDF Tempo 1er août 2026 mis à jour dans `energy/save_prefs` (HC Bleu: 0.1356€, HP Bleu: 0.1654€, HC Blanc: 0.1536€, HP Blanc: 0.1921€, HC Rouge: 0.1615€, HP Rouge: 0.7295€). | 2026-08-02 |
 | `sensor.puissance_3ct` sans valeur (0 W plat) dans Dashboard 1.Mobile | Déconnexion/perte de rétention des topics de disponibilité MQTT (`Zendure/sensor/TE31NJN8N386922/L.../availability`) et blocage dans l'automation de recovery. Fix : publication `online` avec `retain: true` et réordonnancement de `automation.recovery_smartmeter_3ct_mosquitto_au_demarrage` dans `automations.yaml`. | 2026-08-01 |
@@ -780,6 +782,11 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 ---
 
 ## 9. Changelog
+
+### 2026-08-10 v19
+
+- 🛠 **Résolution du blocage 3CT** : Identification de l'arrêt d'émission du module 3CT suite à une micro-coupure Wi-Fi (au moment où la prise PC Acer a clignoté le 9 août à 09:20:10). Home Assistant avait figé la valeur à 111 W pendant 2 heures avant de marquer le capteur indisponible. Résolu via redémarrage électrique du 3CT.
+- 🛠 **Correction du Dashboard Énergie** : Ajustement de la statistique sur `sensor.lixee_easf05` pour corriger un spike négatif anormal de -2571.778 kWh apparu aujourd'hui à 15h00 (heure de Paris). Toutes les valeurs d'aujourd'hui sont rétablies propres à 1090.927 kWh.
 
 ### 2026-08-06 v18
 
