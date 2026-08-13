@@ -1542,10 +1542,18 @@
   max_exceeded: silent
 - id: '1779174125486'
   alias: SolarFlow — Sync limite charge
-  description: 'Sync charge → consigne transitoire Zendure (input_limit).'
+  description: 'Sync charge → consigne transitoire Zendure (input_limit). Garde unavailable
+    ajoutée pour sécuriser post-mise à jour plugin.'
   triggers:
   - platform: state
     entity_id: input_select.solarflow_limite_charge
+  conditions:
+  - alias: Garde — entités Zendure disponibles
+    condition: template
+    value_template: >-
+      {{ states('number.solarflow_800_plus_input_limit') not in ['unavailable',
+      'unknown'] and states('select.solarflow_800_plus_ac_mode') not in
+      ['unavailable', 'unknown'] }}
   actions:
   - variables:
       valeur_charge: >-
@@ -1574,10 +1582,18 @@
   max_exceeded: silent
 - id: '1779174130202'
   alias: SolarFlow — Sync limite décharge
-  description: 'Sync décharge → consigne transitoire Zendure (output_limit).'
+  description: 'Sync décharge → consigne transitoire Zendure (output_limit). Garde
+    unavailable ajoutée pour sécuriser post-mise à jour plugin.'
   triggers:
   - platform: state
     entity_id: input_select.solarflow_limite_decharge
+  conditions:
+  - alias: Garde — entités Zendure disponibles
+    condition: template
+    value_template: >-
+      {{ states('number.solarflow_800_plus_output_limit') not in ['unavailable',
+      'unknown'] and states('select.solarflow_800_plus_ac_mode') not in
+      ['unavailable', 'unknown'] }}
   actions:
   - variables:
       valeur_decharge: >-
@@ -1660,7 +1676,7 @@
   mode: single
 - id: '1779624839201'
   alias: "SolarFlow — Écrêteur température batterie"
-  description: "Régule la limite de charge (input_limit) en fonction de la température de l'appareil (sensor.solarflow_800_plus_hyper_tmp) pour éviter la surchauffe. Hystérésis temporelle de 5 min en descente."
+  description: "Régule la limite de charge (input_limit) en fonction de la température de l'appareil (sensor.solarflow_800_plus_hyper_tmp) pour éviter la surchauffe. Hystérésis temporelle de 5 min en descente. Garde unavailable ajoutée pour sécuriser post-mise à jour plugin."
   mode: restart
   triggers:
     - platform: homeassistant
@@ -1691,6 +1707,13 @@
       below: 46
       for:
         minutes: 5
+  conditions:
+    - alias: Garde — capteur température et entité limite disponibles
+      condition: template
+      value_template: >-
+        {{ states('sensor.solarflow_800_plus_hyper_tmp') not in ['unavailable',
+        'unknown'] and states('number.solarflow_800_plus_input_limit') not in
+        ['unavailable', 'unknown'] }}
   actions:
     - variables:
         temp: "{{ states('sensor.solarflow_800_plus_hyper_tmp') | float(0) }}"
@@ -1736,7 +1759,7 @@
                 notification_id: solarflow_ecretage_temp
 - id: '1779624839202'
   alias: "SolarFlow — Écrêteur température batterie décharge"
-  description: "Régule la limite de décharge (output_limit) en fonction de la température de l'appareil (sensor.solarflow_800_plus_hyper_tmp) pour éviter la surchauffe. Hystérésis temporelle de 5 min en descente."
+  description: "Régule la limite de décharge (output_limit) en fonction de la température de l'appareil (sensor.solarflow_800_plus_hyper_tmp) pour éviter la surchauffe. Hystérésis temporelle de 5 min en descente. Garde unavailable ajoutée pour sécuriser post-mise à jour plugin."
   mode: restart
   triggers:
     - platform: homeassistant
@@ -1767,6 +1790,13 @@
       below: 46
       for:
         minutes: 5
+  conditions:
+    - alias: Garde — capteur température et entité limite disponibles
+      condition: template
+      value_template: >-
+        {{ states('sensor.solarflow_800_plus_hyper_tmp') not in ['unavailable',
+        'unknown'] and states('number.solarflow_800_plus_output_limit') not in
+        ['unavailable', 'unknown'] }}
   actions:
     - variables:
         temp: "{{ states('sensor.solarflow_800_plus_hyper_tmp') | float(0) }}"

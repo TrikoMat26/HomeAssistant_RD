@@ -377,7 +377,7 @@ Deux familles d'entités coexistent : `opendtu_4c9028_*` (gateway OpenDTU) et `h
 
 | Paramètre | Valeur |
 |---|---|
-| Intégration HACS | "Zendure Home Assistant Integration" (fireson, v1.3.1) |
+| Intégration HACS | "Zendure Home Assistant Integration" (fireson, v1.4.4 - à jour au 13/08/2026) |
 | Téléchargements | ~8 000 (référence communautaire) |
 | Entités créées | 59 entités automatiques après redémarrage HA |
 
@@ -415,6 +415,7 @@ Deux familles d'entités coexistent : `opendtu_4c9028_*` (gateway OpenDTU) et `h
 
 > [!IMPORTANT]
 > **Séparation des responsabilités critique** : Les sync écrivent sur les consignes transitoires (`input_limit`/`output_limit`), les écrêteurs thermiques écrivent **uniquement** sur les plafonds matériels (`charge_max_limit`/`inverse_max_power`). Ne jamais mélanger ces deux niveaux sous peine de verrouillage à 0 W.
+> **Gardes de sécurité `unavailable` (13/08/2026)** : Les 4 automatisations cibles (`sync_limite_charge`, `sync_limite_decharge`, `ecreteur_temperature_batterie`, `ecreteur_temperature_batterie_decharge`) possèdent des conditions de garde template (`not in ['unavailable', 'unknown']`) afin d'éviter la réinitialisation silencieuse à 0 W des consignes si le plugin ou le broker MQTT se déconnecte.
 
 **⚠️ Valeurs du `select.solarflow_800_plus_ac_mode`** : l'intégration Zendure utilise `"input"` et `"output"` (pas de labels français). Si les commandes du dashboard cessent de fonctionner après une mise à jour HACS, vérifier en premier que ces valeurs n'ont pas changé :
 ```
@@ -800,6 +801,13 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
   - **Mise à jour des entités cibles** : Adaptation des automatisations d'écrêtage thermique (`automation.solarflow_ecreteur_temperature_batterie` et `automation.solarflow_ecreteur_temperature_batterie_decharge`) pour cibler `number.solarflow_800_plus_input_limit` (charge) et `number.solarflow_800_plus_output_limit` (décharge), suite au passage des entités `charge_max_limit` et `inverse_max_power` en capteurs en lecture seule (`sensor.*`).
   - **Calcul dynamique des consignes** : Application de la formule `min(valeur_user, limite_thermique)` (lorsque `valeur_user > 0`) pour respecter les préférences du dashboard sans verrouiller la charge/décharge à 0 W.
   - **Audit complet des entités SolarFlow** : Validation que 100% des entités SolarFlow utilisées dans les automatisations de Home Assistant sont actives et opérationnelles.
+
+### 2026-08-13 v17
+
+- 🛡️ **Sécurisation post-mise à jour Plugin Zendure v1.4.4** :
+  - **Audit de l'intégration** : Validation de la version v1.4.4 (résolvant la régression des écritures `limit_writes` de la v1.4.3). Confirmation de l'absence d'entités dupliquées (`_2`) et statut `available` vérifié sur l'ensemble des entités Zendure et SolarFlow.
+  - **Gardes de sécurité `unavailable`** : Ajout d'une condition de garde template (`not in ['unavailable', 'unknown']`) dans 4 automatisations cibles (`automation.solarflow_sync_limite_charge`, `automation.solarflow_sync_limite_decharge`, `automation.solarflow_ecreteur_temperature_batterie`, `automation.solarflow_ecreteur_temperature_batterie_decharge`). Empêche le basculement accidentel des consignes de charge/décharge à 0 W causé par le fallback `| int(0)` / `| float(0)` lors d'une indisponibilité temporaire du plugin ou d'une déconnexion MQTT.
+  - **Déploiement à chaud & Notification** : Téléversement direct des automatisations sur le serveur Home Assistant via l'API REST (`POST /api/config/automation/config/<id>`) + rechargement à chaud. Notification de confirmation envoyée sur l'instance HA.
 
 ### 2026-06-17 v16
 
