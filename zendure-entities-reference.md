@@ -142,3 +142,21 @@ Le SmartMeter Zendure 3CT mesure la puissance sur les 3 phases de l'installation
 | `sensor.te31njn8n386922_l3_p` | `371.1` W | TE31NJN8N386922 L3_p | Puissance active mesurée sur la phase 3 via MQTT. |
 | `automation.recovery_smartmeter_3ct_mosquitto_au_demarrage` | `on` | Recovery SmartMeter 3CT — Mosquitto au démarrage | Automatisation au démarrage de HA pour redémarrer Mosquitto, recharger l'intégration MQTT, et publier `online` avec rétention (`retain: true`) sur `Zendure/sensor/TE31NJN8N386922/L.../availability`. |
 
+---
+
+## 🛠️ 8. Guide Anti-Régression & Bonnes Pratiques Zendure
+
+Ce guide résume les points critiques à retenir pour le fonctionnement de l'intégration :
+
+1. **Écritures MQTT = Micro-décrochages à 0 W** :
+   - Tout ordre envoyé sur `number.solarflow_800_plus_input_limit` ou `output_limit` réinitialise le hacheur de la batterie.
+   - Toujours filtrer pour n'écrire que si la consigne demandée est différente de la consigne déjà active.
+2. **Coexistence Zendure Manager & Automatisations HA** :
+   - En mode `store_solar`, Zendure Manager pilote dynamiquement `input_limit` sans toucher aux `input_select` du dashboard (qui restent à `0 W`).
+   - Les automatisations d'écrêtage doivent agir comme un **plafond dynamique** sur `input_limit`/`output_limit` et ne jamais forcer `0 W`.
+3. **Gardes `unavailable` indispensables** :
+   - Toujours encadrer les templates par `{{ states('...') not in ['unavailable', 'unknown'] }}` pour éviter qu'une déconnexion ne bascule les consignes à 0 W via un filtre `| int(0)`.
+4. **Options AC Mode** :
+   - Vérifier que `select.solarflow_800_plus_ac_mode` utilise bien `"input"` et `"output"`.
+
+

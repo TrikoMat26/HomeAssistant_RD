@@ -2,7 +2,7 @@
 
 <!--
   Fichier de contexte persistant. Version stockée sur HA : /config/claude-hass-preferences.md
-  Dernière mise à jour : 2026-08-10 v19 (voir Changelog en bas pour détails)
+  Dernière mise à jour : 2026-08-14 v20 (voir Changelog en bas pour détails)
   Optimisé pour Claude Cowork (desktop/mobile/web) ET Claude Code.
 -->
 
@@ -407,14 +407,14 @@ Deux familles d'entités coexistent : `opendtu_4c9028_*` (gateway OpenDTU) et `h
 
 | Automation | entity_id | config_hash | Logique |
 |---|---|---|---|
-| Sync limite charge | `automation.solarflow_sync_limite_charge` | — | Select charge → `input_limit` (consigne transitoire). Si > 0 : mode `"input"` + décharge forcée à 0 W. **Ne touche plus aux plafonds de sécurité.** |
-| Sync limite décharge | `automation.solarflow_sync_limite_decharge` | — | Select décharge → `output_limit` (consigne transitoire). Si > 0 : mode `"output"` + charge forcée à 0 W. **Ne touche plus aux plafonds de sécurité.** |
+| Sync limite charge | `automation.solarflow_sync_limite_charge` | — | Select charge → `input_limit` avec respect du plafond thermique. Si > 0 : mode `"input"` + décharge forcée à 0 W. |
+| Sync limite décharge | `automation.solarflow_sync_limite_decharge` | — | Select décharge → `output_limit` avec respect du plafond thermique. Si > 0 : mode `"output"` + charge forcée à 0 W. |
 | Alerte température | `automation.solarflow_alerte_temperature_elevee` | — | > 45 °C pendant 2 min → notif persistante. Dismiss auto < 42 °C (hystérésis 3 °C) |
-| Écrêteur temp. (charge) | `automation.solarflow_ecreteur_temperature_batterie` | `1779624839201` | Régule **exclusivement** le plafond `charge_max_limit` (700W/300W/100W) selon la température (47/49/51 °C). Notif + Hystérésis 5 min. |
-| Écrêteur temp. (décharge) | `automation.solarflow_ecreteur_temperature_batterie_decharge` | `1779624839202` | Régule **exclusivement** le plafond `inverse_max_power` (600W/300W/100W) selon la température (47/49/51 °C). Notif + Hystérésis 5 min. |
+| Écrêteur temp. (charge) | `automation.solarflow_ecreteur_temperature_batterie` | `1779624839201` | Régule comme un **plafond dynamique** sur `input_limit` (700W/300W/100W) selon la température (47/49/51 °C). N'écrit que si `consigne > limite`. Notif + Hystérésis 5 min. |
+| Écrêteur temp. (décharge) | `automation.solarflow_ecreteur_temperature_batterie_decharge` | `1779624839202` | Régule comme un **plafond dynamique** sur `output_limit` (600W/300W/100W) selon la température (47/49/51 °C). N'écrit que si `consigne > limite`. Notif + Hystérésis 5 min. |
 
 > [!IMPORTANT]
-> **Séparation des responsabilités critique** : Les sync écrivent sur les consignes transitoires (`input_limit`/`output_limit`), les écrêteurs thermiques écrivent **uniquement** sur les plafonds matériels (`charge_max_limit`/`inverse_max_power`). Ne jamais mélanger ces deux niveaux sous peine de verrouillage à 0 W.
+> **Régulation par plafond dynamique (14/08/2026 v20)** : Les écrêteurs thermiques agissent comme des limiteurs de crête. Ils ne forcent plus jamais la consigne à 0 W en fonctionnement automatique (Zendure Manager `store_solar`) et n'envoient d'ordres `number.set_value` que si la consigne active dépasse le seuil autorisé, éliminant les décrochages intempestifs.
 > **Gardes de sécurité `unavailable` (13/08/2026)** : Les 4 automatisations cibles (`sync_limite_charge`, `sync_limite_decharge`, `ecreteur_temperature_batterie`, `ecreteur_temperature_batterie_decharge`) possèdent des conditions de garde template (`not in ['unavailable', 'unknown']`) afin d'éviter la réinitialisation silencieuse à 0 W des consignes si le plugin ou le broker MQTT se déconnecte.
 
 **⚠️ Valeurs du `select.solarflow_800_plus_ac_mode`** : l'intégration Zendure utilise `"input"` et `"output"` (pas de labels français). Si les commandes du dashboard cessent de fonctionner après une mise à jour HACS, vérifier en premier que ces valeurs n'ont pas changé :
@@ -460,6 +460,48 @@ Le bloc "Mode de fonctionnement" a été supprimé — le mode est géré automa
   - Mois : `sensor.solarflow_discharge_cost_saved_monthly`
   - Année : `sensor.solarflow_discharge_cost_saved_yearly`
 - **Dashboard** : affichage dans le dashboard "Énergie détail" (`lovelace.energie-detail`) avec une carte verticale principale (total économisé) et une grille à 4 colonnes pour le Jour, Semaine, Mois, Année.
+
+### 2quater.8 🧠 Base de Connaissances & REX Zendure (Incidents, Diagnostics et Règles d'or)
+
+> Ce recueil synthétise tous les incidents rencontrés, les particularités matérielles/logicielles et les retours d'expérience (REX) sur l'intégration Zendure SolarFlow 800 Plus afin d'assurer une maintenance pérenne et éviter toute régression lors des futures mises à jour.
+
+#### 1. Particularités Matérielles & Protocolaires (SolarFlow 800 Plus)
+- **Décrochage à 0 W sur écriture de registre** : Tout ordre MQTT/Cloud modifiant `inputLimit` ou `outputLimit` force le contrôleur/onduleur Zendure à réinitialiser sa boucle MPPT/PWM. La puissance s'effondre à 0 W pendant 1 à 3 secondes avant de remonter. **Règle absolue : ne jamais envoyer d'ordre d'écriture redondant si la consigne active est déjà conforme.**
+- **Dualité de régulation (Zendure Manager vs Mode Manuel)** :
+  - En mode automatique `select.zendure_manager_operation: store_solar`, Zendure Manager calcule le surplus solaire et ajuste en continu `number.solarflow_800_plus_input_limit`. Les sélecteurs du tableau de bord (`input_select.solarflow_limite_charge/decharge`) restent à `0 W`.
+  - Les automatisations de sécurité ne doivent **jamais** déduire que la batterie est à l'arrêt simplement parce que `input_select` vaut `0 W`.
+- **Entités plafonds vs entités consignes** :
+  - `number.solarflow_800_plus_input_limit` / `output_limit` : Les seules entités de régulation modifiables par Home Assistant en v1.4.x.
+  - `sensor.solarflow_800_plus_charge_max_limit` / `inverse_max_power` : Entités passées en **lecture seule (`sensor.*`)** par le firmware. Les anciennes entités `number` associées sont `unavailable`.
+
+#### 2. Historique des Pannes & Solutions Déployées (REX)
+
+| Date | Incident & Symptôme | Cause Racine Identifiée | Solution Définitive Appliquée |
+|---|---|---|---|
+| **2026-08-14** | Chute brutale à 0 W à chaque montée en température (> 47 °C) suivie d'une réinitialisation Zendure. | L'écrêteur appliquait `min(valeur_user, limite) if valeur_user > 0 else 0`. Comme `valeur_user` (`input_select`) vaut 0 W en mode auto `store_solar`, l'écrêteur forçait `input_limit` à 0 W. De plus, l'écrêteur de décharge envoyait 0 W simultanément. | Refonte en **plafond dynamique supérieur** : l'écrêteur compare directement `consigne_actuelle > limite_thermique`. S'il n'y a pas de dépassement, aucun ordre n'est émis. |
+| **2026-08-13** | Consignes de charge/décharge sautant silencieusement à 0 W après redémarrage ou micro-coupure. | Lors d'une déconnexion MQTT/Cloud temporaire, les entités passaient `unavailable`. Le filtre Jinja `states(...) \| int(0)` renvoyait `0`, forçant les limites à 0 W. | Ajout systématique de **gardes templates de disponibilité** : `{{ states('...') not in ['unavailable', 'unknown'] }}` sur toutes les automatisations de régulation. |
+| **2026-08-10** | Gel de la puissance instantanée 3CT (`sensor.puissance_3ct`) à 111 W pendant plusieurs heures. | Micro-coupure Wi-Fi du routeur : le SmartMeter 3CT a épuisé ses 30 tentatives de reconnexion MQTT et s'est mis en veille radio. | Redémarrage électrique physique du boîtier 3CT + rétention MQTT (`retain: true`) via `automation.recovery_smartmeter_3ct_mosquitto_au_demarrage`. |
+| **2026-05-20** | Commandes charge/décharge inopérantes après mise à jour HACS (échec silencieux). | L'intégration Zendure a renommé les options de `select.solarflow_800_plus_ac_mode` (`"Mode entrée AC"` ➔ `"input"`, `"Mode sortie AC"` ➔ `"output"`). | Alignement strict des automatisations sur les slugs internes `"input"` et `"output"`. |
+| **2026-06-17** | Verrouillage à 0 W des plafonds de sécurité lors de la bascule charge/décharge. | Les automatisations de synchronisation écrivaient `0 W` sur les plafonds matériels lors de l'exclusion mutuelle. | Découplage strict : les synchronisations n'écrivent que sur les consignes transitoires (`input_limit`/`output_limit`), jamais sur les sécurités. |
+
+#### 3. Règles d'or Architecturales (À respecter impérativement)
+1. **Plafond supérieur uniquement** : Les sécurités thermiques doivent uniquement abaisser la consigne en cas de dépassement (`consigne > limite`). Elles ne doivent **jamais** forcer une valeur à 0 W lorsque le système est en veille ou en régulation automatique.
+2. **Pas d'écriture redondante** : Ne jamais appeler `number.set_value` avec la même valeur que celle déjà active pour éviter d'interrompre la production solaire.
+3. **Gardes de disponibilité obligatoires** : Toute automatisation Zendure doit vérifier que le capteur de température ET l'entité de consigne ne sont ni `unavailable` ni `unknown`.
+4. **Exclusion mutuelle propre** : Activer la charge (> 0 W) passe le mode en `"input"` et réinitialise le sélecteur de décharge à `0 W` (et inversement pour la décharge en `"output"`).
+
+#### 4. Protocole de Diagnostic Rapide (CLI `ha_tool.py`)
+En cas de comportement anormal de la batterie, exécuter :
+```bash
+# 1. Vérifier la température et l'état opérationnel
+python ha_tool.py get-state sensor.solarflow_800_plus_hyper_tmp
+
+# 2. Vérifier les consignes et modes actifs
+python -c "import ha_tool; [print(e, '-->', ha_tool.api_request('/api/states/' + e)['state']) for e in ['select.zendure_manager_operation', 'number.solarflow_800_plus_input_limit', 'number.solarflow_800_plus_output_limit', 'select.solarflow_800_plus_ac_mode', 'sensor.solarflow_800_plus_bat_in_out']]"
+
+# 3. Vérifier la validité de la configuration
+python ha_tool.py check-config
+```
 
 ---
 
@@ -783,6 +825,15 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 ---
 
 ## 9. Changelog
+
+### 2026-08-14 v20
+
+- 🛠 **Refonte Écrêtage Thermique SolarFlow (Suppression des coupures 0 W & Compatibilité Zendure Manager)** :
+  - **Plafond dynamique supérieur** : Les écrêteurs thermiques (`automation.solarflow_ecreteur_temperature_batterie` et `automation.solarflow_ecreteur_temperature_batterie_decharge`) appliquent désormais une régulation par plafond dynamique via `choose`. L'action `number.set_value` n'est déclenchée **que si la consigne active dépasse le seuil thermique autorisé**.
+  - **Suppression du forçage à 0 W** : Élimination du calcul `min(valeur_user, limite) if valeur_user > 0 else 0` qui écrasait la puissance à 0 W lors du fonctionnement automatique de Zendure Manager en mode `store_solar` (où `input_select` reste à 0 W).
+  - **Fin des interférences croisées** : L'écrêteur inactif n'envoie plus de commande `0 W` sur le canal opposé lors des variations de température.
+  - **Intégration du plafond dans les sélecteurs UI** : `automation.solarflow_sync_limite_charge` et `automation.solarflow_sync_limite_decharge` intègrent directement la température pour ne jamais dépasser le plafond en cas de consigne manuelle élevée.
+  - **Rechargement et validation** : Configuration vérifiée avec succès via `check-config` et automatisations rechargées à chaud.
 
 ### 2026-08-10 v19
 

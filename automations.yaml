@@ -1542,8 +1542,7 @@
   max_exceeded: silent
 - id: '1779174125486'
   alias: SolarFlow — Sync limite charge
-  description: 'Sync charge → consigne transitoire Zendure (input_limit). Garde unavailable
-    ajoutée pour sécuriser post-mise à jour plugin.'
+  description: 'Sync charge → consigne transitoire Zendure (input_limit) avec respect du plafond thermique. Garde unavailable ajoutée pour sécuriser post-mise à jour plugin.'
   triggers:
   - platform: state
     entity_id: input_select.solarflow_limite_charge
@@ -1558,11 +1557,24 @@
   - variables:
       valeur_charge: >-
         {{ states('input_select.solarflow_limite_charge') | replace(' W', '') | int(0) }}
+      temp: "{{ states('sensor.solarflow_800_plus_hyper_tmp') | float(0) }}"
+      limite_thermique: >-
+        {% if temp >= 51 %}
+          100
+        {% elif temp >= 49 %}
+          300
+        {% elif temp >= 47 %}
+          700
+        {% else %}
+          1000
+        {% endif %}
+      valeur_effective: >-
+        {{ [valeur_charge, limite_thermique] | min if valeur_charge > 0 else 0 }}
   - action: number.set_value
     target:
       entity_id: number.solarflow_800_plus_input_limit
     data:
-      value: '{{ valeur_charge }}'
+      value: '{{ valeur_effective }}'
   - choose:
     - conditions:
       - condition: template
@@ -1582,8 +1594,7 @@
   max_exceeded: silent
 - id: '1779174130202'
   alias: SolarFlow — Sync limite décharge
-  description: 'Sync décharge → consigne transitoire Zendure (output_limit). Garde
-    unavailable ajoutée pour sécuriser post-mise à jour plugin.'
+  description: 'Sync décharge → consigne transitoire Zendure (output_limit) avec respect du plafond thermique. Garde unavailable ajoutée pour sécuriser post-mise à jour plugin.'
   triggers:
   - platform: state
     entity_id: input_select.solarflow_limite_decharge
@@ -1598,11 +1609,24 @@
   - variables:
       valeur_decharge: >-
         {{ states('input_select.solarflow_limite_decharge') | replace(' W', '') | int(0) }}
+      temp: "{{ states('sensor.solarflow_800_plus_hyper_tmp') | float(0) }}"
+      limite_thermique: >-
+        {% if temp >= 51 %}
+          100
+        {% elif temp >= 49 %}
+          300
+        {% elif temp >= 47 %}
+          600
+        {% else %}
+          800
+        {% endif %}
+      valeur_effective: >-
+        {{ [valeur_decharge, limite_thermique] | min if valeur_decharge > 0 else 0 }}
   - action: number.set_value
     target:
       entity_id: number.solarflow_800_plus_output_limit
     data:
-      value: '{{ valeur_decharge }}'
+      value: '{{ valeur_effective }}'
   - choose:
     - conditions:
       - condition: template
@@ -1676,7 +1700,7 @@
   mode: single
 - id: '1779624839201'
   alias: "SolarFlow — Écrêteur température batterie"
-  description: "Régule la limite de charge (input_limit) en fonction de la température de l'appareil (sensor.solarflow_800_plus_hyper_tmp) pour éviter la surchauffe. Hystérésis temporelle de 5 min en descente. Garde unavailable ajoutée pour sécuriser post-mise à jour plugin."
+  description: "Régule la limite de charge (input_limit) en fonction de la température de l'appareil (sensor.solarflow_800_plus_hyper_tmp) pour éviter la surchauffe. Agit comme un plafond sans forcer à 0W. Hystérésis de 5 min en descente. Garde unavailable ajoutée pour sécuriser post-mise à jour plugin."
   mode: restart
   triggers:
     - platform: homeassistant
@@ -1717,6 +1741,7 @@
   actions:
     - variables:
         temp: "{{ states('sensor.solarflow_800_plus_hyper_tmp') | float(0) }}"
+        consigne_actuelle: "{{ states('number.solarflow_800_plus_input_limit') | float(0) }}"
         valeur_user: "{{ states('input_select.solarflow_limite_charge') | replace(' W', '') | int(0) }}"
         limite_thermique: >-
           {% if temp >= 51 %}
@@ -1728,23 +1753,38 @@
           {% else %}
             1000
           {% endif %}
-        valeur_effective: "{{ [valeur_user, limite_thermique] | min if valeur_user > 0 else 0 }}"
-    # Appliquer la consigne sur la batterie
-    - action: number.set_value
-      target:
-        entity_id: number.solarflow_800_plus_input_limit
-      data:
-        value: "{{ valeur_effective }}"
-    # Gestion des notifications persistantes
+    # Appliquer le bridage UNIQUEMENT si la consigne dépasse le plafond thermique
     - choose:
-        # Cas où le bridage est théoriquement actif
+        # Cas 1 : La consigne active dépasse le plafond thermique autorisé -> on bride
         - conditions:
             - condition: template
-              value_template: "{{ limite_thermique < 1000 }}"
+              value_template: "{{ consigne_actuelle > limite_thermique }}"
+          sequence:
+            - action: number.set_value
+              target:
+                entity_id: number.solarflow_800_plus_input_limit
+              data:
+                value: "{{ limite_thermique }}"
+        # Cas 2 : Température redescendue (normale) et consigne manuelle utilisateur active qui était bridée -> on restaure
+        - conditions:
+            - condition: template
+              value_template: "{{ limite_thermique >= 1000 and valeur_user > 0 and consigne_actuelle < valeur_user }}"
+          sequence:
+            - action: number.set_value
+              target:
+                entity_id: number.solarflow_800_plus_input_limit
+              data:
+                value: "{{ valeur_user }}"
+    # Gestion des notifications persistantes
+    - choose:
+        # Cas où la batterie est sous bridage actif
+        - conditions:
+            - condition: template
+              value_template: "{{ limite_thermique < 1000 and (consigne_actuelle >= limite_thermique or temp >= 47) }}"
           sequence:
             - action: persistent_notification.create
               data:
-                title: "🌡️ SolarFlow — Écrêtage thermique actif"
+                title: "🌡️ SolarFlow — Écrêtage thermique charge actif"
                 message: >-
                   Température SolarFlow à {{ temp | round(1) }} °C.
                   Charge bridée à {{ limite_thermique }} W maximum.
@@ -1759,7 +1799,7 @@
                 notification_id: solarflow_ecretage_temp
 - id: '1779624839202'
   alias: "SolarFlow — Écrêteur température batterie décharge"
-  description: "Régule la limite de décharge (output_limit) en fonction de la température de l'appareil (sensor.solarflow_800_plus_hyper_tmp) pour éviter la surchauffe. Hystérésis temporelle de 5 min en descente. Garde unavailable ajoutée pour sécuriser post-mise à jour plugin."
+  description: "Régule la limite de décharge (output_limit) en fonction de la température de l'appareil (sensor.solarflow_800_plus_hyper_tmp) pour éviter la surchauffe. Agit comme un plafond sans forcer à 0W. Hystérésis de 5 min en descente. Garde unavailable ajoutée pour sécuriser post-mise à jour plugin."
   mode: restart
   triggers:
     - platform: homeassistant
@@ -1800,6 +1840,7 @@
   actions:
     - variables:
         temp: "{{ states('sensor.solarflow_800_plus_hyper_tmp') | float(0) }}"
+        consigne_actuelle: "{{ states('number.solarflow_800_plus_output_limit') | float(0) }}"
         valeur_user: "{{ states('input_select.solarflow_limite_decharge') | replace(' W', '') | int(0) }}"
         limite_thermique: >-
           {% if temp >= 51 %}
@@ -1811,19 +1852,34 @@
           {% else %}
             800
           {% endif %}
-        valeur_effective: "{{ [valeur_user, limite_thermique] | min if valeur_user > 0 else 0 }}"
-    # Appliquer la consigne sur la batterie
-    - action: number.set_value
-      target:
-        entity_id: number.solarflow_800_plus_output_limit
-      data:
-        value: "{{ valeur_effective }}"
-    # Gestion des notifications persistantes
+    # Appliquer le bridage UNIQUEMENT si la consigne dépasse le plafond thermique
     - choose:
-        # Cas où le bridage est théoriquement actif
+        # Cas 1 : La consigne active dépasse le plafond thermique autorisé -> on bride
         - conditions:
             - condition: template
-              value_template: "{{ limite_thermique < 800 }}"
+              value_template: "{{ consigne_actuelle > limite_thermique }}"
+          sequence:
+            - action: number.set_value
+              target:
+                entity_id: number.solarflow_800_plus_output_limit
+              data:
+                value: "{{ limite_thermique }}"
+        # Cas 2 : Température redescendue (normale) et consigne manuelle utilisateur active qui était bridée -> on restaure
+        - conditions:
+            - condition: template
+              value_template: "{{ limite_thermique >= 800 and valeur_user > 0 and consigne_actuelle < valeur_user }}"
+          sequence:
+            - action: number.set_value
+              target:
+                entity_id: number.solarflow_800_plus_output_limit
+              data:
+                value: "{{ valeur_user }}"
+    # Gestion des notifications persistantes
+    - choose:
+        # Cas où la batterie est sous bridage actif
+        - conditions:
+            - condition: template
+              value_template: "{{ limite_thermique < 800 and (consigne_actuelle >= limite_thermique or temp >= 47) }}"
           sequence:
             - action: persistent_notification.create
               data:

@@ -1,4 +1,5 @@
 .env
 .env.bin
 scheduler.storage
+__pycache__/
 
