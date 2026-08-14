@@ -12,25 +12,37 @@
 
 > "Lis le fichier de contexte Home Assistant et applique ses règles."
 
+> [!IMPORTANT]
+> ### 📜 DIRECTIVES OBLIGATOIRES POUR TOUT LLM / ASSISTANT IA
+> 1. **Consulter impérativement le REX et l'historique de l'intégration concernée** :
+>    - Avant de modifier ou corriger une automatisation, un script ou un template (Zendure, HMS-1600, Emporia, Zigbee, etc.), vous **DEVEZ** lire la section REX correspondante (ex: §2quater.8 pour Zendure, §2ter.5 pour HMS-1600).
+>    - Il est formellement interdit de réintroduire un comportement précédemment invalidé (comme forcer 0 W, ignorer Zendure Manager, ou oublier les gardes de disponibilité).
+> 2. **Interdiction absolue du "patch aveugle"** :
+>    - Ne jamais supposer le comportement ou l'état d'une entité à partir du seul fichier YAML.
+>    - Vous **DEVEZ** inspecter l'état réel en direct via le skill HA (`python ha_tool.py get-state <entity_id>`) ou `ha-mcp` avant toute modification.
+> 3. **Obligation d'alimenter continuellement le REX et le Changelog** :
+>    - Toute intervention (correction de bug, adaptation post-MAJ, création d'entité) **DOIT obligatoirement être enregistrée dans le Changelog (§9)**.
+>    - Si l'intervention résout un dysfonctionnement ou apporte un nouvel enseignement matériel/logiciel, elle **DOIT être ajoutée dans la Base de Connaissances & REX de l'intégration** concernée afin de préserver la mémoire du système pour les sessions futures.
+
 **Règles de chargement par environnement :**
 
 | Environnement | Comment Claude charge ce fichier |
 |---|---|
 | Claude Cowork / Desktop / Web / Mobile | Connecteur HA actif → utiliser `ha-mcp` pour `/config/claude-hass-preferences.md`. Si le connecteur n'est pas activé dans la conversation, demander à Krikor de l'activer (bouton `+` → Connecteurs → Home Assistant) avant tout. |
-| Claude Code | Deux options : (1) si la MCP HA est configurée côté Code, pareil que Cowork ; (2) sinon, Krikor peut copier-coller le contenu du fichier en début de session, ou faire `scp hass:/config/claude-hass-preferences.md .` dans le repo de travail puis `Read` local. |
+| Claude Code / Antigravity / Agents | Utiliser `ha_tool.py` localement avec le fichier `.env` ou interroger l'API REST/WebSocket directement. Lire les fichiers markdown de contexte du dépôt (`claude-hass-preferences.md`, `zendure-entities-reference.md`, `CLAUDE.md`). |
 
 **Priorité des outils (règle d'or, toujours dans cet ordre) :**
 
-1. **MCP `ha-mcp` d'abord** pour tout ce qui concerne HA : automations, scripts, dashboards, helpers, zones, étages, pièces, groupes, labels, catégories, templates, états, services, logs, traces, HACS, intégrations, appareils, blueprints, validation, redémarrage, fichiers de `/config`, add-ons.
-2. **SSH de Krikor en fallback** (pour écritures fichiers hors `/config` et manip hardware) : Claude donne les commandes exactes, Krikor les exécute depuis PowerShell avec `ssh hass`.
-3. **Chrome/Comet en dernier recours** uniquement (lent, coûteux en tokens).
-4. **Pour écrire dans `/config`** : ha-mcp n'a pas de `write_file` générique. Claude sauvegarde en outputs, Krikor copie via Samba ou SSH.
+1. **Skill HA CLI (`ha_tool.py`) / MCP `ha-mcp` d'abord** pour tout ce qui concerne HA : inspection d'état en direct (`get-state`), historique (`history`), validation de configuration (`check-config`), rechargement à chaud (`call-service automation reload`), gestion des entités et dashboards.
+2. **Édition locale Git & validation syntaxique** : Modification propre dans le dépôt de travail suivie d'un `check-config` et d'un commit Git documenté.
+3. **SSH de Krikor en fallback** (pour écritures fichiers hors `/config` et manip hardware) : Claude donne les commandes exactes, Krikor les exécute depuis PowerShell avec `ssh hass`.
+4. **Chrome/Comet en dernier recours** uniquement (lent, coûteux en tokens).
 
 **Trigger phrases utiles :**
 
-- `"mets à jour le fichier de contexte"` → Claude produit une nouvelle version dans outputs + commandes SSH de copie + mise à jour du changelog (voir §7.3).
-- `"charge les données solaires du [date]"` → Claude lit le CSV correspondant dans `/config/claude_data/`.
-- `"snapshot HA"` → Claude appelle `ha_get_overview` et met à jour mentalement les stats sans modifier le fichier (les stats sont volatiles).
+- `"mets à jour le fichier de contexte"` → Produire la nouvelle version, mettre à jour le changelog et enrichir le REX.
+- `"charge les données solaires du [date]"` → Lire le CSV correspondant dans `/config/claude_data/`.
+- `"snapshot HA"` → Exécuter `python ha_tool.py get-state` sur les entités clés ou appeler `ha_get_overview`.
 
 ---
 
