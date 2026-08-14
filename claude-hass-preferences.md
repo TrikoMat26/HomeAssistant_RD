@@ -2,7 +2,7 @@
 
 <!--
   Fichier de contexte persistant. Version stockée sur HA : /config/claude-hass-preferences.md
-  Dernière mise à jour : 2026-08-14 v20 (voir Changelog en bas pour détails)
+  Dernière mise à jour : 2026-08-14 v21 (voir Changelog en bas pour détails)
   Optimisé pour Claude Cowork (desktop/mobile/web) ET Claude Code.
 -->
 
@@ -421,13 +421,12 @@ Deux familles d'entités coexistent : `opendtu_4c9028_*` (gateway OpenDTU) et `h
 |---|---|---|---|
 | Sync limite charge | `automation.solarflow_sync_limite_charge` | — | Select charge → `input_limit` avec respect du plafond thermique. Si > 0 : mode `"input"` + décharge forcée à 0 W. |
 | Sync limite décharge | `automation.solarflow_sync_limite_decharge` | — | Select décharge → `output_limit` avec respect du plafond thermique. Si > 0 : mode `"output"` + charge forcée à 0 W. |
-| Alerte température | `automation.solarflow_alerte_temperature_elevee` | — | > 45 °C pendant 2 min → notif persistante. Dismiss auto < 42 °C (hystérésis 3 °C) |
-| Écrêteur temp. (charge) | `automation.solarflow_ecreteur_temperature_batterie` | `1779624839201` | Régule comme un **plafond dynamique** sur `input_limit` (700W/300W/100W) selon la température (47/49/51 °C). N'écrit que si `consigne > limite`. Notif + Hystérésis 5 min. |
-| Écrêteur temp. (décharge) | `automation.solarflow_ecreteur_temperature_batterie_decharge` | `1779624839202` | Régule comme un **plafond dynamique** sur `output_limit` (600W/300W/100W) selon la température (47/49/51 °C). N'écrit que si `consigne > limite`. Notif + Hystérésis 5 min. |
+| Alerte température | `automation.solarflow_alerte_temperature_elevee` | `1779172974274` | > 45 °C pendant 2 min → notif persistante. Dismiss auto < 42 °C (hystérésis 3 °C). **ACTIVE (Seule surveillance en place)**. |
+| Écrêteur temp. (charge) | `automation.solarflow_ecreteur_temperature_batterie` | `1779624839201` | **DÉSACTIVÉ (`initial_state: false`)** — Évite les conflits de réécriture et les micro-décrochages avec Zendure HEMS. |
+| Écrêteur temp. (décharge) | `automation.solarflow_ecreteur_temperature_batterie_decharge` | `1779624839202` | **DÉSACTIVÉ (`initial_state: false`)** — Évite les conflits de réécriture et les micro-décrochages avec Zendure HEMS. |
 
 > [!IMPORTANT]
-> **Régulation par plafond dynamique (14/08/2026 v20)** : Les écrêteurs thermiques agissent comme des limiteurs de crête. Ils ne forcent plus jamais la consigne à 0 W en fonctionnement automatique (Zendure Manager `store_solar`) et n'envoient d'ordres `number.set_value` que si la consigne active dépasse le seuil autorisé, éliminant les décrochages intempestifs.
-> **Gardes de sécurité `unavailable` (13/08/2026)** : Les 4 automatisations cibles (`sync_limite_charge`, `sync_limite_decharge`, `ecreteur_temperature_batterie`, `ecreteur_temperature_batterie_decharge`) possèdent des conditions de garde template (`not in ['unavailable', 'unknown']`) afin d'éviter la réinitialisation silencieuse à 0 W des consignes si le plugin ou le broker MQTT se déconnecte.
+> **Cohabitation HEMS Cloud & Sécurité Thermique (14/08/2026 v21)** : Lorsque HEMS Cloud est actif (`binary_sensor.solarflow_800_plus_hems_state: on`), le serveur Zendure Cloud réécrit sa consigne toutes les 5 secondes en écrasant les modifications locales de HA, provoquant un reset matériel du pont de conversion (chute à 0 W en boucle). Les écrêteurs thermiques logiciels HA sont **désactivés** par précaution pour laisser HEMS gérer en direct. La surveillance reste assurée par l'alerte température (`automation.solarflow_alerte_temperature_elevee`).
 
 **⚠️ Valeurs du `select.solarflow_800_plus_ac_mode`** : l'intégration Zendure utilise `"input"` et `"output"` (pas de labels français). Si les commandes du dashboard cessent de fonctionner après une mise à jour HACS, vérifier en premier que ces valeurs n'ont pas changé :
 ```
@@ -490,6 +489,7 @@ Le bloc "Mode de fonctionnement" a été supprimé — le mode est géré automa
 
 | Date | Incident & Symptôme | Cause Racine Identifiée | Solution Définitive Appliquée |
 |---|---|---|---|
+| **2026-08-14 (Soir)** | Écrêtage décharge à 600 W ignoré + chute à 0 W en boucle (la batterie remonte à 700 W toutes les 5s). | Conflit Cloud HEMS : `hems_state: on` + profil Android `inverseMaxPower = 700 W`. Quand HA écrit 600 W sur `output_limit`, l'onduleur coupe à 0 W, puis Zendure Cloud réécrit 800 W 5 secondes après. | **Désactivation des écrêteurs HA** (`initial_state: false`) pour laisser HEMS gérer sans conflit. Maintien de l'alerte température `automation.solarflow_alerte_temperature_elevee`. |
 | **2026-08-14** | Chute brutale à 0 W à chaque montée en température (> 47 °C) suivie d'une réinitialisation Zendure. | L'écrêteur appliquait `min(valeur_user, limite) if valeur_user > 0 else 0`. Comme `valeur_user` (`input_select`) vaut 0 W en mode auto `store_solar`, l'écrêteur forçait `input_limit` à 0 W. De plus, l'écrêteur de décharge envoyait 0 W simultanément. | Refonte en **plafond dynamique supérieur** : l'écrêteur compare directement `consigne_actuelle > limite_thermique`. S'il n'y a pas de dépassement, aucun ordre n'est émis. |
 | **2026-08-13** | Consignes de charge/décharge sautant silencieusement à 0 W après redémarrage ou micro-coupure. | Lors d'une déconnexion MQTT/Cloud temporaire, les entités passaient `unavailable`. Le filtre Jinja `states(...) \| int(0)` renvoyait `0`, forçant les limites à 0 W. | Ajout systématique de **gardes templates de disponibilité** : `{{ states('...') not in ['unavailable', 'unknown'] }}` sur toutes les automatisations de régulation. |
 | **2026-08-10** | Gel de la puissance instantanée 3CT (`sensor.puissance_3ct`) à 111 W pendant plusieurs heures. | Micro-coupure Wi-Fi du routeur : le SmartMeter 3CT a épuisé ses 30 tentatives de reconnexion MQTT et s'est mis en veille radio. | Redémarrage électrique physique du boîtier 3CT + rétention MQTT (`retain: true`) via `automation.recovery_smartmeter_3ct_mosquitto_au_demarrage`. |
@@ -837,6 +837,13 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 ---
 
 ## 9. Changelog
+
+### 2026-08-14 v21
+
+- 🛡️ **Désactivation des Écrêteurs Thermiques SolarFlow (Conflit HEMS Cloud & Stabilisation)** :
+  - **Désactivation des écrêteurs** : `automation.solarflow_ecreteur_temperature_batterie` et `automation.solarflow_ecreteur_temperature_batterie_decharge` passées en `initial_state: false` et éteintes en direct via `automation.turn_off`.
+  - **Motif REX** : Lorsque Zendure HEMS Cloud est actif (`binary_sensor.solarflow_800_plus_hems_state: on`), le serveur Zendure Cloud réécrit sa consigne toutes les 5 secondes (800 W / profil 700 W) et écrase l'écrêtage de HA, provoquant une coupure à 0 W répétitive sur l'onduleur.
+  - **Maintien de la surveillance** : L'alerte de température élevée (`automation.solarflow_alerte_temperature_elevee`) reste active (`on`) à partir de 45 °C.
 
 ### 2026-08-14 v20
 

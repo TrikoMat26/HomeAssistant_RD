@@ -1700,7 +1700,8 @@
   mode: single
 - id: '1779624839201'
   alias: "SolarFlow — Écrêteur température batterie"
-  description: "Régule la limite de charge (input_limit) en fonction de la température de l'appareil (sensor.solarflow_800_plus_hyper_tmp) pour éviter la surchauffe. Agit comme un plafond sans forcer à 0W. Hystérésis de 5 min en descente. Garde unavailable ajoutée pour sécuriser post-mise à jour plugin."
+  description: "DÉSACTIVÉ (en attente d'une solution compatible HEMS) — Régule la limite de charge (input_limit) en fonction de la température."
+  initial_state: false
   mode: restart
   triggers:
     - platform: homeassistant
@@ -1799,7 +1800,8 @@
                 notification_id: solarflow_ecretage_temp
 - id: '1779624839202'
   alias: "SolarFlow — Écrêteur température batterie décharge"
-  description: "Régule la limite de décharge (output_limit) en fonction de la température de l'appareil (sensor.solarflow_800_plus_hyper_tmp) pour éviter la surchauffe. Agit comme un plafond sans forcer à 0W. Hystérésis de 5 min en descente. Garde unavailable ajoutée pour sécuriser post-mise à jour plugin."
+  description: "DÉSACTIVÉ (en attente d'une solution compatible HEMS) — Régule la limite de décharge (output_limit) en fonction de la température."
+  initial_state: false
   mode: restart
   triggers:
     - platform: homeassistant
