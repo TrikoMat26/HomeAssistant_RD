@@ -489,6 +489,7 @@ Le bloc "Mode de fonctionnement" a été supprimé — le mode est géré automa
 
 | Date | Incident & Symptôme | Cause Racine Identifiée | Solution Définitive Appliquée |
 |---|---|---|---|
+| **2026-09-04** | Blocage d'actualisation de la puissance 3CT (`sensor.puissance_3ct` figé à 0 W) sur le dashboard mobile (phases L1/L2/L3 en `unknown`). | Le Smart Meter 3CT s'était figé en émission locale MQTT suite à un redémarrage de HA. | Cycle électrique matériel (reboot physique) du boîtier 3CT. |
 | **2026-08-14 (Soir)** | Écrêtage décharge à 600 W ignoré + chute à 0 W en boucle (la batterie remonte à 700 W toutes les 5s). | Conflit Cloud HEMS : `hems_state: on` + profil Android `inverseMaxPower = 700 W`. Quand HA écrit 600 W sur `output_limit`, l'onduleur coupe à 0 W, puis Zendure Cloud réécrit 800 W 5 secondes après. | **Désactivation des écrêteurs HA** (`initial_state: false`) pour laisser HEMS gérer sans conflit. Maintien de l'alerte température `automation.solarflow_alerte_temperature_elevee`. |
 | **2026-08-14** | Chute brutale à 0 W à chaque montée en température (> 47 °C) suivie d'une réinitialisation Zendure. | L'écrêteur appliquait `min(valeur_user, limite) if valeur_user > 0 else 0`. Comme `valeur_user` (`input_select`) vaut 0 W en mode auto `store_solar`, l'écrêteur forçait `input_limit` à 0 W. De plus, l'écrêteur de décharge envoyait 0 W simultanément. | Refonte en **plafond dynamique supérieur** : l'écrêteur compare directement `consigne_actuelle > limite_thermique`. S'il n'y a pas de dépassement, aucun ordre n'est émis. |
 | **2026-08-13** | Consignes de charge/décharge sautant silencieusement à 0 W après redémarrage ou micro-coupure. | Lors d'une déconnexion MQTT/Cloud temporaire, les entités passaient `unavailable`. Le filtre Jinja `states(...) \| int(0)` renvoyait `0`, forçant les limites à 0 W. | Ajout systématique de **gardes templates de disponibilité** : `{{ states('...') not in ['unavailable', 'unknown'] }}` sur toutes les automatisations de régulation. |
@@ -671,6 +672,7 @@ Foobot, Statistics, Wake-on-LAN, KEF. *(Bloc `aarlo:` commenté.)*
 
 | Problème | Résolution | Date |
 |---|---|---|
+| Blocage d'actualisation de la puissance 3CT (`sensor.puissance_3ct` figé à 0 W) sur le dashboard mobile | Le Smart Meter 3CT Zendure s'était à nouveau figé en émission locale MQTT suite à un redémarrage de HA (phases L1/L2/L3 en `unknown`). Résolu par un cycle électrique matériel (reboot physique) du boîtier 3CT. | 2026-09-04 |
 | Bloquage de la puissance instantanée 3CT (`sensor.puissance_3ct`) à 111 W suite à une micro-coupure Wi-Fi | Le Smart Meter 3CT Zendure s'était figé en émission locale (épuisement de ses 30 essais de connexion MQTT après micro-coupure Wi-Fi du routeur le 9 août à 09:20:10). Résolu par un redémarrage électrique physique du boîtier 3CT. | 2026-08-10 |
 | Courbe de consommation électrique incorrecte (spike négatif de -2571.78 kWh) sur `sensor.lixee_easf05` | Correction de la statistique à 15h00 heure de Paris par un ajustement via la WebSocket API (`recorder/adjust_sum_statistics`), rétablissant la somme cumulative cumulée lisse de 1090.927 kWh. | 2026-08-10 |
 | Avertissement "La configuration YAML HTTP est obsolète" | Suppression du bloc `http:` de `configuration.yaml` suite à l'importation automatique des paramètres proxy inverse (`use_x_forwarded_for` & `trusted_proxies`) dans le stockage/UI interne de Home Assistant. | 2026-08-06 |
@@ -838,6 +840,12 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 
 ## 9. Changelog
 
+### 2026-09-04 v22
+
+- ⚡ **Smart Meter Zendure 3CT — Dépannage blocage MQTT local** (§2quater.8, §5.2, §7 `zendure-entities-reference.md`) :
+  - **Symptôme** : Suite au redémarrage de Home Assistant la veille, le boîtier 3CT s'était figé en émission locale MQTT, laissant les phases L1/L2/L3 (`sensor.te31njn8n386922_l*_p`) à l'état `unknown` et la carte du dashboard mobile `sensor.puissance_3ct` bloquée à plat (0 W).
+  - **Diagnostic & Résolution** : Intégration Zendure vérifiée à jour (v1.4.4). Rétablissement complet opéré par un cycle d'extinction/rallumage matériel (redémarrage électrique physique secteur) du boîtier Zendure 3CT.
+
 ### 2026-08-14 v21
 
 - 🛡️ **Désactivation des Écrêteurs Thermiques SolarFlow (Conflit HEMS Cloud & Stabilisation)** :
@@ -942,7 +950,6 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
   - 🔽 **Limite abaissée 900W → 800W** : marge accrue sous le seuil de trip empirique observé (835W).
   - 🔧 **`number.set_value` remplace `mqtt.publish` brut** : entité HA native `number.hms_1600_limit_nonpersistent_absolute`.
   - 📌 **Entités `hms_1600_*` documentées** (§2ter.2) : `sensor.hms_1600_voltage`, `number.hms_1600_limit_nonpersistent_absolute`, `binary_sensor.hms_1600_producing`, etc.
-  - Config_hash : `dd09da9dfc6cbac4` → `0a04db722440aa8c`
 
 ### 2026-08-02 v1
 
