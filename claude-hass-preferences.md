@@ -848,6 +848,7 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
   - **Capteur de puissance instantanée** : Mise à jour du template helper `sensor.puissance_chauffe_eau_principal` de 3000 W à 2000 W.
   - **Bilan de fin de cycle** : Dans `automation.chauffe_eau_principal_bilan_fin_de_cycle` ([automations.yaml line 1305](file:///c:/Users/kriko/GitHub/HomeAssistant_RD/automations.yaml#L1305)), remplacement du multiplicateur `3.0` par `2.0` pour les calculs de `kwh_cycle` et `cout_estime`.
   - **Dashboard Lovelace** : Mise à jour de la carte Markdown conditionnelle dans la sous-vue `/lovelace/programmation_principal` (`kwh = 2 * ... / 3600`).
+  - **Discrimination des charges PH1 (Lave-linge / Sèche-linge)** : Intégration dans le template de `binary_sensor.chauffe_eau_principal_actif` du verrou d'état contacteur (`is_state('switch.0x00124b0024c79699', 'on')`) et du calcul de puissance nette déduisant la prise connectée lave-linge/sèche-linge (`sensor.atelier_ph1_power_minute_average - sensor.lave_linge_seche_linge_power > 1700`). Élimine les faux démarrages lors des pointes de chauffe eau du lave-linge (~2 200 W pendant <10 min) et permet la détection immédiate de coupure même en cas de fonctionnement simultané.
   - **Déploiement & validation** : Synchronisation sur `/config/automations.yaml` avec sauvegarde horodatée, validation de syntaxe (`check-config`: valid), rechargement à chaud des automatisations et mise à jour live du dashboard via WebSocket.
 
 ### 2026-09-04 v22
