@@ -577,6 +577,23 @@ Pour la liste exacte et à jour : `ha_search_entities(query="", domain_filter="a
 | Chauffe-eau principal | `sensor.puissance_chauffe_eau_principal` (W) | — (estimé × durée) | `input_number.chauffe_eau_principal_timestamp_debut_de_cycle` (Unix ts) |
 | Pompe piscine | `sensor.pompe_piscine_ph3_3_1min` (W, avg 1 min) | `sensor.pompe_piscine` (kWh cumul., source `ph3_3_1min`) | Pas de baseline — kWh estimés via puissance × durée |
 
+#### 3.ter.2bis Détection Chauffe-eau Principal & Suivi des Charges PH1 (Atelier)
+
+- **Principe de détection actuelle (2000 W)** : Le chauffe-eau principal ne dispose pas d'un compteur d'énergie propre. Sa consommation est déduite de `sensor.atelier_ph1_power_minute_average` via le template helper `binary_sensor.chauffe_eau_principal_actif`.
+- **Formule active (Verrou contacteur + Puissance Nette)** :
+  ```jinja
+  {% set ph1 = states('sensor.atelier_ph1_power_minute_average') | float(0) %}
+  {% set ll_sl = states('sensor.lave_linge_seche_linge_power') | float(0) %}
+  {% set puissance_nette = ph1 - ll_sl %}
+  {{ is_state('switch.0x00124b0024c79699', 'on') and (puissance_nette > 1700) }}
+  ```
+- **📌 Consigne pour les interventions futures (Roadmap charges PH1)** :
+  - *Contexte* : D'autres équipements consommateurs sont branchés sur la Phase 1 de l'atelier sans être encore identifiés ni équipés de compteurs d'énergie.
+  - *Action requise dès que l'utilisateur les aura identifiés* :
+    1. Si des prises connectées de mesure sont installées sur ces équipements, déduire leurs puissances instantanées dans `puissance_nette` au sein de `binary_sensor.chauffe_eau_principal_actif` :
+       `{% set puissance_nette = ph1 - ll_sl - states('sensor.nouvel_appareil_power') | float(0) %}`
+    2. Si les appareils ne peuvent pas avoir de prise connectée, envisager la solution matérielle directe : ajouter un tore de mesure (ex: pince Emporia dédiée ou micromodule Shelly EM) directement sur la ligne départ du chauffe-eau principal.
+
 #### 3.ter.3 Dashboard Aperçu V4 (version actuelle)
 
 - 3 cartes `tile` natives sur vue Home, chacune avec `navigation_path: /lovelace/programmation_<slug>`
@@ -667,6 +684,7 @@ Foobot, Statistics, Wake-on-LAN, KEF. *(Bloc `aarlo:` commenté.)*
 | **Emporia Vue timeouts API** | emporia_vue (custom) | Basse | Analyse 10 jours (2026-05-12→22) : 4 événements sporadiques + 1 vague DNS le 2026-05-21 à 13h19 (Paris) — probablement résolution DNS intermittente. Voir logs `/config/python_scripts/emporia/logs/`. |
 | **`sensor.chauffe_eau_opportunite_stats` : vérifier unité** | statistics | **À vérifier** | Si valeur 0–100, corriger trigger SIMU_OFF : `below: 0.40` → `below: 40` |
 | **Surtension réseau HMS-1600** | réseau EDF | Moyenne | Contacter Enedis. Pics > 253 V hors tolérance EN 50160. Géré temporairement par l'écrêteur §2ter.5. |
+| **Charges concurrentes PH1 vs Chauffe-eau principal** | énergie | Moyenne (surveillance) | Krikor doit identifier d'autres appareils consommateurs sur PH1 Atelier (actuellement sans compteur d'énergie). À leur identification, intégrer la soustraction de leurs mesures dans `binary_sensor.chauffe_eau_principal_actif` (§3.ter.2bis) ou envisager un tore de mesure dédié au chauffe-eau. |
 
 ### 5.2 Résolus récents
 
