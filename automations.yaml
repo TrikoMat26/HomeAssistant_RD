@@ -1099,52 +1099,28 @@
   mode: single
 - id: '1778015763914'
   alias: Cycle complet chauffes eaux
-  description: 'Gère le cycle séquentiel : arme le passage au chauffe-eau principal à l''extinction du chauffe-eau cuisine. Annulable à tout moment en éteignant le bouton.'
+  description: 'Relève automatique : allume le chauffe-eau principal à l''extinction du chauffe-eau cuisine si l''option est armée. Ne démarre jamais la cuisine automatiquement.'
   triggers:
-  - trigger: state
-    entity_id: input_boolean.cycle_chauffes_eaux
-    from: 'off'
-    to: 'on'
-    id: armement_cycle
   - trigger: state
     entity_id: switch.chauffe_eau_cuisine
     from: 'on'
     to: 'off'
-    id: extinction_cuisine
-  conditions: []
+  conditions:
+  - condition: state
+    entity_id: input_boolean.cycle_chauffes_eaux
+    state: 'on'
   actions:
-  - choose:
-    - conditions:
-      - condition: trigger
-        id: armement_cycle
-      - condition: state
-        entity_id: switch.chauffe_eau_cuisine
-        state: 'off'
-      sequence:
-      - action: switch.turn_on
-        metadata: {}
-        target:
-          entity_id: switch.chauffe_eau_cuisine
-        data: {}
-    - conditions:
-      - condition: trigger
-        id: extinction_cuisine
-      - condition: state
-        entity_id: input_boolean.cycle_chauffes_eaux
-        state: 'on'
-      sequence:
-      - action: switch.turn_on
-        metadata: {}
-        target:
-          entity_id: switch.0x00124b0024c79699
-        data: {}
-      - action: input_boolean.turn_off
-        metadata: {}
-        target:
-          entity_id: input_boolean.cycle_chauffes_eaux
-        data: {}
-  mode: queued
-  max: 5
+  - action: switch.turn_on
+    metadata: {}
+    target:
+      entity_id: switch.0x00124b0024c79699
+    data: {}
+  - action: input_boolean.turn_off
+    metadata: {}
+    target:
+      entity_id: input_boolean.cycle_chauffes_eaux
+    data: {}
+  mode: single
 - id: '1778091406287'
   alias: ⚡ Anomalie — Power 1400W tombe à 0
   description: Notification persistante chaque fois que le capteur Power_1400W passe
