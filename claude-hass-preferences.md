@@ -672,6 +672,7 @@ Foobot, Statistics, Wake-on-LAN, KEF. *(Bloc `aarlo:` commenté.)*
 
 | Problème | Résolution | Date |
 |---|---|---|
+| Détection de chauffe & extinction automatique inopérantes suite au passage du chauffe-eau principal à 2000 W | Réduction de la puissance résistive de 3 kW à 2 kW. Ajustement du seuil de détection du template helper `binary_sensor.chauffe_eau_principal_actif` (`> 1700 W` au lieu de `> 3000 W`), mise à jour de `sensor.puissance_chauffe_eau_principal` (2000 W), révision du calcul de bilan d'énergie/coût (multiplicateur `2.0` kW) dans `automation.chauffe_eau_principal_bilan_fin_de_cycle` et de la carte Markdown dans le dashboard `/lovelace/programmation_principal`. | 2026-09-20 |
 | Blocage d'actualisation de la puissance 3CT (`sensor.puissance_3ct` figé à 0 W) sur le dashboard mobile | Le Smart Meter 3CT Zendure s'était à nouveau figé en émission locale MQTT suite à un redémarrage de HA (phases L1/L2/L3 en `unknown`). Résolu par un cycle électrique matériel (reboot physique) du boîtier 3CT. | 2026-09-04 |
 | Bloquage de la puissance instantanée 3CT (`sensor.puissance_3ct`) à 111 W suite à une micro-coupure Wi-Fi | Le Smart Meter 3CT Zendure s'était figé en émission locale (épuisement de ses 30 essais de connexion MQTT après micro-coupure Wi-Fi du routeur le 9 août à 09:20:10). Résolu par un redémarrage électrique physique du boîtier 3CT. | 2026-08-10 |
 | Courbe de consommation électrique incorrecte (spike négatif de -2571.78 kWh) sur `sensor.lixee_easf05` | Correction de la statistique à 15h00 heure de Paris par un ajustement via la WebSocket API (`recorder/adjust_sum_statistics`), rétablissant la somme cumulative cumulée lisse de 1090.927 kWh. | 2026-08-10 |
@@ -839,6 +840,15 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 ---
 
 ## 9. Changelog
+
+### 2026-09-20 v23
+
+- ⚡ **Chauffe-eau principal — Adaptation de puissance 3000 W → 2000 W** (§3.ter.2, §5.2) :
+  - **Seuil de détection de chauffe** : Abaissement du seuil de `binary_sensor.chauffe_eau_principal_actif` de `> 3000 W` à `> 1700 W` sur `sensor.atelier_ph1_power_minute_average` via l'options flow de HA. Rétablit le déclenchement de l'extinction automatique (`automation.extinction_chauffe_eau_principal`) et du bilan de cycle.
+  - **Capteur de puissance instantanée** : Mise à jour du template helper `sensor.puissance_chauffe_eau_principal` de 3000 W à 2000 W.
+  - **Bilan de fin de cycle** : Dans `automation.chauffe_eau_principal_bilan_fin_de_cycle` ([automations.yaml line 1305](file:///c:/Users/kriko/GitHub/HomeAssistant_RD/automations.yaml#L1305)), remplacement du multiplicateur `3.0` par `2.0` pour les calculs de `kwh_cycle` et `cout_estime`.
+  - **Dashboard Lovelace** : Mise à jour de la carte Markdown conditionnelle dans la sous-vue `/lovelace/programmation_principal` (`kwh = 2 * ... / 3600`).
+  - **Déploiement & validation** : Synchronisation sur `/config/automations.yaml` avec sauvegarde horodatée, validation de syntaxe (`check-config`: valid), rechargement à chaud des automatisations et mise à jour live du dashboard via WebSocket.
 
 ### 2026-09-04 v22
 

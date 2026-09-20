@@ -1254,9 +1254,9 @@
       p.get(states(''input_text.chauffe_eau_cuisine_periode_tarifaire_debut_de_cycle''),
       0.1612) }}'
 - id: '1778194096554'
-  alias: "\U0001F4BE Chauffe-eau principal — Début de cycle"
+  alias: "💾 Chauffe-eau principal — Début de cycle"
   description: Mémorise le timestamp et la période tarifaire au démarrage du chauffe-eau
-    principal. Le kWh est calculé à l'arrêt via durée × 3 kW (tout ou rien).
+    principal. Le kWh est calculé à l'arrêt via durée × 2 kW (tout ou rien).
   triggers:
   - platform: state
     entity_id: binary_sensor.chauffe_eau_principal_actif
@@ -1276,8 +1276,8 @@
       value: '{{ states(''sensor.leexi_current_price'') }}'
   mode: single
 - id: '1778194112295'
-  alias: "\U0001F4CA Chauffe-eau principal — Bilan fin de cycle"
-  description: Calcule et notifie la consommation du cycle via durée × 3 kW (puissance
+  alias: "📊 Chauffe-eau principal — Bilan fin de cycle"
+  description: Calcule et notifie la consommation du cycle via durée × 2 kW (puissance
     fixe), avec coût au tarif Tempo mémorisé au démarrage.
   triggers:
   - platform: state
@@ -1291,23 +1291,23 @@
   actions:
   - action: persistent_notification.create
     data:
-      title: "\U0001F3E0 Bilan chauffe-eau principal"
+      title: "🏠 Bilan chauffe-eau principal"
       notification_id: bilan_chauffe_eau_principal_{{ now().strftime('%Y%m%d_%H%M%S')
         }}
       message: "**Cycle terminé à {{ now().strftime('%H:%M') }}**\n\n- ⚡ Consommation
-        : **{{ kwh_cycle }} kWh**\n- ⏱ Durée : **{{ duree_min }} min**\n- \U0001F4CA
-        Période : **{{ tarif_periode }}** ({{ prix_kwh }} €/kWh)\n- \U0001F4B6 Coût
+        : **{{ kwh_cycle }} kWh**\n- ⏱ Durée : **{{ duree_min }} min**\n- 📊
+        Période : **{{ tarif_periode }}** ({{ prix_kwh }} €/kWh)\n- 💵 Coût
         estimé : **{{ cout_estime }} €**"
   - action: notify.mobile_app_sm_s948b
     data:
-      title: "\U0001F3E0 Bilan chauffe-eau principal"
+      title: "🏠 Bilan chauffe-eau principal"
       message: Cycle terminé à {{ now().strftime('%H:%M') }} · {{ kwh_cycle }} kWh
         · {{ duree_min }} min · {{ tarif_periode }} · {{ cout_estime }} €
   mode: single
   variables:
     duree_min: '{{ ((as_timestamp(now()) - states(''input_number.chauffe_eau_principal_timestamp_debut_de_cycle'')
       | float(0)) / 60) | round(0) | int }}'
-    kwh_cycle: '{{ (3.0 * (as_timestamp(now()) - states(''input_number.chauffe_eau_principal_timestamp_debut_de_cycle'')
+    kwh_cycle: '{{ (2.0 * (as_timestamp(now()) - states(''input_number.chauffe_eau_principal_timestamp_debut_de_cycle'')
       | float(0)) / 3600) | round(3) }}'
     tarif_periode: '{{ states(''input_text.chauffe_eau_principal_periode_tarifaire_debut_de_cycle'')
       }}'
@@ -1317,7 +1317,7 @@
       0.1612) }}'
     cout_estime: '{% set p = {''HC BLEU'': 0.1325, ''HP BLEU'': 0.1612, ''HC BLANC'':
       0.1499, ''HP BLANC'': 0.1871, ''HC ROUGE'': 0.1575, ''HP ROUGE'': 0.7060} %}{{
-      (3.0 * (as_timestamp(now()) - states(''input_number.chauffe_eau_principal_timestamp_debut_de_cycle'')
+      (2.0 * (as_timestamp(now()) - states(''input_number.chauffe_eau_principal_timestamp_debut_de_cycle'')
       | float(0)) / 3600 * p.get(states(''input_text.chauffe_eau_principal_periode_tarifaire_debut_de_cycle''),
       0.1612)) | round(3) }}'
 - id: '1778328676519'
