@@ -2,7 +2,7 @@
 
 <!--
   Fichier de contexte persistant. Version stockée sur HA : /config/claude-hass-preferences.md
-  Dernière mise à jour : 2026-08-14 v21 (voir Changelog en bas pour détails)
+  Dernière mise à jour : 2026-10-01 v22 (voir Changelog en bas pour détails)
   Optimisé pour Claude Cowork (desktop/mobile/web) ET Claude Code.
 -->
 
@@ -55,6 +55,7 @@
 2quater. [SolarFlow 800 Plus — Batterie Zendure](#2quater-solarflow-800-plus--batterie-zendure)
 3. [Automations clés](#3-automations-clés)
 3quater. [Cast vers Nest Hub Cuisine](#3quater-cast-vers-nest-hub-cuisine)
+3quinquies. [PC Bureau & Écrans (Multiprise Meross)](#3quinquies-pc-bureau--gestion-des-écrans-multiprise-meross)
 4. [Intégrations & add-ons](#4-intégrations--add-ons)
 5. [Santé système — ouverts / connus / résolus](#5-santé-système)
 6. [Bibliothèque de données solaires](#6-bibliothèque-de-données-solaires)
@@ -624,6 +625,42 @@ Pour la liste exacte et à jour : `ha_search_entities(query="", domain_filter="a
 
 ---
 
+## 3quinquies. 🖥️ PC Bureau & Gestion des Écrans (Multiprise Meross)
+
+> Gestion combinée du PC Bureau (`switch.pc_bureau` via Wake-on-LAN et core_rpc_shutdown) et des écrans connectés sur la multiprise Meross MSS425F (`switch.switch_1` et `switch.switch_2`).
+
+### 3quinquies.1 Entités & Scripts
+
+| Entité | entity_id | Type | Rôle / Description |
+|---|---|---|---|
+| PC Bureau | `switch.pc_bureau` | switch (WOL) | Démarrage via Wake-on-LAN et extinction via `core_rpc_shutdown`. |
+| Écran 1 | `switch.switch_1` | switch (Meross) | Prise Outlet 1 de la multiprise du bureau (Écran 1). |
+| Écran 2 | `switch.switch_2` | switch (Meross) | Prise Outlet 2 de la multiprise du bureau (Écran 2). |
+| Remote TOGGLE | `script.pc_bureau_remote_toggle` | script | Bascule intelligente : si PC `on` → `pc_bureau_remote_turn_off`, sinon → `pc_bureau_remote_turn_on`. |
+| Remote ON | `script.pc_bureau_remote_turn_on` | script | Éteint les écrans (`switch_1`, `switch_2`), attend 1s, puis réveille le PC via WOL. |
+| Remote OFF | `script.pc_bureau_remote_turn_off` | script | Éteint le PC via RPC shutdown, attend l'arrêt réel (`off`, timeout 2 min), puis rallume les écrans. |
+| **Toggle Écrans** | **`script.pc_bureau_ecrans_toggle`** | script | **Bascule synchrone sécurisée** : si l'un des écrans est `on` → éteint les deux ; sinon → allume les deux. |
+
+### 3quinquies.2 Automations associées
+
+- **`automation.pc_bureau_ecrans_on_apres_arret_ha`** (id: `1767538447908`) : Rallume automatiquement les écrans (`switch.switch_1`, `switch.switch_2`) dès que `switch.pc_bureau` passe à `off`.
+- **`automation.pc_bureau_notification_demarrage`** (id: `1767549456504`) : Notifie le mobile quand le PC Bureau passe de `off` à `on`.
+
+### 3quinquies.3 🧠 REX & Diagnostic : Pourquoi les écrans ne restaient parfois pas éteints
+
+1. **Symptôme** : Lors d'un démarrage du PC à distance pour une session de télétravail/streaming, les écrans restaient parfois allumés dans la pièce toute la journée malgré le script `pc_bureau_remote_turn_on`.
+2. **Cause racine identifiée** :
+   - Le switch `switch.pc_bureau` est basé sur la plateforme `wake_on_lan`. Lors de l'allumage, il envoie le paquet WOL et passe brièvement à `on`.
+   - Pendant les 15 à 30 premières secondes de démarrage de Windows, le PC ne répond pas encore au ping réseau sur `192.168.1.43`.
+   - Le composant WOL bascule donc temporairement `switch.pc_bureau` à `off`.
+   - Ce passage à `off` déclenchait immédiatement `automation.pc_bureau_ecrans_on_apres_arret_ha` (qui écoute `to: 'off'` sans filtre de durée), **rallumant instantanément les écrans** !
+3. **Solution appliquée (2026-10-01)** :
+   - Création du script synchrone `script.pc_bureau_ecrans_toggle`.
+   - Ajout d'un bouton dédié dans le dashboard **1.Mobile** (`dashboard-mobile`), positionné juste en dessous du bouton "PC Bureau" dans une `vertical-stack`.
+   - Retour d'état en temps réel : icône `mdi:monitor` verte si allumé, rouge si éteint, permettant un contrôle manuel direct et immédiat à distance.
+
+---
+
 ## 4. Intégrations & add-ons
 
 ### Protocoles / intégrations actifs
@@ -837,6 +874,14 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 ---
 
 ## 9. Changelog
+
+### 2026-10-01 v22
+
+- 🆕 **Bouton & Script Contrôle Écran(s) PC Bureau (Dashboard 1.Mobile)** :
+  - **Script de bascule sécurisée** : Création de `script.pc_bureau_ecrans_toggle` (`scripts.yaml`) pour commander de manière synchrone et sécurisée les deux sorties écrans (`switch.switch_1` et `switch.switch_2` de la multiprise Meross). Si au moins un écran est `on`, le script éteint les deux ; sinon, il les allume.
+  - **Bouton dédié Dashboard 1.Mobile** : Ajout d'une carte Mushroom Template "Écran(s) PC" dans `dashboard-mobile` (Section 1), positionnée immédiatement sous le bouton de commande à distance "PC Bureau" dans une `vertical-stack`.
+  - **Retour visuel dynamique** : Icône `mdi:monitor` verte si au moins un écran est allumé, rouge si éteint, avec bascule en 1 tap (`tap_action: toggle script`).
+  - 🧠 **Diagnostic REX surtension / rebond WOL** (§3quinquies.3) : Identification de la cause pour laquelle les écrans restaient parfois allumés lors d'un réveil distant (la coupure temporaire du ping WOL pendant le boot de Windows faisait retomber le switch `pc_bureau` à `off`, ce qui déclenchait l'automation de secours `automation.pc_bureau_ecrans_on_apres_arret_ha`).
 
 ### 2026-08-14 v21
 
