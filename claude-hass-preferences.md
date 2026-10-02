@@ -439,18 +439,20 @@ ou via Developer Tools → Template : `{{ state_attr('select.solarflow_800_plus_
 
 **Bascule mode automatique** : le mode AC (`select.solarflow_800_plus_ac_mode`) est géré exclusivement par les automations — ne jamais le modifier manuellement depuis le dashboard.
 
-### 2quater.5 Dashboard Aperçu — carte SolarFlow (carte n°9)
+### 2quater.5 Dashboard Aperçu — carte SolarFlow (carte n°3 de la vue Home)
 
-Structure `vertical-stack` actuelle (5 lignes) :
+Structure `vertical-stack` unifiée pour les deux boîtiers SolarFlow 800 Plus :
 
 ```
-## ⚡ SolarFlow 800 Plus
+## ⚡ SolarFlow 800 Plus n°1
 [Batterie %] [Puissance W] [Temp. SolarFlow] [Temp. Batterie]
-🔋 Charge (0–1000 W)    [ 400 W ▼ ]
-🔋 Décharge (0–800 W)   [ 200 W ▼ ]
+## ⚡ SolarFlow 800 Plus n°2
+[Batterie %] [Puissance W] [Temp. SolarFlow] [Temp. Batterie]
 ```
 
-Le bloc "Mode de fonctionnement" a été supprimé — le mode est géré automatiquement par les automations.
+- **SolarFlow n°1** (Historique — SN `EOC1NLNAN506559`) : batterie `AB2000 06618`, capteurs `sensor.solarflow_800_plus_*`.
+- **SolarFlow n°2** (Nouveau — SN `EOC1NLN9N466477`) : batterie `AB2000 06018`, capteurs `sensor.solarflow_800_plus_n2_*`.
+- Les deux anciennes cartes de consignes manuelles de charge et de décharge (`input_select.solarflow_limite_charge/decharge`) ont été retirées de la vue principale (pilotage assuré par Zendure Manager / HEMS).
 
 ### 2quater.6 Automations futures à créer
 
@@ -490,6 +492,7 @@ Le bloc "Mode de fonctionnement" a été supprimé — le mode est géré automa
 
 | Date | Incident & Symptôme | Cause Racine Identifiée | Solution Définitive Appliquée |
 |---|---|---|---|
+| **2026-10-03** | Rejet et disparition des 64 entités du 2ème SolarFlow 800 Plus (`Platform zendure_ha does not generate unique IDs`). | L'intégration `zendure_ha` v1.4.4 base ses identifiants `unique_id` sur le nom Cloud de l'appareil (`dev.get("deviceName")`). Comme les deux boîtiers portaient le même nom par défaut `"SolarFlow 800 Plus"`, Home Assistant rejetait toutes les entités du 2nd boîtier pour collision d'identifiants uniques. | **Renommage du second boîtier dans l'application mobile Zendure** en `SolarFlow 800 Plus n°2`. L'intégration a généré automatiquement des entités isolées `solarflow_800_plus_n2_*` pour le 2nd boîtier tout en préservant 100% des entités et historiques du 1er boîtier, sans nécessiter de patch de code fragile. |
 | **2026-08-14 (Soir)** | Écrêtage décharge à 600 W ignoré + chute à 0 W en boucle (la batterie remonte à 700 W toutes les 5s). | Conflit Cloud HEMS : `hems_state: on` + profil Android `inverseMaxPower = 700 W`. Quand HA écrit 600 W sur `output_limit`, l'onduleur coupe à 0 W, puis Zendure Cloud réécrit 800 W 5 secondes après. | **Désactivation des écrêteurs HA** (`initial_state: false`) pour laisser HEMS gérer sans conflit. Maintien de l'alerte température `automation.solarflow_alerte_temperature_elevee`. |
 | **2026-08-14** | Chute brutale à 0 W à chaque montée en température (> 47 °C) suivie d'une réinitialisation Zendure. | L'écrêteur appliquait `min(valeur_user, limite) if valeur_user > 0 else 0`. Comme `valeur_user` (`input_select`) vaut 0 W en mode auto `store_solar`, l'écrêteur forçait `input_limit` à 0 W. De plus, l'écrêteur de décharge envoyait 0 W simultanément. | Refonte en **plafond dynamique supérieur** : l'écrêteur compare directement `consigne_actuelle > limite_thermique`. S'il n'y a pas de dépassement, aucun ordre n'est émis. |
 | **2026-08-13** | Consignes de charge/décharge sautant silencieusement à 0 W après redémarrage ou micro-coupure. | Lors d'une déconnexion MQTT/Cloud temporaire, les entités passaient `unavailable`. Le filtre Jinja `states(...) \| int(0)` renvoyait `0`, forçant les limites à 0 W. | Ajout systématique de **gardes templates de disponibilité** : `{{ states('...') not in ['unavailable', 'unknown'] }}` sur toutes les automatisations de régulation. |
@@ -874,6 +877,16 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 ---
 
 ## 9. Changelog
+
+### 2026-10-03 v23
+
+- 🆕 **Intégration d'un 2ème boîtier Zendure SolarFlow 800 Plus** :
+  - **Résolution du bug multi-appareils (Unique ID Collision)** (§2quater.8) : Identification de la cause racine du blocage de l'intégration `zendure_ha` v1.4.4 (collision des `unique_id` causée par le nom par défaut identique `"SolarFlow 800 Plus"`). Résolution propre et pérenne aux MAJ HACS par renommage du 2nd appareil dans l'application Zendure en `SolarFlow 800 Plus n°2`.
+  - **Déploiement des 64 entités** : Le second SolarFlow dispose désormais de son jeu complet de 64 entités (`*_solarflow_800_plus_n2_*`) et de sa batterie AB2000 dédiée (`AB2000 06018`). Le 1er SolarFlow historique et sa batterie (`AB2000 06618`) restent à 100% intacts.
+- 🎛 **Refonte de la carte SolarFlow dans le Dashboard Aperçu** (§2quater.5) :
+  - Empilement vertical unifié des deux SolarFlow (glance 4 colonnes chacun : Batterie %, Puissance W, Temp. SolarFlow, Temp. Batterie).
+  - Suppression des sélecteurs manuels de charge et décharge qui encombraient la carte principale.
+  - Déploiement à chaud via WebSocket API et sauvegarde dans `lovelace.json`.
 
 ### 2026-10-01 v22
 

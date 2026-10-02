@@ -158,5 +158,10 @@ Ce guide résume les points critiques à retenir pour le fonctionnement de l'int
    - Toujours encadrer les templates par `{{ states('...') not in ['unavailable', 'unknown'] }}` pour éviter qu'une déconnexion ne bascule les consignes à 0 W via un filtre `| int(0)`.
 4. **Options AC Mode** :
    - Vérifier que `select.solarflow_800_plus_ac_mode` utilise bien `"input"` et `"output"`.
+5. **Gestion Multi-Boîtiers (Règle d'or de nommage)** :
+   - L'intégration `zendure_ha` v1.4.x génère ses identifiants `unique_id` sur la base du nom Cloud de l'appareil (`device.name`).
+   - Si plusieurs boîtiers d'un même modèle sont ajoutés sur le même compte Zendure, **chacun doit obligatoirement porter un nom distinct dans l'application mobile Zendure** (ex: `SolarFlow 800 Plus` et `SolarFlow 800 Plus n°2`).
+   - Ne jamais laisser le nom par défaut identique sur plusieurs hubs, sous peine de voir Home Assistant bloquer toutes les entités du 2ème boîtier pour collision d'identifiants (`Platform zendure_ha does not generate unique IDs`).
+
 
 

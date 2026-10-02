@@ -132,7 +132,7 @@
           "cards": [
             {
               "type": "markdown",
-              "content": "## ⚡ SolarFlow 800 Plus n°1\n"
+              "content": "## ⚡ SolarFlow 800 Plus\n"
             },
             {
               "type": "glance",
@@ -163,34 +163,24 @@
               ]
             },
             {
-              "type": "markdown",
-              "content": "## ⚡ SolarFlow 800 Plus n°2\n"
-            },
-            {
-              "type": "glance",
-              "show_name": true,
-              "show_icon": true,
-              "show_state": true,
+              "type": "entities",
+              "title": "🔋 Charge (0–1000 W)",
               "entities": [
                 {
-                  "entity": "sensor.solarflow_800_plus_n2_electric_level",
-                  "name": "Batterie",
-                  "icon": "mdi:battery"
-                },
+                  "entity": "input_select.solarflow_limite_charge",
+                  "name": "Limite charge",
+                  "icon": "mdi:battery-arrow-up"
+                }
+              ]
+            },
+            {
+              "type": "entities",
+              "title": "🔋 Décharge (0–800 W)",
+              "entities": [
                 {
-                  "entity": "sensor.solarflow_800_plus_n2_bat_in_out",
-                  "name": "Puissance",
-                  "icon": "mdi:lightning-bolt"
-                },
-                {
-                  "entity": "sensor.solarflow_800_plus_n2_hyper_tmp",
-                  "name": "Temp. SolarFlow",
-                  "icon": "mdi:thermometer"
-                },
-                {
-                  "entity": "sensor.ab2000_06018_max_temp",
-                  "name": "Temp. Batterie",
-                  "icon": "mdi:thermometer"
+                  "entity": "input_select.solarflow_limite_decharge",
+                  "name": "Limite décharge",
+                  "icon": "mdi:battery-arrow-down"
                 }
               ]
             }
