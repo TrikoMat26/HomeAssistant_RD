@@ -887,6 +887,10 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
   - **Carte ApexCharts 24h Triphasée (Haute Visibilité)** : Déploiement dans le dashboard `energie-detail` d'un graphique interactif 24h superposant les 3 phases (Bleu `#1e88e5`, Orange `#fb8c00`, Vert `#43a047`), avec zoom/pan, résolution 2 min, annotations de ligne 0 W (distinction nette entre soutirage et surproduction solaire) et infobulle synchronisée.
   - **Carte de répartition & identification des appareils** : Ajout d'une carte d'entités ventilant les sous-circuits Emporia Vue et prises connectées par phase (Ph 1, Ph 2, Ph 3 et circuits cuisine/salon en cours de repérage) pour identifier directement sur quelle phase consomme chaque appareil lors des paliers de puissance.
   - **Déploiement à chaud & Sauvegarde** : Téléversement en direct via WebSocket API (`lovelace/config/save`) et sauvegarde dans `dashboard_energie_detail.json` (avec backup horodaté dans `dashboard_backup/`).
+  - **Ajustements visuels & ergonomie (v25.1)** :
+    - Formatage propre de l'axe des ordonnées en Watts entiers (`Math.round(val) + ' W'`) via fonction EVAL et `decimalsInFloat: 0` (suppression définitive des 15 décimales parasites `.000000000000000`).
+    - Résolution des chevauchements : déplacement de la légende cliquable en bas (`position: bottom`), libérant l'angle supérieur droit pour la barre d'outils de zoom/pan sans collision avec les états en en-tête.
+    - Élimination des lignes plates projetées dans le futur (`extend_to: false`) et ajout d'un repère temporel vertical dynamique « Maintenant » (`now: show: true`).
 
 ### 2026-10-10 v24
 

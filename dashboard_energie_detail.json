@@ -286,6 +286,11 @@
           "span": {
             "start": "day"
           },
+          "now": {
+            "show": true,
+            "label": "Maintenant",
+            "color": "#e53935"
+          },
           "header": {
             "show": true,
             "title": "⚡ Charge & Évolution des 3 Phases (24h)",
@@ -296,34 +301,54 @@
             "stroke_width": 2,
             "type": "line",
             "curve": "smooth",
+            "extend_to": false,
             "group_by": {
               "func": "avg",
               "duration": "2m"
             }
           },
+          "yaxis": [
+            {
+              "decimals": 0,
+              "apex_config": {
+                "tickAmount": 5,
+                "title": {
+                  "text": "Puissance (W)",
+                  "style": {
+                    "fontSize": "12px",
+                    "fontWeight": 500,
+                    "color": "#757575"
+                  }
+                }
+              }
+            }
+          ],
           "series": [
             {
               "entity": "sensor.te31njn8n386922_l1_p",
               "name": "Phase 1",
               "color": "#1e88e5",
+              "extend_to": false,
               "show": {
-                "legend_value": true
+                "legend_value": false
               }
             },
             {
               "entity": "sensor.te31njn8n386922_l2_p",
               "name": "Phase 2",
               "color": "#fb8c00",
+              "extend_to": false,
               "show": {
-                "legend_value": true
+                "legend_value": false
               }
             },
             {
               "entity": "sensor.te31njn8n386922_l3_p",
               "name": "Phase 3",
               "color": "#43a047",
+              "extend_to": false,
               "show": {
-                "legend_value": true
+                "legend_value": false
               }
             }
           ],
@@ -350,17 +375,39 @@
               "width": 2,
               "curve": "smooth"
             },
+            "yaxis": {
+              "decimalsInFloat": 0,
+              "labels": {
+                "formatter": "EVAL:function(val) { return val !== null && val !== undefined ? Math.round(val) + ' W' : ''; }",
+                "style": {
+                  "fontSize": "11px",
+                  "colors": "#757575"
+                }
+              }
+            },
+            "xaxis": {
+              "labels": {
+                "format": "HH:mm",
+                "style": {
+                  "fontSize": "11px",
+                  "colors": "#757575"
+                }
+              }
+            },
             "annotations": {
               "yaxis": [
                 {
                   "y": 0,
-                  "borderColor": "#9e9e9e",
-                  "strokeDashArray": 3,
+                  "borderColor": "#b0bec5",
+                  "strokeDashArray": 4,
                   "label": {
-                    "text": "0 W (Équilibre / Injection)",
+                    "text": "0 W (Équilibre)",
+                    "position": "right",
+                    "textAnchor": "end",
                     "style": {
-                      "color": "#616161",
-                      "background": "#f5f5f5"
+                      "color": "#546e7a",
+                      "background": "#eceff1",
+                      "fontSize": "11px"
                     }
                   }
                 }
@@ -368,21 +415,20 @@
             },
             "tooltip": {
               "shared": true,
-              "intersect": false
+              "intersect": false,
+              "y": {
+                "formatter": "EVAL:function(val) { return val !== null && val !== undefined ? Math.round(val) + ' W' : ''; }"
+              }
             },
             "legend": {
               "show": true,
-              "position": "top",
-              "horizontalAlign": "right"
-            },
-            "yaxis": [
-              {
-                "decimals": 0,
-                "title": {
-                  "text": "Puissance (W)"
-                }
+              "position": "bottom",
+              "horizontalAlign": "center",
+              "itemMargin": {
+                "horizontal": 15,
+                "vertical": 6
               }
-            ]
+            }
           },
           "view_layout": {
             "position": "main"
