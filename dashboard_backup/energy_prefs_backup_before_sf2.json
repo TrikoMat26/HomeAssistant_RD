@@ -1,0 +1,159 @@
+{
+  "energy_sources": [
+    {
+      "type": "solar",
+      "stat_energy_from": "sensor.beem_quotidien",
+      "config_entry_solar_forecast": null
+    },
+    {
+      "type": "solar",
+      "stat_energy_from": "sensor.beemnquotidien",
+      "config_entry_solar_forecast": null
+    },
+    {
+      "type": "solar",
+      "stat_energy_from": "sensor.solaire_800w",
+      "config_entry_solar_forecast": null
+    },
+    {
+      "type": "battery",
+      "stat_energy_from": "sensor.solarflow_800_plus_aggr_discharge",
+      "stat_energy_to": "sensor.solarflow_800_plus_aggr_charge"
+    },
+    {
+      "type": "grid",
+      "stat_energy_from": "sensor.leexi_easf01",
+      "stat_energy_to": null,
+      "stat_cost": null,
+      "stat_compensation": null,
+      "entity_energy_price": null,
+      "number_energy_price": 0.1356,
+      "entity_energy_price_export": null,
+      "number_energy_price_export": null,
+      "cost_adjustment_day": 0.0
+    },
+    {
+      "type": "grid",
+      "stat_energy_from": "sensor.leexi_easf02",
+      "stat_energy_to": null,
+      "stat_cost": null,
+      "stat_compensation": null,
+      "entity_energy_price": null,
+      "number_energy_price": 0.1654,
+      "entity_energy_price_export": null,
+      "number_energy_price_export": null,
+      "cost_adjustment_day": 0.0
+    },
+    {
+      "type": "grid",
+      "stat_energy_from": "sensor.lixee_easf03",
+      "stat_energy_to": null,
+      "stat_cost": null,
+      "stat_compensation": null,
+      "entity_energy_price": null,
+      "number_energy_price": 0.1536,
+      "entity_energy_price_export": null,
+      "number_energy_price_export": null,
+      "cost_adjustment_day": 0.0
+    },
+    {
+      "type": "grid",
+      "stat_energy_from": "sensor.lixee_easf04",
+      "stat_energy_to": null,
+      "stat_cost": null,
+      "stat_compensation": null,
+      "entity_energy_price": null,
+      "number_energy_price": 0.1921,
+      "entity_energy_price_export": null,
+      "number_energy_price_export": null,
+      "cost_adjustment_day": 0.0
+    },
+    {
+      "type": "grid",
+      "stat_energy_from": "sensor.lixee_easf05",
+      "stat_energy_to": null,
+      "stat_cost": null,
+      "stat_compensation": null,
+      "entity_energy_price": null,
+      "number_energy_price": 0.1615,
+      "entity_energy_price_export": null,
+      "number_energy_price_export": null,
+      "cost_adjustment_day": 0.0
+    },
+    {
+      "type": "grid",
+      "stat_energy_from": "sensor.lixee_easf06",
+      "stat_energy_to": null,
+      "stat_cost": null,
+      "stat_compensation": null,
+      "entity_energy_price": null,
+      "number_energy_price": 0.7295,
+      "entity_energy_price_export": null,
+      "number_energy_price_export": null,
+      "cost_adjustment_day": 0.0
+    }
+  ],
+  "device_consumption": [
+    {
+      "stat_consumption": "sensor.lave_linge_seche_linge_energy",
+      "name": "Lave linge/Sèche linge"
+    },
+    {
+      "stat_consumption": "sensor.smart_plug_2008146345173351802148e1e92b5ecb_energy"
+    },
+    {
+      "stat_consumption": "sensor.systeme_pc_bureau_energy",
+      "name": "PC Bureau"
+    },
+    {
+      "stat_consumption": "sensor.smart_plug_2008141416403851802148e1e92b5821_energy",
+      "name": "Zone réseau_ciné"
+    },
+    {
+      "stat_consumption": "sensor.prise_tv_energy"
+    },
+    {
+      "stat_consumption": "sensor.four",
+      "name": "Cuisine_Four"
+    },
+    {
+      "stat_consumption": "sensor.chauffe_eau_cuisine",
+      "name": "Chauffe-eau cuisine"
+    },
+    {
+      "stat_consumption": "sensor.climatisation_chambres",
+      "name": "Climatisation des chambres "
+    },
+    {
+      "stat_consumption": "sensor.climatisation_salon",
+      "name": "Climatisation du salon"
+    },
+    {
+      "stat_consumption": "sensor.frigo_micro_ondes",
+      "name": "Cuisine_frigo/micro-ondes "
+    },
+    {
+      "stat_consumption": "sensor.energie_chauffe_eau_principal",
+      "name": "Chauffe-eau principal"
+    },
+    {
+      "stat_consumption": "sensor.cuisine_plaque_induction_energie_plaque_induction",
+      "name": "Cuisine_plaque induction"
+    },
+    {
+      "stat_consumption": "sensor.vmc_lumiere_hall_cuisin_vmc_lumiere_hall_cuisine",
+      "name": "VMC/Lumière Hall cuisine"
+    },
+    {
+      "stat_consumption": "sensor.pompe_piscine"
+    },
+    {
+      "stat_consumption": "sensor.cuisine_lave_vaisselle_cuisine_lave_vaisselle",
+      "name": "Cuisine lave-vaisselle"
+    },
+    {
+      "stat_consumption": "sensor.frigo_salle_cine_energy"
+    }
+  ],
+  "device_consumption_water": []
+}

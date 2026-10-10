@@ -492,6 +492,7 @@ Structure `vertical-stack` unifiée pour les deux boîtiers SolarFlow 800 Plus :
 
 | Date | Incident & Symptôme | Cause Racine Identifiée | Solution Définitive Appliquée |
 |---|---|---|---|
+| **2026-10-10** | Absence du 2ème SolarFlow dans le Dashboard Énergie (`/energy`) et dans le diagramme de distribution d'énergie. | L'intégration HACS Zendure a bien généré les entités `sensor.solarflow_800_plus_n2_aggr_*`, mais la deuxième batterie n'était pas configurée dans les préférences de l'Energy Dashboard de HA (`energy_sources`). | **Ajout de la seconde batterie** (`sensor.solarflow_800_plus_n2_aggr_charge` et `sensor.solarflow_800_plus_n2_aggr_discharge`) via WebSocket `energy/save_prefs`. Validation sans erreur (`energy/validate`), intégration immédiate dans le diagramme de distribution d'énergie avec rétroactivité sur les 71h+ d'historique en base. |
 | **2026-10-03** | Rejet et disparition des 64 entités du 2ème SolarFlow 800 Plus (`Platform zendure_ha does not generate unique IDs`). | L'intégration `zendure_ha` v1.4.4 base ses identifiants `unique_id` sur le nom Cloud de l'appareil (`dev.get("deviceName")`). Comme les deux boîtiers portaient le même nom par défaut `"SolarFlow 800 Plus"`, Home Assistant rejetait toutes les entités du 2nd boîtier pour collision d'identifiants uniques. | **Renommage du second boîtier dans l'application mobile Zendure** en `SolarFlow 800 Plus n°2`. L'intégration a généré automatiquement des entités isolées `solarflow_800_plus_n2_*` pour le 2nd boîtier tout en préservant 100% des entités et historiques du 1er boîtier, sans nécessiter de patch de code fragile. |
 | **2026-08-14 (Soir)** | Écrêtage décharge à 600 W ignoré + chute à 0 W en boucle (la batterie remonte à 700 W toutes les 5s). | Conflit Cloud HEMS : `hems_state: on` + profil Android `inverseMaxPower = 700 W`. Quand HA écrit 600 W sur `output_limit`, l'onduleur coupe à 0 W, puis Zendure Cloud réécrit 800 W 5 secondes après. | **Désactivation des écrêteurs HA** (`initial_state: false`) pour laisser HEMS gérer sans conflit. Maintien de l'alerte température `automation.solarflow_alerte_temperature_elevee`. |
 | **2026-08-14** | Chute brutale à 0 W à chaque montée en température (> 47 °C) suivie d'une réinitialisation Zendure. | L'écrêteur appliquait `min(valeur_user, limite) if valeur_user > 0 else 0`. Comme `valeur_user` (`input_select`) vaut 0 W en mode auto `store_solar`, l'écrêteur forçait `input_limit` à 0 W. De plus, l'écrêteur de décharge envoyait 0 W simultanément. | Refonte en **plafond dynamique supérieur** : l'écrêteur compare directement `consigne_actuelle > limite_thermique`. S'il n'y a pas de dépassement, aucun ordre n'est émis. |
@@ -877,6 +878,15 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 ---
 
 ## 9. Changelog
+
+### 2026-10-10 v24
+
+- 🔋 **Dashboard Énergie — Prise en compte du 2ème boîtier SolarFlow 800 Plus dans la distribution d'énergie** (§2quater, §5, `zendure-entities-reference.md` §5) :
+  - **Symptôme** : Malgré la mise en place du second boîtier (`SolarFlow 800 Plus n°2`), le Dashboard Énergie natif (`/energy`) et son diagramme de flux "Distribution d'énergie" ne comptabilisaient que le premier boîtier historique.
+  - **Solution appliquée** : Déclaration de la deuxième batterie dans les sources d'énergie (`energy_sources`) de Home Assistant via l'API WebSocket (`energy/save_prefs`) :
+    - Énergie entrant dans la batterie (charge) : `sensor.solarflow_800_plus_n2_aggr_charge`
+    - Énergie sortant de la batterie (décharge) : `sensor.solarflow_800_plus_n2_aggr_discharge`
+  - **Validation & Rétroactivité** : Validation immédiate sans erreur via `energy/validate`. Les 71+ heures d'historique statistique déjà collectées en base de données SQLite/recorder pour le second boîtier sont automatiquement intégrées dans les flux et calculs journaliers du Dashboard Énergie.
 
 ### 2026-10-03 v23
 

@@ -83,15 +83,27 @@ Ces capteurs remontent les flux d'énergie et les états physiques de l'installa
 ---
 
 ## 📈 5. Capteurs d'Énergie Cumulée (Statistiques d'Intégration)
-Ces index cumulent la production et la consommation d'énergie au fil du temps (en kWh), idéaux pour un ajout dans le **Dashboard Énergie** de Home Assistant.
+Ces index cumulent la production et la consommation d'énergie au fil du temps (en kWh), configurés dans le **Dashboard Énergie** (`/energy`) de Home Assistant sous la section *Systèmes de stockage par batterie*.
+
+### SolarFlow 800 Plus n°1 (Historique — SN `EOC1NLNAN506559`)
 
 | Entity ID | État | Nom | Description / Utilité |
 | --- | --- | --- | --- |
-| `sensor.solarflow_800_plus_aggr_charge` | `21.38` | SolarFlow 800 Plus Total charges | Index cumulatif de l'énergie totale envoyée dans la batterie pour la recharger (en kWh). |
-| `sensor.solarflow_800_plus_aggr_discharge` | `19.02` | SolarFlow 800 Plus Total décharges | Index cumulatif de l'énergie totale soutirée de la batterie (en kWh). |
-| `sensor.solarflow_800_plus_aggr_solar` | `0.0` | SolarFlow 800 Plus Total solaire | Index cumulatif de l'énergie totale générée par les panneaux solaires (en kWh). |
-| `sensor.solarflow_800_plus_aggr_output_home` | `19.08` | SolarFlow 800 Plus introduit dans la maison | Index cumulatif de l'énergie totale fournie au micro-onduleur domestique (en kWh). |
-| `sensor.solarflow_800_plus_aggr_grid_input_power` | `21.38` | SolarFlow 800 Plus Total Grid Energy | Index cumulatif de l'énergie réseau utilisée pour la charge (en kWh). |
+| `sensor.solarflow_800_plus_aggr_charge` | Varie | SolarFlow 800 Plus Total charges | Index cumulatif de l'énergie totale envoyée dans la batterie n°1 pour la recharger (en kWh). Configuré dans le Dashboard Énergie comme *Énergie entrant dans la batterie*. |
+| `sensor.solarflow_800_plus_aggr_discharge` | Varie | SolarFlow 800 Plus Total décharges | Index cumulatif de l'énergie totale soutirée de la batterie n°1 (en kWh). Configuré dans le Dashboard Énergie comme *Énergie sortant de la batterie*. |
+| `sensor.solarflow_800_plus_aggr_solar` | `0.0` | SolarFlow 800 Plus Total solaire | Index cumulatif de l'énergie totale générée par les panneaux solaires sur l'entrée DC du hub (en kWh). |
+| `sensor.solarflow_800_plus_aggr_output_home` | Varie | SolarFlow 800 Plus introduit dans la maison | Index cumulatif de l'énergie totale fournie au réseau domestique par l'onduleur interne (en kWh). |
+| `sensor.solarflow_800_plus_aggr_grid_input_power` | Varie | SolarFlow 800 Plus Total Grid Energy | Index cumulatif de l'énergie réseau utilisée pour la charge de la batterie n°1 (en kWh). |
+
+### SolarFlow 800 Plus n°2 (Nouveau — SN `EOC1NLN9N466477`)
+
+| Entity ID | État | Nom | Description / Utilité |
+| --- | --- | --- | --- |
+| `sensor.solarflow_800_plus_n2_aggr_charge` | Varie | SolarFlow 800 Plus n°2 Total charges | Index cumulatif de l'énergie totale envoyée dans la batterie n°2 pour la recharger (en kWh). Configuré dans le Dashboard Énergie comme *Énergie entrant dans la batterie*. |
+| `sensor.solarflow_800_plus_n2_aggr_discharge` | Varie | SolarFlow 800 Plus n°2 Total décharges | Index cumulatif de l'énergie totale soutirée de la batterie n°2 (en kWh). Configuré dans le Dashboard Énergie comme *Énergie sortant de la batterie*. |
+| `sensor.solarflow_800_plus_n2_aggr_solar` | `0.0` | SolarFlow 800 Plus n°2 Total solaire | Index cumulatif de l'énergie totale générée par les panneaux solaires sur l'entrée DC du hub n°2 (en kWh). |
+| `sensor.solarflow_800_plus_n2_aggr_output_home` | Varie | SolarFlow 800 Plus n°2 introduit dans la maison | Index cumulatif de l'énergie totale fournie au réseau domestique par le hub n°2 (en kWh). |
+| `sensor.solarflow_800_plus_n2_aggr_grid_input_power` | Varie | SolarFlow 800 Plus n°2 Total Grid Energy | Index cumulatif de l'énergie réseau utilisée pour la charge du hub n°2 (en kWh). |
 
 ---
 
