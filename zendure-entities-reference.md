@@ -152,6 +152,10 @@ Le SmartMeter Zendure 3CT mesure la puissance sur les 3 phases de l'installation
 | `sensor.te31njn8n386922_l1_p` | `820.9` W | TE31NJN8N386922 L1_p | Puissance active mesurée sur la phase 1 via MQTT. |
 | `sensor.te31njn8n386922_l2_p` | `0.0` W | TE31NJN8N386922 L2_p | Puissance active mesurée sur la phase 2 via MQTT. |
 | `sensor.te31njn8n386922_l3_p` | `371.1` W | TE31NJN8N386922 L3_p | Puissance active mesurée sur la phase 3 via MQTT. |
+| `sensor.puissance_phase1` | `~500` W | Puissance Phase1 | Helper Template filtrant le soutirage sur Phase 1 (`max(L1_p, 0)`). Source de `sensor.conso_phase_1`. |
+| `sensor.puissance_phase2` | `0.0` W | Puissance Phase2 | Helper Template filtrant le soutirage sur Phase 2 (`max(L2_p, 0)`). Source de `sensor.conso_phase_2`. |
+| `sensor.puissance_phase3` | `~700` W | Puissance Phase3 | Helper Template filtrant le soutirage sur Phase 3 (`max(L3_p, 0)`). Source de `sensor.conso_phase_3`. |
+| `sensor.conso_phase_1/2/3` | `Wh` | Conso Phase 1/2/3 | Intégrations Riemann Sum (`left`) calculant l'énergie soutirée cumulée par phase. |
 | `automation.recovery_smartmeter_3ct_mosquitto_au_demarrage` | `on` | Recovery SmartMeter 3CT — Mosquitto au démarrage | Automatisation au démarrage de HA pour redémarrer Mosquitto, recharger l'intégration MQTT, et publier `online` avec rétention (`retain: true`) sur `Zendure/sensor/TE31NJN8N386922/L.../availability`. |
 
 ---

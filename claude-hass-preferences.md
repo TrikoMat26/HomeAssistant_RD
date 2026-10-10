@@ -879,6 +879,15 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 
 ## 9. Changelog
 
+### 2026-10-10 v25
+
+- ⚡ **Dashboard 2.Energie Détail — Visualisation 24h Triphasée & Réactivation du suivi par phase** (§5.3, `zendure-entities-reference.md` §7, `dashboard_energie_detail.json`) :
+  - **Reconnexion des helpers de puissance** : Mise à jour des helpers `sensor.puissance_phase1`, `sensor.puissance_phase2` et `sensor.puissance_phase3` via options flow pour pointer sur les mesures réelles du 3CT (`sensor.te31njn8n386922_l1_p`, `_l2_p`, `_l3_p`) avec filtre positif (`[..., 0] | max | round(1)`).
+  - **Reprise automatique du cumul d'énergie** : Les intégrations de Riemann `sensor.conso_phase_1`, `sensor.conso_phase_2` et `sensor.conso_phase_3` ont immédiatement repris leur incrémentation d'énergie cumulée (Wh) par phase.
+  - **Carte ApexCharts 24h Triphasée (Haute Visibilité)** : Déploiement dans le dashboard `energie-detail` d'un graphique interactif 24h superposant les 3 phases (Bleu `#1e88e5`, Orange `#fb8c00`, Vert `#43a047`), avec zoom/pan, résolution 2 min, annotations de ligne 0 W (distinction nette entre soutirage et surproduction solaire) et infobulle synchronisée.
+  - **Carte de répartition & identification des appareils** : Ajout d'une carte d'entités ventilant les sous-circuits Emporia Vue et prises connectées par phase (Ph 1, Ph 2, Ph 3 et circuits cuisine/salon en cours de repérage) pour identifier directement sur quelle phase consomme chaque appareil lors des paliers de puissance.
+  - **Déploiement à chaud & Sauvegarde** : Téléversement en direct via WebSocket API (`lovelace/config/save`) et sauvegarde dans `dashboard_energie_detail.json` (avec backup horodaté dans `dashboard_backup/`).
+
 ### 2026-10-10 v24
 
 - 🔋 **Dashboard Énergie — Prise en compte du 2ème boîtier SolarFlow 800 Plus dans la distribution d'énergie** (§2quater, §5, `zendure-entities-reference.md` §5) :
