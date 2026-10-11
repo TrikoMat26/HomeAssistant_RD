@@ -193,6 +193,38 @@
                   "icon": "mdi:thermometer"
                 }
               ]
+            },
+            {
+              "type": "markdown",
+              "content": "## ⚡ SolarFlow 1600 AC+\n"
+            },
+            {
+              "type": "glance",
+              "show_name": true,
+              "show_icon": true,
+              "show_state": true,
+              "entities": [
+                {
+                  "entity": "sensor.solarflow_1600_ac_plus_electric_level",
+                  "name": "Batterie",
+                  "icon": "mdi:battery"
+                },
+                {
+                  "entity": "sensor.solarflow_1600_ac_plus_bat_in_out",
+                  "name": "Puissance",
+                  "icon": "mdi:lightning-bolt"
+                },
+                {
+                  "entity": "sensor.solarflow_1600_ac_plus_hyper_tmp",
+                  "name": "Temp. SolarFlow",
+                  "icon": "mdi:thermometer"
+                },
+                {
+                  "entity": "sensor.ab2000_00146_max_temp",
+                  "name": "Temp. Batterie",
+                  "icon": "mdi:thermometer"
+                }
+              ]
             }
           ]
         },

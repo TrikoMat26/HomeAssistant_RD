@@ -441,17 +441,20 @@ ou via Developer Tools → Template : `{{ state_attr('select.solarflow_800_plus_
 
 ### 2quater.5 Dashboard Aperçu — carte SolarFlow (carte n°3 de la vue Home)
 
-Structure `vertical-stack` unifiée pour les deux boîtiers SolarFlow 800 Plus :
+Structure `vertical-stack` unifiée pour les trois boîtiers SolarFlow (deux 800 Plus et un 1600 AC+) :
 
 ```
 ## ⚡ SolarFlow 800 Plus n°1
 [Batterie %] [Puissance W] [Temp. SolarFlow] [Temp. Batterie]
 ## ⚡ SolarFlow 800 Plus n°2
 [Batterie %] [Puissance W] [Temp. SolarFlow] [Temp. Batterie]
+## ⚡ SolarFlow 1600 AC+
+[Batterie %] [Puissance W] [Temp. SolarFlow] [Temp. Batterie]
 ```
 
 - **SolarFlow n°1** (Historique — SN `EOC1NLNAN506559`) : batterie `AB2000 06618`, capteurs `sensor.solarflow_800_plus_*`.
-- **SolarFlow n°2** (Nouveau — SN `EOC1NLN9N466477`) : batterie `AB2000 06018`, capteurs `sensor.solarflow_800_plus_n2_*`.
+- **SolarFlow n°2** (Second — SN `EOC1NLN9N466477`) : batterie `AB2000 06018`, capteurs `sensor.solarflow_800_plus_n2_*`.
+- **SolarFlow 1600 AC+** (Nouveau — SN `HED4NEP1P030110`) : batterie `AB2000 00146`, capteurs `sensor.solarflow_1600_ac_plus_*` et `sensor.ab2000_00146_max_temp`.
 - Les deux anciennes cartes de consignes manuelles de charge et de décharge (`input_select.solarflow_limite_charge/decharge`) ont été retirées de la vue principale (pilotage assuré par Zendure Manager / HEMS).
 
 ### 2quater.6 Automations futures à créer
@@ -492,6 +495,7 @@ Structure `vertical-stack` unifiée pour les deux boîtiers SolarFlow 800 Plus :
 
 | Date | Incident & Symptôme | Cause Racine Identifiée | Solution Définitive Appliquée |
 |---|---|---|---|
+| **2026-10-11** | Intégration du SolarFlow 1600 AC+ et inclusion dans le Dashboard Énergie et la vue Aperçu. | Ajout physique du matériel par l'utilisateur. L'intégration `zendure_ha` nécessitait un rechargement de config_entry pour interroger l'API Cloud Zendure et découvrir le nouveau hub (SN `HED4NEP1P030110`) et sa batterie `AB2000 00146`. | Rechargement à chaud de `zendure_ha` via `/api/config/config_entries/entry/{id}/reload` (65+ entités créées automatiquement sans conflit d'ID). Ajout de la 3ème batterie (`sensor.solarflow_1600_ac_plus_aggr_charge/discharge`) dans `energy_sources` du Dashboard Énergie via `energy/save_prefs`. Mise à jour de la carte unifiée du Dashboard Aperçu (`lovelace.json`). |
 | **2026-10-10** | Absence du 2ème SolarFlow dans le Dashboard Énergie (`/energy`) et dans le diagramme de distribution d'énergie. | L'intégration HACS Zendure a bien généré les entités `sensor.solarflow_800_plus_n2_aggr_*`, mais la deuxième batterie n'était pas configurée dans les préférences de l'Energy Dashboard de HA (`energy_sources`). | **Ajout de la seconde batterie** (`sensor.solarflow_800_plus_n2_aggr_charge` et `sensor.solarflow_800_plus_n2_aggr_discharge`) via WebSocket `energy/save_prefs`. Validation sans erreur (`energy/validate`), intégration immédiate dans le diagramme de distribution d'énergie avec rétroactivité sur les 71h+ d'historique en base. |
 | **2026-10-03** | Rejet et disparition des 64 entités du 2ème SolarFlow 800 Plus (`Platform zendure_ha does not generate unique IDs`). | L'intégration `zendure_ha` v1.4.4 base ses identifiants `unique_id` sur le nom Cloud de l'appareil (`dev.get("deviceName")`). Comme les deux boîtiers portaient le même nom par défaut `"SolarFlow 800 Plus"`, Home Assistant rejetait toutes les entités du 2nd boîtier pour collision d'identifiants uniques. | **Renommage du second boîtier dans l'application mobile Zendure** en `SolarFlow 800 Plus n°2`. L'intégration a généré automatiquement des entités isolées `solarflow_800_plus_n2_*` pour le 2nd boîtier tout en préservant 100% des entités et historiques du 1er boîtier, sans nécessiter de patch de code fragile. |
 | **2026-08-14 (Soir)** | Écrêtage décharge à 600 W ignoré + chute à 0 W en boucle (la batterie remonte à 700 W toutes les 5s). | Conflit Cloud HEMS : `hems_state: on` + profil Android `inverseMaxPower = 700 W`. Quand HA écrit 600 W sur `output_limit`, l'onduleur coupe à 0 W, puis Zendure Cloud réécrit 800 W 5 secondes après. | **Désactivation des écrêteurs HA** (`initial_state: false`) pour laisser HEMS gérer sans conflit. Maintien de l'alerte température `automation.solarflow_alerte_temperature_elevee`. |
@@ -878,6 +882,15 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 ---
 
 ## 9. Changelog
+
+### 2026-10-11 v26
+
+- 🔋 **Intégration du SolarFlow 1600 AC+ (Dashboard Énergie & Dashboard Aperçu)** (§2quater.5, `zendure-entities-reference.md` §5) :
+  - **Découverte du nouveau matériel** : Rechargement à chaud de l'intégration `zendure_ha` via l'API REST de Home Assistant pour synchroniser les appareils enregistrés sur le compte Zendure Cloud. Détection immédiate du hub `SolarFlow 1600 AC+` (SN `HED4NEP1P030110`) et de sa batterie `AB2000 00146` (SN `CO4AEP1P0300146`), générant 65 nouvelles entités sans conflit.
+  - **Prise en compte dans le Dashboard Énergie** : Ajout de la 3ème batterie dans les préférences d'énergie (`energy/save_prefs`) de Home Assistant :
+    - Charge : `sensor.solarflow_1600_ac_plus_aggr_charge`
+    - Décharge : `sensor.solarflow_1600_ac_plus_aggr_discharge`
+  - **Mise à jour du Dashboard Aperçu** : Ajout de la section `⚡ SolarFlow 1600 AC+` dans la carte verticale unifiée du dashboard principal (`lovelace.json`) affichant en temps réel le niveau de batterie (%), la puissance instantanée (W), la température du hub (°C) et la température de la batterie AB2000 (°C). Sauvegarde à chaud via WebSocket (`lovelace/config/save`).
 
 ### 2026-10-10 v25
 

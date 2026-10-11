@@ -105,6 +105,16 @@ Ces index cumulent la production et la consommation d'énergie au fil du temps (
 | `sensor.solarflow_800_plus_n2_aggr_output_home` | Varie | SolarFlow 800 Plus n°2 introduit dans la maison | Index cumulatif de l'énergie totale fournie au réseau domestique par le hub n°2 (en kWh). |
 | `sensor.solarflow_800_plus_n2_aggr_grid_input_power` | Varie | SolarFlow 800 Plus n°2 Total Grid Energy | Index cumulatif de l'énergie réseau utilisée pour la charge du hub n°2 (en kWh). |
 
+### SolarFlow 1600 AC+ (Nouveau — SN `HED4NEP1P030110`, Batterie AB2000 `CO4AEP1P0300146`)
+
+| Entity ID | État | Nom | Description / Utilité |
+| --- | --- | --- | --- |
+| `sensor.solarflow_1600_ac_plus_aggr_charge` | Varie | SolarFlow 1600 AC+ Total charges | Index cumulatif de l'énergie totale envoyée dans la batterie 1600 AC+ pour la recharger (en kWh). Configuré dans le Dashboard Énergie comme *Énergie entrant dans la batterie*. |
+| `sensor.solarflow_1600_ac_plus_aggr_discharge` | Varie | SolarFlow 1600 AC+ Total décharges | Index cumulatif de l'énergie totale soutirée de la batterie 1600 AC+ (en kWh). Configuré dans le Dashboard Énergie comme *Énergie sortant de la batterie*. |
+| `sensor.solarflow_1600_ac_plus_aggr_solar` | `0.0` | SolarFlow 1600 AC+ Total solaire | Index cumulatif de l'énergie totale générée par les panneaux solaires sur les 4 entrées MPPT du hub 1600 AC+ (en kWh). |
+| `sensor.solarflow_1600_ac_plus_aggr_output_home` | Varie | SolarFlow 1600 AC+ introduit dans la maison | Index cumulatif de l'énergie totale fournie au réseau domestique par le hub 1600 AC+ (en kWh). |
+| `sensor.solarflow_1600_ac_plus_aggr_grid_input_power` | Varie | SolarFlow 1600 AC+ Total Grid Energy | Index cumulatif de l'énergie réseau utilisée pour la charge du hub 1600 AC+ (en kWh). |
+
 ---
 
 ## 💻 6. Entités Techniques & Diagnostic Système
