@@ -49,6 +49,56 @@
           ]
         },
         {
+          "title": "Ventilateur Chambre Arthur (Cecotec)",
+          "cards": [
+            {
+              "type": "tile",
+              "entity": "fan.ventilateur_arthur",
+              "name": "Ventilateur Arthur",
+              "icon": "mdi:fan",
+              "features": [
+                {
+                  "type": "fan-speed"
+                }
+              ],
+              "layout_options": {
+                "grid_columns": 4,
+                "grid_rows": 2
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "light.lumiere_ventilateur_arthur",
+              "name": "Lumière Ventilateur Arthur",
+              "icon": "mdi:lightbulb",
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "button",
+              "name": "Inverser sens (F/R)",
+              "icon": "mdi:rotate-3d-variant",
+              "tap_action": {
+                "action": "call-service",
+                "service": "remote.send_command",
+                "target": {
+                  "entity_id": "remote.rm_pro"
+                },
+                "data": {
+                  "device": "ventilateur_arthur",
+                  "command": "f_r"
+                }
+              },
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 1
+              }
+            }
+          ]
+        },
+        {
           "title": "Chauffage (Tado)",
           "cards": [
             {
