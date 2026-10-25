@@ -2,7 +2,7 @@
 
 <!--
   Fichier de contexte persistant. Version stockée sur HA : /config/claude-hass-preferences.md
-  Dernière mise à jour : 2026-10-01 v22 (voir Changelog en bas pour détails)
+  Dernière mise à jour : 2026-10-25 v26 (voir Changelog en bas pour détails)
   Optimisé pour Claude Cowork (desktop/mobile/web) ET Claude Code.
 -->
 
@@ -904,6 +904,15 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
     - Formatage propre de l'axe des ordonnées en Watts entiers (`Math.round(val) + ' W'`) via fonction EVAL et `decimalsInFloat: 0` (suppression définitive des 15 décimales parasites `.000000000000000`).
     - Résolution des chevauchements : déplacement de la légende cliquable en bas (`position: bottom`), libérant l'angle supérieur droit pour la barre d'outils de zoom/pan sans collision avec les états en en-tête.
     - Élimination des lignes plates projetées dans le futur (`extend_to: false`) et ajout d'un repère temporel vertical dynamique « Maintenant » (`now: show: true`).
+
+### 2026-10-25 v26
+
+- 🛡️ **Assainissement RFXtrx & Déconnexion des 121 appareils fantômes de Matterbridge / Google Home** :
+  - **Origine identifiée** : Clé USB RFXCOM RFXtrx433 (`ttyUSB0`) qui recevait les signaux non chiffrés du voisinage sur 433.92 MHz (PT2262, Kangtai, RM174RF Smoke Detector, Byron SX, BBSB, TFA, ELEC4). L'option "Ajout automatique" de l'intégration RFXtrx générait automatiquement des appareils dans HA (121 appareils et 518 entités créés au fil du temps).
+  - **Relais Matterbridge** : L'add-on Matterbridge (plugin `matterbridge-hass`) synchronisait l'ensemble de ces appareils (interrupteurs, sirènes) vers Google Home via Matter.
+  - **Étape 1 (Option B)** : Désactivation de l'option `automatic_add` (passée à `false`) dans l'intégration RFXtrx via l'API Options Flow. Aucun nouvel appareil 433 MHz inconnu ne sera plus créé automatiquement.
+  - **Étape 2** : Suppression en bloc via l'API WebSocket (`config/device_registry/remove_config_entry`) des 121 appareils fantômes et 518 entités associées de Home Assistant.
+  - **Redémarrage Matterbridge** : Add-on Matterbridge redémarré avec succès. Les nœuds fantômes sont retirés de la fabrique Matter et Google Home est assaini.
 
 ### 2026-10-10 v24
 
