@@ -907,15 +907,15 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 
 ### 2026-10-25 v26
 
-- 🆕 **Ventilateur de plafond LEDS C4 (Salon)** :
-  - **Matériel identifié** : Ventilateur LEDS C4 avec moteur DC et télécommande Funpower FT1211R (étiquette FC989RS-BW / FCC ID 2ABUP-FT1211R) sur la fréquence 433.92 MHz.
-  - **Apprentissage RF Broadlink** : Capture radio ciblée des 5 vitesses, de la commande an_on_off et de la lumière light_on_off via le Broadlink RM Pro (
+- 🆕 **Ventilateur de plafond LEDS C4 (Salon) & Switch F/R** :
+  - **Matériel identifié** : Ventilateur LEDS C4 avec moteur DC et télécommande Funpower FT1211R (étiquette FC989RS-BW / FCC ID 2ABUP-FT1211R) sur la fréquence 433.92 MHz (sans kit éclairage physique).
+  - **Apprentissage RF Broadlink** : Capture radio ciblée des 5 vitesses, de la commande an_on_off et de la commande d'inversion _r via le Broadlink RM Pro (
 emote.rm_pro). Zéro pollution radio et aucun appareil fantôme créé.
   - **Entités créées** :
     - an.ventilateur_salon : Entité Template Fan native avec gestion des 5 vitesses (paliers de 20%), marche/arrêt. Assignée à la pièce Salon.
-    - light.lumiere_ventilateur_salon : Entité Template Light pour l'éclairage du plafonnier. Assignée à la pièce Salon.
-    - Helpers d'état : input_boolean.ventilateur_salon_etat, input_number.ventilateur_salon_vitesse, input_boolean.lumiere_ventilateur_salon_etat.
-  - **Synchronisation Matterbridge / Google Home** : Redémarrage de l'add-on Matterbridge. Le ventilateur et sa lumière sont immédiatement exposés à Google Home.
+    - switch.ventilateur_salon_sens_f_r : Interrupteur Template pour basculer le sens de rotation Été / Hiver (Forward / Reverse). Assigné à la pièce Salon.
+    - Helpers d'état : input_boolean.ventilateur_salon_etat, input_number.ventilateur_salon_vitesse, input_boolean.ventilateur_salon_sens_rotation.
+  - **Nettoyage & Synchronisation** : Suppression de l'entité lumière inutile (light.lumiere_ventilateur_salon) et redémarrage de l'add-on Matterbridge pour actualiser Google Home.
 
 - 🛡️ **Assainissement RFXtrx & Déconnexion des 121 appareils fantômes de Matterbridge / Google Home** :
   - **Origine identifiée** : Clé USB RFXCOM RFXtrx433 (`ttyUSB0`) qui recevait les signaux non chiffrés du voisinage sur 433.92 MHz (PT2262, Kangtai, RM174RF Smoke Detector, Byron SX, BBSB, TFA, ELEC4). L'option "Ajout automatique" de l'intégration RFXtrx générait automatiquement des appareils dans HA (121 appareils et 518 entités créés au fil du temps).
