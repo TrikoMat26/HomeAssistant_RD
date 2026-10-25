@@ -1,0 +1,177 @@
+{
+  "title": "4.Chauffage",
+  "views": [
+    {
+      "title": "Chauffage & Ventilation",
+      "path": "climat",
+      "icon": "mdi:hvac",
+      "type": "sections",
+      "max_columns": 2,
+      "sections": [
+        {
+          "title": "Ventilateur de plafond (Salon)",
+          "cards": [
+            {
+              "type": "tile",
+              "entity": "fan.ventilateur_salon",
+              "name": "Ventilateur Salon (LEDS C4)",
+              "icon": "mdi:fan",
+              "features": [
+                {
+                  "type": "fan-speed"
+                }
+              ]
+            },
+            {
+              "type": "tile",
+              "entity": "switch.ventilateur_salon_sens_f_r",
+              "name": "Sens de rotation Été / Hiver (F/R)",
+              "icon": "mdi:rotate-3d-variant",
+              "color": "amber",
+              "state_content": [
+                "state",
+                "last-changed"
+              ]
+            },
+            {
+              "type": "horizontal-stack",
+              "cards": [
+                {
+                  "type": "button",
+                  "name": "Arrêt",
+                  "icon": "mdi:fan-off",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.turn_off",
+                    "target": {
+                      "entity_id": "fan.ventilateur_salon"
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V1 (20%)",
+                  "icon": "mdi:numeric-1-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_salon"
+                    },
+                    "data": {
+                      "percentage": 20
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V2 (40%)",
+                  "icon": "mdi:numeric-2-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_salon"
+                    },
+                    "data": {
+                      "percentage": 40
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V3 (60%)",
+                  "icon": "mdi:numeric-3-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_salon"
+                    },
+                    "data": {
+                      "percentage": 60
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V4 (80%)",
+                  "icon": "mdi:numeric-4-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_salon"
+                    },
+                    "data": {
+                      "percentage": 80
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V5 (100%)",
+                  "icon": "mdi:numeric-5-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_salon"
+                    },
+                    "data": {
+                      "percentage": 100
+                    }
+                  }
+                }
+              ]
+            },
+            {
+              "type": "tile",
+              "entity": "sensor.salon_temperature",
+              "name": "Température Salon",
+              "icon": "mdi:thermometer"
+            }
+          ]
+        },
+        {
+          "title": "Chauffage & Thermostats (Tado)",
+          "cards": [
+            {
+              "type": "thermostat",
+              "entity": "climate.salon",
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 4
+              }
+            },
+            {
+              "type": "thermostat",
+              "entity": "climate.chambres",
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 4
+              }
+            },
+            {
+              "type": "horizontal-stack",
+              "cards": [
+                {
+                  "type": "tile",
+                  "entity": "sensor.maison_beauvallon_mode_tado",
+                  "name": "Mode Tado",
+                  "icon": "mdi:home-thermometer"
+                },
+                {
+                  "type": "tile",
+                  "entity": "sensor.maison_beauvallon_temperature_exterieure",
+                  "name": "Extérieur",
+                  "icon": "mdi:weather-partly-cloudy"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -907,6 +907,13 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 
 ### 2026-10-25 v26
 
+- 🆕 **Nouveau Dashboard "4.Chauffage" (`/dashboard-chauffage`)** :
+  - Création du dashboard Lovelace dédié au confort thermique (chauffage Tado + ventilation de plafond).
+  - Vue `sections` responsive avec 2 sections :
+    - **Ventilateur de plafond (Salon)** : Tuile complète native avec slider de vitesse, tuile switch pour le sens de rotation F/R (Été / Hiver), rangée de boutons d'accès direct (Arrêt, V1 20%, V2 40%, V3 60%, V4 80%, V5 100%) et température locale.
+    - **Chauffage & Thermostats (Tado)** : Cartes thermostats pour `climate.salon` et `climate.chambres`, mode Tado global et température extérieure.
+  - Sauvegarde locale dans `dashboard_chauffage.json` et déploiement à chaud via WebSocket API (`lovelace/config/save`).
+
 - 🆕 **Ventilateur de plafond LEDS C4 (Salon) & Switch F/R** :
   - **Matériel identifié** : Ventilateur LEDS C4 avec moteur DC et télécommande Funpower FT1211R (étiquette FC989RS-BW / FCC ID 2ABUP-FT1211R) sur la fréquence 433.92 MHz (sans kit éclairage physique).
   - **Apprentissage RF Broadlink** : Capture radio ciblée des 5 vitesses, de la commande an_on_off et de la commande d'inversion _r via le Broadlink RM Pro (
