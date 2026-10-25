@@ -27,13 +27,19 @@
               }
             },
             {
-              "type": "custom:mushroom-template-card",
-              "primary": "{{ 'Mode Hiver — Déstratification' if is_state('switch.ventilateur_salon_sens_f_r', 'on') else 'Mode Été — Rafraîchissement' }}",
-              "icon": "{{ 'mdi:snowflake' if is_state('switch.ventilateur_salon_sens_f_r', 'on') else 'mdi:weather-sunny' }}",
-              "icon_color": "{{ 'blue' if is_state('switch.ventilateur_salon_sens_f_r', 'on') else 'amber' }}",
-              "entity": "switch.ventilateur_salon_sens_f_r",
+              "type": "button",
+              "name": "Inverser sens de rotation (F/R)",
+              "icon": "mdi:rotate-3d-variant",
               "tap_action": {
-                "action": "toggle"
+                "action": "call-service",
+                "service": "remote.send_command",
+                "target": {
+                  "entity_id": "remote.rm_pro"
+                },
+                "data": {
+                  "device": "ventilateur_leds_c4",
+                  "command": "f_r"
+                }
               },
               "layout_options": {
                 "grid_columns": 4,
