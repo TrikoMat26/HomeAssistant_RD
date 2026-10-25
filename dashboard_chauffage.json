@@ -9,132 +9,41 @@
       "max_columns": 2,
       "sections": [
         {
-          "title": "Ventilateur de plafond (Salon)",
+          "title": "Ventilateur Salon (LEDS C4)",
           "cards": [
             {
               "type": "tile",
               "entity": "fan.ventilateur_salon",
-              "name": "Ventilateur Salon (LEDS C4)",
+              "name": "Ventilateur Salon",
               "icon": "mdi:fan",
               "features": [
                 {
                   "type": "fan-speed"
                 }
-              ]
+              ],
+              "layout_options": {
+                "grid_columns": 4,
+                "grid_rows": 2
+              }
             },
             {
               "type": "custom:mushroom-template-card",
-              "primary": "{{ 'Sens : Hiver (Déstratification)' if is_state('switch.ventilateur_salon_sens_f_r', 'on') else 'Sens : Été (Rafraîchissement)' }}",
-              "secondary": "{{ 'Appuyez pour basculer en mode Été ☀️' if is_state('switch.ventilateur_salon_sens_f_r', 'on') else 'Appuyez pour basculer en mode Hiver ❄️' }}",
+              "primary": "{{ 'Mode Hiver — Déstratification' if is_state('switch.ventilateur_salon_sens_f_r', 'on') else 'Mode Été — Rafraîchissement' }}",
               "icon": "{{ 'mdi:snowflake' if is_state('switch.ventilateur_salon_sens_f_r', 'on') else 'mdi:weather-sunny' }}",
               "icon_color": "{{ 'blue' if is_state('switch.ventilateur_salon_sens_f_r', 'on') else 'amber' }}",
               "entity": "switch.ventilateur_salon_sens_f_r",
               "tap_action": {
                 "action": "toggle"
+              },
+              "layout_options": {
+                "grid_columns": 4,
+                "grid_rows": 1
               }
-            },
-            {
-              "type": "horizontal-stack",
-              "cards": [
-                {
-                  "type": "button",
-                  "name": "Arrêt",
-                  "icon": "mdi:fan-off",
-                  "tap_action": {
-                    "action": "call-service",
-                    "service": "fan.turn_off",
-                    "target": {
-                      "entity_id": "fan.ventilateur_salon"
-                    }
-                  }
-                },
-                {
-                  "type": "button",
-                  "name": "V1 (20%)",
-                  "icon": "mdi:numeric-1-circle-outline",
-                  "tap_action": {
-                    "action": "call-service",
-                    "service": "fan.set_percentage",
-                    "target": {
-                      "entity_id": "fan.ventilateur_salon"
-                    },
-                    "data": {
-                      "percentage": 20
-                    }
-                  }
-                },
-                {
-                  "type": "button",
-                  "name": "V2 (40%)",
-                  "icon": "mdi:numeric-2-circle-outline",
-                  "tap_action": {
-                    "action": "call-service",
-                    "service": "fan.set_percentage",
-                    "target": {
-                      "entity_id": "fan.ventilateur_salon"
-                    },
-                    "data": {
-                      "percentage": 40
-                    }
-                  }
-                },
-                {
-                  "type": "button",
-                  "name": "V3 (60%)",
-                  "icon": "mdi:numeric-3-circle-outline",
-                  "tap_action": {
-                    "action": "call-service",
-                    "service": "fan.set_percentage",
-                    "target": {
-                      "entity_id": "fan.ventilateur_salon"
-                    },
-                    "data": {
-                      "percentage": 60
-                    }
-                  }
-                },
-                {
-                  "type": "button",
-                  "name": "V4 (80%)",
-                  "icon": "mdi:numeric-4-circle-outline",
-                  "tap_action": {
-                    "action": "call-service",
-                    "service": "fan.set_percentage",
-                    "target": {
-                      "entity_id": "fan.ventilateur_salon"
-                    },
-                    "data": {
-                      "percentage": 80
-                    }
-                  }
-                },
-                {
-                  "type": "button",
-                  "name": "V5 (100%)",
-                  "icon": "mdi:numeric-5-circle-outline",
-                  "tap_action": {
-                    "action": "call-service",
-                    "service": "fan.set_percentage",
-                    "target": {
-                      "entity_id": "fan.ventilateur_salon"
-                    },
-                    "data": {
-                      "percentage": 100
-                    }
-                  }
-                }
-              ]
-            },
-            {
-              "type": "tile",
-              "entity": "sensor.salon_temperature",
-              "name": "Température Salon",
-              "icon": "mdi:thermometer"
             }
           ]
         },
         {
-          "title": "Chauffage & Thermostats (Tado)",
+          "title": "Chauffage (Tado)",
           "cards": [
             {
               "type": "thermostat",
@@ -153,21 +62,24 @@
               }
             },
             {
-              "type": "horizontal-stack",
-              "cards": [
-                {
-                  "type": "tile",
-                  "entity": "sensor.maison_beauvallon_mode_tado",
-                  "name": "Mode Tado",
-                  "icon": "mdi:home-thermometer"
-                },
-                {
-                  "type": "tile",
-                  "entity": "sensor.maison_beauvallon_temperature_exterieure",
-                  "name": "Extérieur",
-                  "icon": "mdi:weather-partly-cloudy"
-                }
-              ]
+              "type": "tile",
+              "entity": "sensor.maison_beauvallon_mode_tado",
+              "name": "Mode Tado",
+              "icon": "mdi:home-thermometer",
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "sensor.maison_beauvallon_temperature_exterieure",
+              "name": "Extérieur",
+              "icon": "mdi:weather-partly-cloudy",
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 1
+              }
             }
           ]
         }
