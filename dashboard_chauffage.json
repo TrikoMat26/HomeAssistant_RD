@@ -23,15 +23,15 @@
               ]
             },
             {
-              "type": "tile",
+              "type": "custom:mushroom-template-card",
+              "primary": "{{ 'Sens : Hiver (Déstratification)' if is_state('switch.ventilateur_salon_sens_f_r', 'on') else 'Sens : Été (Rafraîchissement)' }}",
+              "secondary": "{{ 'Appuyez pour basculer en mode Été ☀️' if is_state('switch.ventilateur_salon_sens_f_r', 'on') else 'Appuyez pour basculer en mode Hiver ❄️' }}",
+              "icon": "{{ 'mdi:snowflake' if is_state('switch.ventilateur_salon_sens_f_r', 'on') else 'mdi:weather-sunny' }}",
+              "icon_color": "{{ 'blue' if is_state('switch.ventilateur_salon_sens_f_r', 'on') else 'amber' }}",
               "entity": "switch.ventilateur_salon_sens_f_r",
-              "name": "Sens de rotation Été / Hiver (F/R)",
-              "icon": "mdi:rotate-3d-variant",
-              "color": "amber",
-              "state_content": [
-                "state",
-                "last-changed"
-              ]
+              "tap_action": {
+                "action": "toggle"
+              }
             },
             {
               "type": "horizontal-stack",
