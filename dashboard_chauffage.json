@@ -240,12 +240,19 @@
               }
             },
             {
-              "type": "tile",
-              "entity": "light.lumiere_ventilateur_arthur",
-              "name": "Lumière Arthur",
-              "icon": "mdi:lightbulb",
+              "type": "button",
+              "name": "Allumer Lumière",
+              "icon": "mdi:lightbulb-on-outline",
               "tap_action": {
-                "action": "toggle"
+                "action": "call-service",
+                "service": "remote.send_command",
+                "target": {
+                  "entity_id": "remote.rm_pro"
+                },
+                "data": {
+                  "device": "ventilateur_arthur",
+                  "command": "light_toggle"
+                }
               },
               "layout_options": {
                 "grid_columns": 2,
