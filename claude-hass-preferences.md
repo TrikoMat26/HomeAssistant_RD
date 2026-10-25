@@ -907,6 +907,20 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 
 ### 2026-10-25 v26
 
+- 🔄 **Ventilateur Chambre Arthur (Cecotec / WK-LC9011)** :
+  - Apprentissage et validation 100% des signaux RF 433 MHz sur Broadlink RM Pro (entilateur_arthur) :
+    - 6 vitesses distinctes validées (itesse_1 à itesse_6).
+    - Sens Forward Été (_r) et Reverse Hiver (
+everse).
+    - Arrêt ventilateur (an_toggle), extinction générale (ll_off).
+    - Éclairage indépendant (light_toggle) et silence touches (eep_mute).
+  - **Mise à jour du dashboard 4.Chauffage (/dashboard-chauffage)** :
+    - Tuile native Ventilateur Arthur (avec slider 6 vitesses 16.7% / cran).
+    - Tuile Lumière indépendante.
+    - Bouton **All-Off** (éteint physiquement le ventilateur + lumière via RF et réinitialise les états HA via rowser_mod.sequence).
+    - Boutons séparés **Sens Été (Forward)** et **Sens Hiver (Reverse)**.
+    - Bouton **Bips Télécommande** (eep_mute).
+
 - 🆕 **Nouveau Dashboard "4.Chauffage" (`/dashboard-chauffage`)** :
   - Création du dashboard Lovelace dédié au confort thermique (chauffage Tado + ventilation de plafond).
   - Vue `sections` responsive avec 2 sections :

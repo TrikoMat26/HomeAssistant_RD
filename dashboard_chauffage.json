@@ -69,7 +69,7 @@
             {
               "type": "tile",
               "entity": "light.lumiere_ventilateur_arthur",
-              "name": "Lumière Ventilateur Arthur",
+              "name": "Lumière Arthur",
               "icon": "mdi:lightbulb",
               "layout_options": {
                 "grid_columns": 2,
@@ -78,8 +78,56 @@
             },
             {
               "type": "button",
-              "name": "Inverser sens (F/R)",
-              "icon": "mdi:rotate-3d-variant",
+              "name": "All-Off (Tout éteindre)",
+              "icon": "mdi:power",
+              "tap_action": {
+                "action": "call-service",
+                "service": "browser_mod.sequence",
+                "data": {
+                  "sequence": [
+                    {
+                      "service": "remote.send_command",
+                      "target": {
+                        "entity_id": "remote.rm_pro"
+                      },
+                      "data": {
+                        "device": "ventilateur_arthur",
+                        "command": "all_off"
+                      }
+                    },
+                    {
+                      "service": "input_boolean.turn_off",
+                      "target": {
+                        "entity_id": "input_boolean.ventilateur_arthur_etat"
+                      }
+                    },
+                    {
+                      "service": "input_number.set_value",
+                      "target": {
+                        "entity_id": "input_number.ventilateur_arthur_vitesse"
+                      },
+                      "data": {
+                        "value": 0
+                      }
+                    },
+                    {
+                      "service": "input_boolean.turn_off",
+                      "target": {
+                        "entity_id": "input_boolean.lumiere_ventilateur_arthur_etat"
+                      }
+                    }
+                  ]
+                }
+              },
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "button",
+              "name": "Sens Été (Forward)",
+              "icon": "mdi:weather-sunny",
               "tap_action": {
                 "action": "call-service",
                 "service": "remote.send_command",
@@ -93,6 +141,46 @@
               },
               "layout_options": {
                 "grid_columns": 2,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "button",
+              "name": "Sens Hiver (Reverse)",
+              "icon": "mdi:snowflake",
+              "tap_action": {
+                "action": "call-service",
+                "service": "remote.send_command",
+                "target": {
+                  "entity_id": "remote.rm_pro"
+                },
+                "data": {
+                  "device": "ventilateur_arthur",
+                  "command": "reverse"
+                }
+              },
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "button",
+              "name": "Bips Télécommande",
+              "icon": "mdi:volume-source",
+              "tap_action": {
+                "action": "call-service",
+                "service": "remote.send_command",
+                "target": {
+                  "entity_id": "remote.rm_pro"
+                },
+                "data": {
+                  "device": "ventilateur_arthur",
+                  "command": "beep_mute"
+                }
+              },
+              "layout_options": {
+                "grid_columns": 4,
                 "grid_rows": 1
               }
             }
