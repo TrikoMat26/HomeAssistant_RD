@@ -16,14 +16,93 @@
               "entity": "fan.ventilateur_salon",
               "name": "Ventilateur Salon",
               "icon": "mdi:fan",
-              "features": [
+              "layout_options": {
+                "grid_columns": 4,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "horizontal-stack",
+              "cards": [
                 {
-                  "type": "fan-speed"
+                  "type": "button",
+                  "name": "V1",
+                  "icon": "mdi:numeric-1-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_salon"
+                    },
+                    "data": {
+                      "percentage": 20
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V2",
+                  "icon": "mdi:numeric-2-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_salon"
+                    },
+                    "data": {
+                      "percentage": 40
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V3",
+                  "icon": "mdi:numeric-3-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_salon"
+                    },
+                    "data": {
+                      "percentage": 60
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V4",
+                  "icon": "mdi:numeric-4-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_salon"
+                    },
+                    "data": {
+                      "percentage": 80
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V5",
+                  "icon": "mdi:numeric-5-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_salon"
+                    },
+                    "data": {
+                      "percentage": 100
+                    }
+                  }
                 }
               ],
               "layout_options": {
                 "grid_columns": 4,
-                "grid_rows": 2
+                "grid_rows": 1
               }
             },
             {
@@ -56,14 +135,108 @@
               "entity": "fan.ventilateur_arthur",
               "name": "Ventilateur Arthur",
               "icon": "mdi:fan",
-              "features": [
+              "layout_options": {
+                "grid_columns": 4,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "horizontal-stack",
+              "cards": [
                 {
-                  "type": "fan-speed"
+                  "type": "button",
+                  "name": "V1",
+                  "icon": "mdi:numeric-1-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_arthur"
+                    },
+                    "data": {
+                      "percentage": 17
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V2",
+                  "icon": "mdi:numeric-2-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_arthur"
+                    },
+                    "data": {
+                      "percentage": 33
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V3",
+                  "icon": "mdi:numeric-3-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_arthur"
+                    },
+                    "data": {
+                      "percentage": 50
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V4",
+                  "icon": "mdi:numeric-4-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_arthur"
+                    },
+                    "data": {
+                      "percentage": 67
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V5",
+                  "icon": "mdi:numeric-5-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_arthur"
+                    },
+                    "data": {
+                      "percentage": 83
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V6",
+                  "icon": "mdi:numeric-6-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_arthur"
+                    },
+                    "data": {
+                      "percentage": 100
+                    }
+                  }
                 }
               ],
               "layout_options": {
                 "grid_columns": 4,
-                "grid_rows": 2
+                "grid_rows": 1
               }
             },
             {

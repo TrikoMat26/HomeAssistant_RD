@@ -907,6 +907,12 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 
 ### 2026-10-25 v26
 
+- 🎛️ **Dashboard Chauffage (/dashboard-chauffage) - Boutons de vitesse discrets** :
+  - Remplacement de la barre de pourcentage / curseur par une rangée de boutons de vitesse directs :
+    - **Ventilateur Chambre Arthur** : Boutons V1 (17%), V2 (33%), V3 (50%), V4 (67%), V5 (83%), V6 (100%) alignés sous la tuile.
+    - **Ventilateur Salon** : Boutons V1 (20%), V2 (40%), V3 (60%), V4 (80%), V5 (100%) alignés sous la tuile.
+  - Tuile compacte pour chaque ventilateur (1 ligne : nom, icône, toggle marche/arrêt et statut).
+
 - 🔄 **Ventilateur Chambre Arthur (Cecotec / WK-LC9011)** :
   - Apprentissage et validation 100% des signaux RF 433 MHz sur Broadlink RM Pro (entilateur_arthur) :
     - 6 vitesses distinctes validées (itesse_1 à itesse_6).
