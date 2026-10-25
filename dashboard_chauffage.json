@@ -244,17 +244,37 @@
               "entity": "light.lumiere_ventilateur_arthur",
               "name": "Lumière Arthur",
               "icon": "mdi:lightbulb",
+              "tap_action": {
+                "action": "toggle"
+              },
               "layout_options": {
                 "grid_columns": 2,
                 "grid_rows": 1
-              },
-              "tap_action": {
-                "action": "toggle"
               }
             },
             {
               "type": "button",
-              "name": "Changer Couleur (↺)",
+              "name": "Éteindre Lumière",
+              "icon": "mdi:lightbulb-off",
+              "tap_action": {
+                "action": "call-service",
+                "service": "remote.send_command",
+                "target": {
+                  "entity_id": "remote.rm_pro"
+                },
+                "data": {
+                  "device": "ventilateur_arthur",
+                  "command": "light_off"
+                }
+              },
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "button",
+              "name": "Changer Couleur",
               "icon": "mdi:palette",
               "tap_action": {
                 "action": "call-service",
