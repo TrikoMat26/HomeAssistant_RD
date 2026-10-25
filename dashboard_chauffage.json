@@ -254,6 +254,26 @@
             },
             {
               "type": "button",
+              "name": "Changer Couleur (↺)",
+              "icon": "mdi:palette",
+              "tap_action": {
+                "action": "call-service",
+                "service": "remote.send_command",
+                "target": {
+                  "entity_id": "remote.rm_pro"
+                },
+                "data": {
+                  "device": "ventilateur_arthur",
+                  "command": "light_color"
+                }
+              },
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "button",
               "name": "All-Off (Tout éteindre)",
               "icon": "mdi:power",
               "tap_action": {
@@ -284,7 +304,7 @@
                 },
                 "data": {
                   "device": "ventilateur_arthur",
-                  "command": "reverse"
+                  "command": "f_r"
                 }
               },
               "layout_options": {
@@ -304,7 +324,7 @@
                 },
                 "data": {
                   "device": "ventilateur_arthur",
-                  "command": "f_r"
+                  "command": "reverse"
                 }
               },
               "layout_options": {
