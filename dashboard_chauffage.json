@@ -242,7 +242,7 @@
             {
               "type": "button",
               "name": "Allumer Lumière",
-              "icon": "mdi:lightbulb-on-outline",
+              "icon": "mdi:lightbulb-outline",
               "tap_action": {
                 "action": "call-service",
                 "service": "remote.send_command",
@@ -280,42 +280,59 @@
               }
             },
             {
-              "type": "button",
-              "name": "Changer Couleur",
-              "icon": "mdi:palette",
-              "tap_action": {
-                "action": "call-service",
-                "service": "remote.send_command",
-                "target": {
-                  "entity_id": "remote.rm_pro"
+              "type": "horizontal-stack",
+              "cards": [
+                {
+                  "type": "button",
+                  "name": "Couleur 1",
+                  "icon": "mdi:circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "remote.send_command",
+                    "target": {
+                      "entity_id": "remote.rm_pro"
+                    },
+                    "data": {
+                      "device": "ventilateur_arthur",
+                      "command": "couleur_1"
+                    }
+                  }
                 },
-                "data": {
-                  "device": "ventilateur_arthur",
-                  "command": "light_color"
-                }
-              },
-              "layout_options": {
-                "grid_columns": 2,
-                "grid_rows": 1
-              }
-            },
-            {
-              "type": "button",
-              "name": "All-Off (Tout éteindre)",
-              "icon": "mdi:power",
-              "tap_action": {
-                "action": "call-service",
-                "service": "remote.send_command",
-                "target": {
-                  "entity_id": "remote.rm_pro"
+                {
+                  "type": "button",
+                  "name": "Couleur 2",
+                  "icon": "mdi:circle-slice-4",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "remote.send_command",
+                    "target": {
+                      "entity_id": "remote.rm_pro"
+                    },
+                    "data": {
+                      "device": "ventilateur_arthur",
+                      "command": "couleur_2"
+                    }
+                  }
                 },
-                "data": {
-                  "device": "ventilateur_arthur",
-                  "command": "all_off"
+                {
+                  "type": "button",
+                  "name": "Couleur 3",
+                  "icon": "mdi:circle",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "remote.send_command",
+                    "target": {
+                      "entity_id": "remote.rm_pro"
+                    },
+                    "data": {
+                      "device": "ventilateur_arthur",
+                      "command": "couleur_3"
+                    }
+                  }
                 }
-              },
+              ],
               "layout_options": {
-                "grid_columns": 2,
+                "grid_columns": 4,
                 "grid_rows": 1
               }
             },
@@ -361,6 +378,26 @@
             },
             {
               "type": "button",
+              "name": "All-Off (Tout éteindre)",
+              "icon": "mdi:power",
+              "tap_action": {
+                "action": "call-service",
+                "service": "remote.send_command",
+                "target": {
+                  "entity_id": "remote.rm_pro"
+                },
+                "data": {
+                  "device": "ventilateur_arthur",
+                  "command": "all_off"
+                }
+              },
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "button",
               "name": "Bips Télécommande",
               "icon": "mdi:volume-source",
               "tap_action": {
@@ -375,7 +412,7 @@
                 }
               },
               "layout_options": {
-                "grid_columns": 4,
+                "grid_columns": 2,
                 "grid_rows": 1
               }
             }

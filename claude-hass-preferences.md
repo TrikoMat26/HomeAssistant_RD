@@ -2,7 +2,7 @@
 
 <!--
   Fichier de contexte persistant. Version stockée sur HA : /config/claude-hass-preferences.md
-  Dernière mise à jour : 2026-10-25 v26 (voir Changelog en bas pour détails)
+  Dernière mise à jour : 2026-10-25 v27 (voir Changelog en bas pour détails)
   Optimisé pour Claude Cowork (desktop/mobile/web) ET Claude Code.
 -->
 
@@ -698,6 +698,38 @@ Foobot, Statistics, Wake-on-LAN, KEF. *(Bloc `aarlo:` commenté.)*
 
 ---
 
+### 4.1 Ventilateurs RF (Broadlink RM Pro)
+
+- **Salon (`ventilateur_leds_c4`)** :
+  - Ventilateur LEDS C4. 5 vitesses (`vitesse_1` à `vitesse_5`), marche/arrêt ventilateur (`fan_on_off`), inversion sens (`f_r`).
+  - Signaux RF nettoyés du bruit de préambule pour assurer le bip de confirmation et la réactivité immédiate.
+  - Dashboard : boutons individuels V1 à V5 + sens F/R.
+
+- **Chambre d'Arthur (`ventilateur_arthur`)** :
+  - Ventilateur de plafond Cecotec (Télécommande `WK-LC9011`, récepteur 433.92 MHz).
+  - **Protocole RF** : Modulation PWM 32 bits (20 bits identifiant télécommande `0x34DC4` + 12 bits commande). 1 trame unitaire = 68 octets.
+  - **Règle matérielle critique (Framing RF)** : Le microcontrôleur du récepteur Cecotec rejette les trames courtes (2 trames). Il exige **au moins 4 à 5 trames identiques consécutives** pour valider la commande. Chaque commande dans `/config/.storage/broadlink_remote_34ea34e7d616_codes` est calibrée à exactement 5 trames pures (344 octets au total avec en-tête `0xb2 0x00 0x54 0x01`).
+  - **Décodage exhaustif des commandes (ID `0x34DC4`)** :
+    - Vitesses : V1 (`0x43F`), V2 (`0x4D1`), V3 (`0x778`), V4 (`0x293`), V5 (`0xBB8`), V6 (`0x35E`).
+    - Sens : Été / Forward (`0x901`, `f_r`), Hiver / Reverse (`0x6A4`, `reverse`).
+    - Arrêt total : All-Off combiné moteur + lumière (`0x16F`, `all_off`).
+    - Signal sonore : Bips télécommande on/mute (`0xD27`, `beep_mute`).
+    - Lumière Allumer / Toggle : `0x20A` (`light_toggle`).
+    - Lumière Éteindre direct : `0x228` (`light_off`).
+    - **Température de couleur (CCT) — 3 codes discrets découverts** :
+      La télécommande possède un compteur interne 3 états sur sa touche cycle (↺). Le ventilateur décode 3 commandes RF distinctes :
+      - Couleur 1 : `0x7C3` (`couleur_1`)
+      - Couleur 2 : `0x7E1` (`couleur_2`)
+      - Couleur 3 : `0x787` (`couleur_3`)
+  - **Intégration Dashboard (`/dashboard-chauffage`)** :
+    - Grille symétrique 4 colonnes (cartes natives sans animation d'état factice pour le RF 433 MHz unidirectionnel).
+    - Vitesses V1 à V6 en pile horizontale.
+    - Deux boutons neutres "Allumer Lumière" (`light_toggle`) et "Éteindre Lumière" (`light_off`).
+    - Sélecteur 3 teintes en pile horizontale ("Couleur 1", "Couleur 2", "Couleur 3").
+    - Commandes "Sens Été", "Sens Hiver", "All-Off", et "Bips Télécommande".
+
+---
+
 ## 5. Santé système
 
 ### 5.1 Ouverts (à traiter)
@@ -882,6 +914,14 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 ---
 
 ## 9. Changelog
+
+### 2026-10-25 (v27)
+
+- 🌬️ **Intégration complète Ventilateurs RF Broadlink RM Pro** (§4.1) :
+  - **Salon (LEDS C4)** : nettoyage des trames parasites sur vitesses 2 à 5, testé et validé fonctionnel avec bip de confirmation.
+  - **Chambre Arthur (Cecotec / WK-LC9011)** : rétro-ingénierie complète du protocole PWM 32 bits (adresse `0x34DC4`). Règle de répétition RF : calibrage à 5 trames pures (344 octets, en-tête `0xb2 0x00 0x54 0x01`).
+  - **Découverte majeure Lumière Arthur** : mise en évidence de 3 codes discrets pour le changement de couleur CCT (`0x7C3`, `0x7E1`, `0x787`), séparation de la commande allumage (`0x20A`) et extinction directe (`0x228`), et commande d'arrêt combiné `all_off` (`0x16F`).
+  - **Dashboard Chauffage & Ventilation (`/dashboard-chauffage`)** : restructuration complète de la section Arthur en boutons discrets 4 colonnes (V1..V6, Allumer/Éteindre lumière sans fausse animation d'état, sélecteur direct des 3 couleurs, Été/Hiver inversés corrigés, All-Off et Bips).
 
 ### 2026-10-11 v26
 
