@@ -132,7 +132,7 @@
           "cards": [
             {
               "type": "markdown",
-              "content": "## ⚡ SolarFlow 800 Plus\n"
+              "content": "## ⚡ SolarFlow 800 Plus n°1\n"
             },
             {
               "type": "glance",
@@ -163,24 +163,66 @@
               ]
             },
             {
-              "type": "entities",
-              "title": "🔋 Charge (0–1000 W)",
+              "type": "markdown",
+              "content": "## ⚡ SolarFlow 800 Plus n°2\n"
+            },
+            {
+              "type": "glance",
+              "show_name": true,
+              "show_icon": true,
+              "show_state": true,
               "entities": [
                 {
-                  "entity": "input_select.solarflow_limite_charge",
-                  "name": "Limite charge",
-                  "icon": "mdi:battery-arrow-up"
+                  "entity": "sensor.solarflow_800_plus_n2_electric_level",
+                  "name": "Batterie",
+                  "icon": "mdi:battery"
+                },
+                {
+                  "entity": "sensor.solarflow_800_plus_n2_bat_in_out",
+                  "name": "Puissance",
+                  "icon": "mdi:lightning-bolt"
+                },
+                {
+                  "entity": "sensor.solarflow_800_plus_n2_hyper_tmp",
+                  "name": "Temp. SolarFlow",
+                  "icon": "mdi:thermometer"
+                },
+                {
+                  "entity": "sensor.ab2000_06018_max_temp",
+                  "name": "Temp. Batterie",
+                  "icon": "mdi:thermometer"
                 }
               ]
             },
             {
-              "type": "entities",
-              "title": "🔋 Décharge (0–800 W)",
+              "type": "markdown",
+              "content": "## ⚡ SolarFlow 1600 AC+\n"
+            },
+            {
+              "type": "glance",
+              "show_name": true,
+              "show_icon": true,
+              "show_state": true,
               "entities": [
                 {
-                  "entity": "input_select.solarflow_limite_decharge",
-                  "name": "Limite décharge",
-                  "icon": "mdi:battery-arrow-down"
+                  "entity": "sensor.solarflow_1600_ac_plus_electric_level",
+                  "name": "Batterie",
+                  "icon": "mdi:battery"
+                },
+                {
+                  "entity": "sensor.solarflow_1600_ac_plus_bat_in_out",
+                  "name": "Puissance",
+                  "icon": "mdi:lightning-bolt"
+                },
+                {
+                  "entity": "sensor.solarflow_1600_ac_plus_hyper_tmp",
+                  "name": "Temp. SolarFlow",
+                  "icon": "mdi:thermometer"
+                },
+                {
+                  "entity": "sensor.ab2000_00146_max_temp",
+                  "name": "Temp. Batterie",
+                  "icon": "mdi:thermometer"
                 }
               ]
             }
@@ -469,7 +511,7 @@
           ],
           "card": {
             "type": "markdown",
-            "content": "{% set dt = now() - states['switch.0x00124b0024c79699'].last_changed %}\n{% set h = (dt.seconds // 3600) | int %}\n{% set m = ((dt.seconds % 3600) // 60) | int %}\n{% if h > 0 %}🕐 Actif depuis **{{ h }}h {{ m }} min**{% else %}🕐 Actif depuis **{{ m }} min**{% endif %}\n\n{% set p = states('sensor.puissance_chauffe_eau_principal') | float(0) | round(0) | int %}\n{% set ts = states('input_number.chauffe_eau_principal_timestamp_debut_de_cycle') | float(0) %}\n{% set kwh = (3 * (now().timestamp() - ts) / 3600) | round(2) if ts > 0 else 0 %}\n⚡ **{{ p }} W** | **{{ kwh }} kWh** estimés ce cycle"
+            "content": "{% set dt = now() - states['switch.0x00124b0024c79699'].last_changed %}\n{% set h = (dt.seconds // 3600) | int %}\n{% set m = ((dt.seconds % 3600) // 60) | int %}\n{% if h > 0 %}🕐 Actif depuis **{{ h }}h {{ m }} min**{% else %}🕐 Actif depuis **{{ m }} min**{% endif %}\n\n{% set p = states('sensor.puissance_chauffe_eau_principal') | float(0) | round(0) | int %}\n{% set ts = states('input_number.chauffe_eau_principal_timestamp_debut_de_cycle') | float(0) %}\n{% set kwh = (2 * (now().timestamp() - ts) / 3600) | round(2) if ts > 0 else 0 %}\n⚡ **{{ p }} W** | **{{ kwh }} kWh** estimés ce cycle"
           }
         },
         {

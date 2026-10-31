@@ -235,18 +235,37 @@
                   }
                 },
                 {
-                  "type": "custom:mushroom-template-card",
-                  "primary": "PC Bureau",
-                  "icon": "mdi:desktop-tower",
-                  "entity": "switch.pc_bureau",
-                  "icon_color": "{{ 'green' if is_state('switch.pc_bureau','on') else 'red' }}",
-                  "tap_action": {
-                    "action": "call-service",
-                    "service": "script.turn_on",
-                    "target": {
-                      "entity_id": "script.pc_bureau_remote_toggle"
+                  "type": "vertical-stack",
+                  "cards": [
+                    {
+                      "type": "custom:mushroom-template-card",
+                      "primary": "PC Bureau",
+                      "icon": "mdi:desktop-tower",
+                      "entity": "switch.pc_bureau",
+                      "icon_color": "{{ 'green' if is_state('switch.pc_bureau','on') else 'red' }}",
+                      "tap_action": {
+                        "action": "call-service",
+                        "service": "script.turn_on",
+                        "target": {
+                          "entity_id": "script.pc_bureau_remote_toggle"
+                        }
+                      }
+                    },
+                    {
+                      "type": "custom:mushroom-template-card",
+                      "primary": "Écran(s) PC",
+                      "icon": "mdi:monitor",
+                      "entity": "switch.switch_1",
+                      "icon_color": "{{ 'green' if is_state('switch.switch_1', 'on') or is_state('switch.switch_2', 'on') else 'red' }}",
+                      "tap_action": {
+                        "action": "call-service",
+                        "service": "script.turn_on",
+                        "target": {
+                          "entity_id": "script.pc_bureau_ecrans_toggle"
+                        }
+                      }
                     }
-                  }
+                  ]
                 }
               ]
             }

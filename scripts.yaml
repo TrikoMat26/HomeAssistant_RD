@@ -54,6 +54,25 @@ pc_bureau_remote_toggle:
     - service: script.turn_on
       target:
         entity_id: script.pc_bureau_remote_turn_on
+pc_bureau_ecrans_toggle:
+  alias: PC Bureau - Toggle Écrans
+  sequence:
+  - choose:
+    - conditions:
+      - condition: template
+        value_template: "{{ is_state('switch.switch_1', 'on') or is_state('switch.switch_2', 'on') }}"
+      sequence:
+      - action: switch.turn_off
+        target:
+          entity_id:
+          - switch.switch_1
+          - switch.switch_2
+    default:
+    - action: switch.turn_on
+      target:
+        entity_id:
+        - switch.switch_1
+        - switch.switch_2
 lancer_minuterie_chauffe_eau_cuisine:
   alias: Lancer minuterie Chauffe-eau cuisine (durée custom)
   description: Lit input_number.duree_custom_chauffe_eau_cuisine (minutes) et démarre

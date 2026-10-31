@@ -1,0 +1,465 @@
+{
+  "title": "4.Chauffage",
+  "views": [
+    {
+      "title": "Chauffage & Ventilation",
+      "path": "climat",
+      "icon": "mdi:hvac",
+      "type": "sections",
+      "max_columns": 2,
+      "sections": [
+        {
+          "title": "Ventilateur Salon (LEDS C4)",
+          "cards": [
+            {
+              "type": "tile",
+              "entity": "fan.ventilateur_salon",
+              "name": "Ventilateur Salon",
+              "icon": "mdi:fan",
+              "layout_options": {
+                "grid_columns": 4,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "horizontal-stack",
+              "cards": [
+                {
+                  "type": "button",
+                  "name": "V1",
+                  "icon": "mdi:numeric-1-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_salon"
+                    },
+                    "data": {
+                      "percentage": 20
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V2",
+                  "icon": "mdi:numeric-2-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_salon"
+                    },
+                    "data": {
+                      "percentage": 40
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V3",
+                  "icon": "mdi:numeric-3-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_salon"
+                    },
+                    "data": {
+                      "percentage": 60
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V4",
+                  "icon": "mdi:numeric-4-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_salon"
+                    },
+                    "data": {
+                      "percentage": 80
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V5",
+                  "icon": "mdi:numeric-5-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_salon"
+                    },
+                    "data": {
+                      "percentage": 100
+                    }
+                  }
+                }
+              ],
+              "layout_options": {
+                "grid_columns": 4,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "button",
+              "name": "Inverser sens de rotation (F/R)",
+              "icon": "mdi:rotate-3d-variant",
+              "tap_action": {
+                "action": "call-service",
+                "service": "remote.send_command",
+                "target": {
+                  "entity_id": "remote.rm_pro"
+                },
+                "data": {
+                  "device": "ventilateur_leds_c4",
+                  "command": "f_r"
+                }
+              },
+              "layout_options": {
+                "grid_columns": 4,
+                "grid_rows": 1
+              }
+            }
+          ]
+        },
+        {
+          "title": "Ventilateur Chambre Arthur (Cecotec)",
+          "cards": [
+            {
+              "type": "tile",
+              "entity": "fan.ventilateur_arthur",
+              "name": "Ventilateur Arthur",
+              "icon": "mdi:fan",
+              "layout_options": {
+                "grid_columns": 4,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "horizontal-stack",
+              "cards": [
+                {
+                  "type": "button",
+                  "name": "V1",
+                  "icon": "mdi:numeric-1-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_arthur"
+                    },
+                    "data": {
+                      "percentage": 17
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V2",
+                  "icon": "mdi:numeric-2-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_arthur"
+                    },
+                    "data": {
+                      "percentage": 33
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V3",
+                  "icon": "mdi:numeric-3-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_arthur"
+                    },
+                    "data": {
+                      "percentage": 50
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V4",
+                  "icon": "mdi:numeric-4-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_arthur"
+                    },
+                    "data": {
+                      "percentage": 67
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V5",
+                  "icon": "mdi:numeric-5-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_arthur"
+                    },
+                    "data": {
+                      "percentage": 83
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "V6",
+                  "icon": "mdi:numeric-6-circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "fan.set_percentage",
+                    "target": {
+                      "entity_id": "fan.ventilateur_arthur"
+                    },
+                    "data": {
+                      "percentage": 100
+                    }
+                  }
+                }
+              ],
+              "layout_options": {
+                "grid_columns": 4,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "button",
+              "name": "Allumer Lumière",
+              "icon": "mdi:lightbulb-outline",
+              "tap_action": {
+                "action": "call-service",
+                "service": "remote.send_command",
+                "target": {
+                  "entity_id": "remote.rm_pro"
+                },
+                "data": {
+                  "device": "ventilateur_arthur",
+                  "command": "light_toggle"
+                }
+              },
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "button",
+              "name": "Éteindre Lumière",
+              "icon": "mdi:lightbulb-off",
+              "tap_action": {
+                "action": "call-service",
+                "service": "remote.send_command",
+                "target": {
+                  "entity_id": "remote.rm_pro"
+                },
+                "data": {
+                  "device": "ventilateur_arthur",
+                  "command": "light_off"
+                }
+              },
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "horizontal-stack",
+              "cards": [
+                {
+                  "type": "button",
+                  "name": "Couleur 1",
+                  "icon": "mdi:circle-outline",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "remote.send_command",
+                    "target": {
+                      "entity_id": "remote.rm_pro"
+                    },
+                    "data": {
+                      "device": "ventilateur_arthur",
+                      "command": "couleur_1"
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "Couleur 2",
+                  "icon": "mdi:circle-slice-4",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "remote.send_command",
+                    "target": {
+                      "entity_id": "remote.rm_pro"
+                    },
+                    "data": {
+                      "device": "ventilateur_arthur",
+                      "command": "couleur_2"
+                    }
+                  }
+                },
+                {
+                  "type": "button",
+                  "name": "Couleur 3",
+                  "icon": "mdi:circle",
+                  "tap_action": {
+                    "action": "call-service",
+                    "service": "remote.send_command",
+                    "target": {
+                      "entity_id": "remote.rm_pro"
+                    },
+                    "data": {
+                      "device": "ventilateur_arthur",
+                      "command": "couleur_3"
+                    }
+                  }
+                }
+              ],
+              "layout_options": {
+                "grid_columns": 4,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "button",
+              "name": "Sens Été (Forward)",
+              "icon": "mdi:weather-sunny",
+              "tap_action": {
+                "action": "call-service",
+                "service": "remote.send_command",
+                "target": {
+                  "entity_id": "remote.rm_pro"
+                },
+                "data": {
+                  "device": "ventilateur_arthur",
+                  "command": "f_r"
+                }
+              },
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "button",
+              "name": "Sens Hiver (Reverse)",
+              "icon": "mdi:snowflake",
+              "tap_action": {
+                "action": "call-service",
+                "service": "remote.send_command",
+                "target": {
+                  "entity_id": "remote.rm_pro"
+                },
+                "data": {
+                  "device": "ventilateur_arthur",
+                  "command": "reverse"
+                }
+              },
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "button",
+              "name": "All-Off (Tout éteindre)",
+              "icon": "mdi:power",
+              "tap_action": {
+                "action": "call-service",
+                "service": "remote.send_command",
+                "target": {
+                  "entity_id": "remote.rm_pro"
+                },
+                "data": {
+                  "device": "ventilateur_arthur",
+                  "command": "all_off"
+                }
+              },
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "button",
+              "name": "Bips Télécommande",
+              "icon": "mdi:volume-source",
+              "tap_action": {
+                "action": "call-service",
+                "service": "remote.send_command",
+                "target": {
+                  "entity_id": "remote.rm_pro"
+                },
+                "data": {
+                  "device": "ventilateur_arthur",
+                  "command": "beep_mute"
+                }
+              },
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 1
+              }
+            }
+          ]
+        },
+        {
+          "title": "Chauffage (Tado)",
+          "cards": [
+            {
+              "type": "thermostat",
+              "entity": "climate.salon",
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 4
+              }
+            },
+            {
+              "type": "thermostat",
+              "entity": "climate.chambres",
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 4
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "sensor.maison_beauvallon_mode_tado",
+              "name": "Mode Tado",
+              "icon": "mdi:home-thermometer",
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 1
+              }
+            },
+            {
+              "type": "tile",
+              "entity": "sensor.maison_beauvallon_temperature_exterieure",
+              "name": "Extérieur",
+              "icon": "mdi:weather-partly-cloudy",
+              "layout_options": {
+                "grid_columns": 2,
+                "grid_rows": 1
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

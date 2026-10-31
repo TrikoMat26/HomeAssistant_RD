@@ -83,15 +83,37 @@ Ces capteurs remontent les flux d'énergie et les états physiques de l'installa
 ---
 
 ## 📈 5. Capteurs d'Énergie Cumulée (Statistiques d'Intégration)
-Ces index cumulent la production et la consommation d'énergie au fil du temps (en kWh), idéaux pour un ajout dans le **Dashboard Énergie** de Home Assistant.
+Ces index cumulent la production et la consommation d'énergie au fil du temps (en kWh), configurés dans le **Dashboard Énergie** (`/energy`) de Home Assistant sous la section *Systèmes de stockage par batterie*.
+
+### SolarFlow 800 Plus n°1 (Historique — SN `EOC1NLNAN506559`)
 
 | Entity ID | État | Nom | Description / Utilité |
 | --- | --- | --- | --- |
-| `sensor.solarflow_800_plus_aggr_charge` | `21.38` | SolarFlow 800 Plus Total charges | Index cumulatif de l'énergie totale envoyée dans la batterie pour la recharger (en kWh). |
-| `sensor.solarflow_800_plus_aggr_discharge` | `19.02` | SolarFlow 800 Plus Total décharges | Index cumulatif de l'énergie totale soutirée de la batterie (en kWh). |
-| `sensor.solarflow_800_plus_aggr_solar` | `0.0` | SolarFlow 800 Plus Total solaire | Index cumulatif de l'énergie totale générée par les panneaux solaires (en kWh). |
-| `sensor.solarflow_800_plus_aggr_output_home` | `19.08` | SolarFlow 800 Plus introduit dans la maison | Index cumulatif de l'énergie totale fournie au micro-onduleur domestique (en kWh). |
-| `sensor.solarflow_800_plus_aggr_grid_input_power` | `21.38` | SolarFlow 800 Plus Total Grid Energy | Index cumulatif de l'énergie réseau utilisée pour la charge (en kWh). |
+| `sensor.solarflow_800_plus_aggr_charge` | Varie | SolarFlow 800 Plus Total charges | Index cumulatif de l'énergie totale envoyée dans la batterie n°1 pour la recharger (en kWh). Configuré dans le Dashboard Énergie comme *Énergie entrant dans la batterie*. |
+| `sensor.solarflow_800_plus_aggr_discharge` | Varie | SolarFlow 800 Plus Total décharges | Index cumulatif de l'énergie totale soutirée de la batterie n°1 (en kWh). Configuré dans le Dashboard Énergie comme *Énergie sortant de la batterie*. |
+| `sensor.solarflow_800_plus_aggr_solar` | `0.0` | SolarFlow 800 Plus Total solaire | Index cumulatif de l'énergie totale générée par les panneaux solaires sur l'entrée DC du hub (en kWh). |
+| `sensor.solarflow_800_plus_aggr_output_home` | Varie | SolarFlow 800 Plus introduit dans la maison | Index cumulatif de l'énergie totale fournie au réseau domestique par l'onduleur interne (en kWh). |
+| `sensor.solarflow_800_plus_aggr_grid_input_power` | Varie | SolarFlow 800 Plus Total Grid Energy | Index cumulatif de l'énergie réseau utilisée pour la charge de la batterie n°1 (en kWh). |
+
+### SolarFlow 800 Plus n°2 (Nouveau — SN `EOC1NLN9N466477`)
+
+| Entity ID | État | Nom | Description / Utilité |
+| --- | --- | --- | --- |
+| `sensor.solarflow_800_plus_n2_aggr_charge` | Varie | SolarFlow 800 Plus n°2 Total charges | Index cumulatif de l'énergie totale envoyée dans la batterie n°2 pour la recharger (en kWh). Configuré dans le Dashboard Énergie comme *Énergie entrant dans la batterie*. |
+| `sensor.solarflow_800_plus_n2_aggr_discharge` | Varie | SolarFlow 800 Plus n°2 Total décharges | Index cumulatif de l'énergie totale soutirée de la batterie n°2 (en kWh). Configuré dans le Dashboard Énergie comme *Énergie sortant de la batterie*. |
+| `sensor.solarflow_800_plus_n2_aggr_solar` | `0.0` | SolarFlow 800 Plus n°2 Total solaire | Index cumulatif de l'énergie totale générée par les panneaux solaires sur l'entrée DC du hub n°2 (en kWh). |
+| `sensor.solarflow_800_plus_n2_aggr_output_home` | Varie | SolarFlow 800 Plus n°2 introduit dans la maison | Index cumulatif de l'énergie totale fournie au réseau domestique par le hub n°2 (en kWh). |
+| `sensor.solarflow_800_plus_n2_aggr_grid_input_power` | Varie | SolarFlow 800 Plus n°2 Total Grid Energy | Index cumulatif de l'énergie réseau utilisée pour la charge du hub n°2 (en kWh). |
+
+### SolarFlow 1600 AC+ (Nouveau — SN `HED4NEP1P030110`, Batterie AB2000 `CO4AEP1P0300146`)
+
+| Entity ID | État | Nom | Description / Utilité |
+| --- | --- | --- | --- |
+| `sensor.solarflow_1600_ac_plus_aggr_charge` | Varie | SolarFlow 1600 AC+ Total charges | Index cumulatif de l'énergie totale envoyée dans la batterie 1600 AC+ pour la recharger (en kWh). Configuré dans le Dashboard Énergie comme *Énergie entrant dans la batterie*. |
+| `sensor.solarflow_1600_ac_plus_aggr_discharge` | Varie | SolarFlow 1600 AC+ Total décharges | Index cumulatif de l'énergie totale soutirée de la batterie 1600 AC+ (en kWh). Configuré dans le Dashboard Énergie comme *Énergie sortant de la batterie*. |
+| `sensor.solarflow_1600_ac_plus_aggr_solar` | `0.0` | SolarFlow 1600 AC+ Total solaire | Index cumulatif de l'énergie totale générée par les panneaux solaires sur les 4 entrées MPPT du hub 1600 AC+ (en kWh). |
+| `sensor.solarflow_1600_ac_plus_aggr_output_home` | Varie | SolarFlow 1600 AC+ introduit dans la maison | Index cumulatif de l'énergie totale fournie au réseau domestique par le hub 1600 AC+ (en kWh). |
+| `sensor.solarflow_1600_ac_plus_aggr_grid_input_power` | Varie | SolarFlow 1600 AC+ Total Grid Energy | Index cumulatif de l'énergie réseau utilisée pour la charge du hub 1600 AC+ (en kWh). |
 
 ---
 
@@ -140,6 +162,10 @@ Le SmartMeter Zendure 3CT mesure la puissance sur les 3 phases de l'installation
 | `sensor.te31njn8n386922_l1_p` | `820.9` W | TE31NJN8N386922 L1_p | Puissance active mesurée sur la phase 1 via MQTT. |
 | `sensor.te31njn8n386922_l2_p` | `0.0` W | TE31NJN8N386922 L2_p | Puissance active mesurée sur la phase 2 via MQTT. |
 | `sensor.te31njn8n386922_l3_p` | `371.1` W | TE31NJN8N386922 L3_p | Puissance active mesurée sur la phase 3 via MQTT. |
+| `sensor.puissance_phase1` | `~500` W | Puissance Phase1 | Helper Template filtrant le soutirage sur Phase 1 (`max(L1_p, 0)`). Source de `sensor.conso_phase_1`. |
+| `sensor.puissance_phase2` | `0.0` W | Puissance Phase2 | Helper Template filtrant le soutirage sur Phase 2 (`max(L2_p, 0)`). Source de `sensor.conso_phase_2`. |
+| `sensor.puissance_phase3` | `~700` W | Puissance Phase3 | Helper Template filtrant le soutirage sur Phase 3 (`max(L3_p, 0)`). Source de `sensor.conso_phase_3`. |
+| `sensor.conso_phase_1/2/3` | `Wh` | Conso Phase 1/2/3 | Intégrations Riemann Sum (`left`) calculant l'énergie soutirée cumulée par phase. |
 | `automation.recovery_smartmeter_3ct_mosquitto_au_demarrage` | `on` | Recovery SmartMeter 3CT — Mosquitto au démarrage | Automatisation au démarrage de HA pour redémarrer Mosquitto, recharger l'intégration MQTT, et publier `online` avec rétention (`retain: true`) sur `Zendure/sensor/TE31NJN8N386922/L.../availability`. |
 
 ---
@@ -158,5 +184,10 @@ Ce guide résume les points critiques à retenir pour le fonctionnement de l'int
    - Toujours encadrer les templates par `{{ states('...') not in ['unavailable', 'unknown'] }}` pour éviter qu'une déconnexion ne bascule les consignes à 0 W via un filtre `| int(0)`.
 4. **Options AC Mode** :
    - Vérifier que `select.solarflow_800_plus_ac_mode` utilise bien `"input"` et `"output"`.
+5. **Gestion Multi-Boîtiers (Règle d'or de nommage)** :
+   - L'intégration `zendure_ha` v1.4.x génère ses identifiants `unique_id` sur la base du nom Cloud de l'appareil (`device.name`).
+   - Si plusieurs boîtiers d'un même modèle sont ajoutés sur le même compte Zendure, **chacun doit obligatoirement porter un nom distinct dans l'application mobile Zendure** (ex: `SolarFlow 800 Plus` et `SolarFlow 800 Plus n°2`).
+   - Ne jamais laisser le nom par défaut identique sur plusieurs hubs, sous peine de voir Home Assistant bloquer toutes les entités du 2ème boîtier pour collision d'identifiants (`Platform zendure_ha does not generate unique IDs`).
+
 
 

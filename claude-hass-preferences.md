@@ -2,7 +2,7 @@
 
 <!--
   Fichier de contexte persistant. Version stockée sur HA : /config/claude-hass-preferences.md
-  Dernière mise à jour : 2026-08-14 v21 (voir Changelog en bas pour détails)
+  Dernière mise à jour : 2026-10-25 v27 (voir Changelog en bas pour détails)
   Optimisé pour Claude Cowork (desktop/mobile/web) ET Claude Code.
 -->
 
@@ -55,6 +55,7 @@
 2quater. [SolarFlow 800 Plus — Batterie Zendure](#2quater-solarflow-800-plus--batterie-zendure)
 3. [Automations clés](#3-automations-clés)
 3quater. [Cast vers Nest Hub Cuisine](#3quater-cast-vers-nest-hub-cuisine)
+3quinquies. [PC Bureau & Écrans (Multiprise Meross)](#3quinquies-pc-bureau--gestion-des-écrans-multiprise-meross)
 4. [Intégrations & add-ons](#4-intégrations--add-ons)
 5. [Santé système — ouverts / connus / résolus](#5-santé-système)
 6. [Bibliothèque de données solaires](#6-bibliothèque-de-données-solaires)
@@ -438,18 +439,23 @@ ou via Developer Tools → Template : `{{ state_attr('select.solarflow_800_plus_
 
 **Bascule mode automatique** : le mode AC (`select.solarflow_800_plus_ac_mode`) est géré exclusivement par les automations — ne jamais le modifier manuellement depuis le dashboard.
 
-### 2quater.5 Dashboard Aperçu — carte SolarFlow (carte n°9)
+### 2quater.5 Dashboard Aperçu — carte SolarFlow (carte n°3 de la vue Home)
 
-Structure `vertical-stack` actuelle (5 lignes) :
+Structure `vertical-stack` unifiée pour les trois boîtiers SolarFlow (deux 800 Plus et un 1600 AC+) :
 
 ```
-## ⚡ SolarFlow 800 Plus
+## ⚡ SolarFlow 800 Plus n°1
 [Batterie %] [Puissance W] [Temp. SolarFlow] [Temp. Batterie]
-🔋 Charge (0–1000 W)    [ 400 W ▼ ]
-🔋 Décharge (0–800 W)   [ 200 W ▼ ]
+## ⚡ SolarFlow 800 Plus n°2
+[Batterie %] [Puissance W] [Temp. SolarFlow] [Temp. Batterie]
+## ⚡ SolarFlow 1600 AC+
+[Batterie %] [Puissance W] [Temp. SolarFlow] [Temp. Batterie]
 ```
 
-Le bloc "Mode de fonctionnement" a été supprimé — le mode est géré automatiquement par les automations.
+- **SolarFlow n°1** (Historique — SN `EOC1NLNAN506559`) : batterie `AB2000 06618`, capteurs `sensor.solarflow_800_plus_*`.
+- **SolarFlow n°2** (Second — SN `EOC1NLN9N466477`) : batterie `AB2000 06018`, capteurs `sensor.solarflow_800_plus_n2_*`.
+- **SolarFlow 1600 AC+** (Nouveau — SN `HED4NEP1P030110`) : batterie `AB2000 00146`, capteurs `sensor.solarflow_1600_ac_plus_*` et `sensor.ab2000_00146_max_temp`.
+- Les deux anciennes cartes de consignes manuelles de charge et de décharge (`input_select.solarflow_limite_charge/decharge`) ont été retirées de la vue principale (pilotage assuré par Zendure Manager / HEMS).
 
 ### 2quater.6 Automations futures à créer
 
@@ -489,6 +495,9 @@ Le bloc "Mode de fonctionnement" a été supprimé — le mode est géré automa
 
 | Date | Incident & Symptôme | Cause Racine Identifiée | Solution Définitive Appliquée |
 |---|---|---|---|
+| **2026-10-11** | Intégration du SolarFlow 1600 AC+ et inclusion dans le Dashboard Énergie et la vue Aperçu. | Ajout physique du matériel par l'utilisateur. L'intégration `zendure_ha` nécessitait un rechargement de config_entry pour interroger l'API Cloud Zendure et découvrir le nouveau hub (SN `HED4NEP1P030110`) et sa batterie `AB2000 00146`. | Rechargement à chaud de `zendure_ha` via `/api/config/config_entries/entry/{id}/reload` (65+ entités créées automatiquement sans conflit d'ID). Ajout de la 3ème batterie (`sensor.solarflow_1600_ac_plus_aggr_charge/discharge`) dans `energy_sources` du Dashboard Énergie via `energy/save_prefs`. Mise à jour de la carte unifiée du Dashboard Aperçu (`lovelace.json`). |
+| **2026-10-10** | Absence du 2ème SolarFlow dans le Dashboard Énergie (`/energy`) et dans le diagramme de distribution d'énergie. | L'intégration HACS Zendure a bien généré les entités `sensor.solarflow_800_plus_n2_aggr_*`, mais la deuxième batterie n'était pas configurée dans les préférences de l'Energy Dashboard de HA (`energy_sources`). | **Ajout de la seconde batterie** (`sensor.solarflow_800_plus_n2_aggr_charge` et `sensor.solarflow_800_plus_n2_aggr_discharge`) via WebSocket `energy/save_prefs`. Validation sans erreur (`energy/validate`), intégration immédiate dans le diagramme de distribution d'énergie avec rétroactivité sur les 71h+ d'historique en base. |
+| **2026-10-03** | Rejet et disparition des 64 entités du 2ème SolarFlow 800 Plus (`Platform zendure_ha does not generate unique IDs`). | L'intégration `zendure_ha` v1.4.4 base ses identifiants `unique_id` sur le nom Cloud de l'appareil (`dev.get("deviceName")`). Comme les deux boîtiers portaient le même nom par défaut `"SolarFlow 800 Plus"`, Home Assistant rejetait toutes les entités du 2nd boîtier pour collision d'identifiants uniques. | **Renommage du second boîtier dans l'application mobile Zendure** en `SolarFlow 800 Plus n°2`. L'intégration a généré automatiquement des entités isolées `solarflow_800_plus_n2_*` pour le 2nd boîtier tout en préservant 100% des entités et historiques du 1er boîtier, sans nécessiter de patch de code fragile. |
 | **2026-09-04** | Blocage d'actualisation de la puissance 3CT (`sensor.puissance_3ct` figé à 0 W) sur le dashboard mobile (phases L1/L2/L3 en `unknown`). | Le Smart Meter 3CT s'était figé en émission locale MQTT suite à un redémarrage de HA. | Cycle électrique matériel (reboot physique) du boîtier 3CT. |
 | **2026-08-14 (Soir)** | Écrêtage décharge à 600 W ignoré + chute à 0 W en boucle (la batterie remonte à 700 W toutes les 5s). | Conflit Cloud HEMS : `hems_state: on` + profil Android `inverseMaxPower = 700 W`. Quand HA écrit 600 W sur `output_limit`, l'onduleur coupe à 0 W, puis Zendure Cloud réécrit 800 W 5 secondes après. | **Désactivation des écrêteurs HA** (`initial_state: false`) pour laisser HEMS gérer sans conflit. Maintien de l'alerte température `automation.solarflow_alerte_temperature_elevee`. |
 | **2026-08-14** | Chute brutale à 0 W à chaque montée en température (> 47 °C) suivie d'une réinitialisation Zendure. | L'écrêteur appliquait `min(valeur_user, limite) if valeur_user > 0 else 0`. Comme `valeur_user` (`input_select`) vaut 0 W en mode auto `store_solar`, l'écrêteur forçait `input_limit` à 0 W. De plus, l'écrêteur de décharge envoyait 0 W simultanément. | Refonte en **plafond dynamique supérieur** : l'écrêteur compare directement `consigne_actuelle > limite_thermique`. S'il n'y a pas de dépassement, aucun ordre n'est émis. |
@@ -647,6 +656,42 @@ Pour la liste exacte et à jour : `ha_search_entities(query="", domain_filter="a
 
 ---
 
+## 3quinquies. 🖥️ PC Bureau & Gestion des Écrans (Multiprise Meross)
+
+> Gestion combinée du PC Bureau (`switch.pc_bureau` via Wake-on-LAN et core_rpc_shutdown) et des écrans connectés sur la multiprise Meross MSS425F (`switch.switch_1` et `switch.switch_2`).
+
+### 3quinquies.1 Entités & Scripts
+
+| Entité | entity_id | Type | Rôle / Description |
+|---|---|---|---|
+| PC Bureau | `switch.pc_bureau` | switch (WOL) | Démarrage via Wake-on-LAN et extinction via `core_rpc_shutdown`. |
+| Écran 1 | `switch.switch_1` | switch (Meross) | Prise Outlet 1 de la multiprise du bureau (Écran 1). |
+| Écran 2 | `switch.switch_2` | switch (Meross) | Prise Outlet 2 de la multiprise du bureau (Écran 2). |
+| Remote TOGGLE | `script.pc_bureau_remote_toggle` | script | Bascule intelligente : si PC `on` → `pc_bureau_remote_turn_off`, sinon → `pc_bureau_remote_turn_on`. |
+| Remote ON | `script.pc_bureau_remote_turn_on` | script | Éteint les écrans (`switch_1`, `switch_2`), attend 1s, puis réveille le PC via WOL. |
+| Remote OFF | `script.pc_bureau_remote_turn_off` | script | Éteint le PC via RPC shutdown, attend l'arrêt réel (`off`, timeout 2 min), puis rallume les écrans. |
+| **Toggle Écrans** | **`script.pc_bureau_ecrans_toggle`** | script | **Bascule synchrone sécurisée** : si l'un des écrans est `on` → éteint les deux ; sinon → allume les deux. |
+
+### 3quinquies.2 Automations associées
+
+- **`automation.pc_bureau_ecrans_on_apres_arret_ha`** (id: `1767538447908`) : Rallume automatiquement les écrans (`switch.switch_1`, `switch.switch_2`) dès que `switch.pc_bureau` passe à `off`.
+- **`automation.pc_bureau_notification_demarrage`** (id: `1767549456504`) : Notifie le mobile quand le PC Bureau passe de `off` à `on`.
+
+### 3quinquies.3 🧠 REX & Diagnostic : Pourquoi les écrans ne restaient parfois pas éteints
+
+1. **Symptôme** : Lors d'un démarrage du PC à distance pour une session de télétravail/streaming, les écrans restaient parfois allumés dans la pièce toute la journée malgré le script `pc_bureau_remote_turn_on`.
+2. **Cause racine identifiée** :
+   - Le switch `switch.pc_bureau` est basé sur la plateforme `wake_on_lan`. Lors de l'allumage, il envoie le paquet WOL et passe brièvement à `on`.
+   - Pendant les 15 à 30 premières secondes de démarrage de Windows, le PC ne répond pas encore au ping réseau sur `192.168.1.43`.
+   - Le composant WOL bascule donc temporairement `switch.pc_bureau` à `off`.
+   - Ce passage à `off` déclenchait immédiatement `automation.pc_bureau_ecrans_on_apres_arret_ha` (qui écoute `to: 'off'` sans filtre de durée), **rallumant instantanément les écrans** !
+3. **Solution appliquée (2026-10-01)** :
+   - Création du script synchrone `script.pc_bureau_ecrans_toggle`.
+   - Ajout d'un bouton dédié dans le dashboard **1.Mobile** (`dashboard-mobile`), positionné juste en dessous du bouton "PC Bureau" dans une `vertical-stack`.
+   - Retour d'état en temps réel : icône `mdi:monitor` verte si allumé, rouge si éteint, permettant un contrôle manuel direct et immédiat à distance.
+
+---
+
 ## 4. Intégrations & add-ons
 
 ### Protocoles / intégrations actifs
@@ -673,6 +718,38 @@ Samba, Studio Code Server, Terminal & SSH, Z-Wave JS, Silicon Labs Multiprotocol
 ### Plateformes YAML conservées dans `configuration.yaml`
 
 Foobot, Statistics, Wake-on-LAN, KEF. *(Bloc `aarlo:` commenté.)*
+
+---
+
+### 4.1 Ventilateurs RF (Broadlink RM Pro)
+
+- **Salon (`ventilateur_leds_c4`)** :
+  - Ventilateur LEDS C4. 5 vitesses (`vitesse_1` à `vitesse_5`), marche/arrêt ventilateur (`fan_on_off`), inversion sens (`f_r`).
+  - Signaux RF nettoyés du bruit de préambule pour assurer le bip de confirmation et la réactivité immédiate.
+  - Dashboard : boutons individuels V1 à V5 + sens F/R.
+
+- **Chambre d'Arthur (`ventilateur_arthur`)** :
+  - Ventilateur de plafond Cecotec (Télécommande `WK-LC9011`, récepteur 433.92 MHz).
+  - **Protocole RF** : Modulation PWM 32 bits (20 bits identifiant télécommande `0x34DC4` + 12 bits commande). 1 trame unitaire = 68 octets.
+  - **Règle matérielle critique (Framing RF)** : Le microcontrôleur du récepteur Cecotec rejette les trames courtes (2 trames). Il exige **au moins 4 à 5 trames identiques consécutives** pour valider la commande. Chaque commande dans `/config/.storage/broadlink_remote_34ea34e7d616_codes` est calibrée à exactement 5 trames pures (344 octets au total avec en-tête `0xb2 0x00 0x54 0x01`).
+  - **Décodage exhaustif des commandes (ID `0x34DC4`)** :
+    - Vitesses : V1 (`0x43F`), V2 (`0x4D1`), V3 (`0x778`), V4 (`0x293`), V5 (`0xBB8`), V6 (`0x35E`).
+    - Sens : Été / Forward (`0x901`, `f_r`), Hiver / Reverse (`0x6A4`, `reverse`).
+    - Arrêt total : All-Off combiné moteur + lumière (`0x16F`, `all_off`).
+    - Signal sonore : Bips télécommande on/mute (`0xD27`, `beep_mute`).
+    - Lumière Allumer / Toggle : `0x20A` (`light_toggle`).
+    - Lumière Éteindre direct : `0x228` (`light_off`).
+    - **Température de couleur (CCT) — 3 codes discrets découverts** :
+      La télécommande possède un compteur interne 3 états sur sa touche cycle (↺). Le ventilateur décode 3 commandes RF distinctes :
+      - Couleur 1 : `0x7C3` (`couleur_1`)
+      - Couleur 2 : `0x7E1` (`couleur_2`)
+      - Couleur 3 : `0x787` (`couleur_3`)
+  - **Intégration Dashboard (`/dashboard-chauffage`)** :
+    - Grille symétrique 4 colonnes (cartes natives sans animation d'état factice pour le RF 433 MHz unidirectionnel).
+    - Vitesses V1 à V6 en pile horizontale.
+    - Deux boutons neutres "Allumer Lumière" (`light_toggle`) et "Éteindre Lumière" (`light_off`).
+    - Sélecteur 3 teintes en pile horizontale ("Couleur 1", "Couleur 2", "Couleur 3").
+    - Commandes "Sens Été", "Sens Hiver", "All-Off", et "Bips Télécommande".
 
 ---
 
@@ -865,7 +942,7 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 
 ## 9. Changelog
 
-### 2026-10-31 v24
+### 2026-10-31 (v28)
 
 - ⚡ **Chauffe-eau principal — Élimination des notifications parasites & déphasage Sèche-linge** (§3.ter.2bis, §5.2) :
   - **Symptôme** : Lors du fonctionnement simultané du sèche-linge et du chauffe-eau principal durant la nuit, 9 notifications de fin de cycle étaient émises par nuit au lieu d'une seule, générant des bilans tronqués (cycles fictifs de 30 secondes à quelques minutes) et faussant la durée totale de chauffe.
@@ -885,22 +962,116 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
     - *Remise à zéro automatique* : Réinitialisation à 0 de `timestamp_debut_de_cycle` à la fin de la notification de bilan et lors de l'extinction du contacteur (`automation.extinction_chauffe_eau_principal`).
   - **Déploiement & validation** : Sauvegarde horodatée `/config/automations.yaml.bak.20261031_090428`, validation syntaxique `check-config` (0 erreur), rechargement à chaud `automation.reload`, et réinitialisation de `input_number.chauffe_eau_principal_timestamp_debut_de_cycle` à `0.0`.
 
-### 2026-09-20 v23
+### 2026-10-25 (v27)
+
+- 🌬️ **Intégration complète Ventilateurs RF Broadlink RM Pro** (§4.1) :
+  - **Salon (LEDS C4)** : nettoyage des trames parasites sur vitesses 2 à 5, testé et validé fonctionnel avec bip de confirmation.
+  - **Chambre Arthur (Cecotec / WK-LC9011)** : rétro-ingénierie complète du protocole PWM 32 bits (adresse `0x34DC4`). Règle de répétition RF : calibrage à 5 trames pures (344 octets, en-tête `0xb2 0x00 0x54 0x01`).
+  - **Découverte majeure Lumière Arthur** : mise en évidence de 3 codes discrets pour le changement de couleur CCT (`0x7C3`, `0x7E1`, `0x787`), séparation de la commande allumage (`0x20A`) et extinction directe (`0x228`), et commande d'arrêt combiné `all_off` (`0x16F`).
+  - **Dashboard Chauffage & Ventilation (`/dashboard-chauffage`)** : restructuration complète de la section Arthur en boutons discrets 4 colonnes (V1..V6, Allumer/Éteindre lumière sans fausse animation d'état, sélecteur direct des 3 couleurs, Été/Hiver inversés corrigés, All-Off et Bips).
+
+### 2026-10-11 v26
+
+- 🔋 **Intégration du SolarFlow 1600 AC+ (Dashboard Énergie & Dashboard Aperçu)** (§2quater.5, `zendure-entities-reference.md` §5) :
+  - **Découverte du nouveau matériel** : Rechargement à chaud de l'intégration `zendure_ha` via l'API REST de Home Assistant pour synchroniser les appareils enregistrés sur le compte Zendure Cloud. Détection immédiate du hub `SolarFlow 1600 AC+` (SN `HED4NEP1P030110`) et de sa batterie `AB2000 00146` (SN `CO4AEP1P0300146`), générant 65 nouvelles entités sans conflit.
+  - **Prise en compte dans le Dashboard Énergie** : Ajout de la 3ème batterie dans les préférences d'énergie (`energy/save_prefs`) de Home Assistant :
+    - Charge : `sensor.solarflow_1600_ac_plus_aggr_charge`
+    - Décharge : `sensor.solarflow_1600_ac_plus_aggr_discharge`
+  - **Mise à jour du Dashboard Aperçu** : Ajout de la section `⚡ SolarFlow 1600 AC+` dans la carte verticale unifiée du dashboard principal (`lovelace.json`) affichant en temps réel le niveau de batterie (%), la puissance instantanée (W), la température du hub (°C) et la température de la batterie AB2000 (°C). Sauvegarde à chaud via WebSocket (`lovelace/config/save`).
+
+### 2026-10-10 v25
+
+- ⚡ **Dashboard 2.Energie Détail — Visualisation 24h Triphasée & Réactivation du suivi par phase** (§5.3, `zendure-entities-reference.md` §7, `dashboard_energie_detail.json`) :
+  - **Reconnexion des helpers de puissance** : Mise à jour des helpers `sensor.puissance_phase1`, `sensor.puissance_phase2` et `sensor.puissance_phase3` via options flow pour pointer sur les mesures réelles du 3CT (`sensor.te31njn8n386922_l1_p`, `_l2_p`, `_l3_p`) avec filtre positif (`[..., 0] | max | round(1)`).
+  - **Reprise automatique du cumul d'énergie** : Les intégrations de Riemann `sensor.conso_phase_1`, `sensor.conso_phase_2` et `sensor.conso_phase_3` ont immédiatement repris leur incrémentation d'énergie cumulée (Wh) par phase.
+  - **Carte ApexCharts 24h Triphasée (Haute Visibilité)** : Déploiement dans le dashboard `energie-detail` d'un graphique interactif 24h superposant les 3 phases (Bleu `#1e88e5`, Orange `#fb8c00`, Vert `#43a047`), avec zoom/pan, résolution 2 min, annotations de ligne 0 W (distinction nette entre soutirage et surproduction solaire) et infobulle synchronisée.
+  - **Carte de répartition & identification des appareils** : Ajout d'une carte d'entités ventilant les sous-circuits Emporia Vue et prises connectées par phase (Ph 1, Ph 2, Ph 3 et circuits cuisine/salon en cours de repérage) pour identifier directement sur quelle phase consomme chaque appareil lors des paliers de puissance.
+  - **Déploiement à chaud & Sauvegarde** : Téléversement en direct via WebSocket API (`lovelace/config/save`) et sauvegarde dans `dashboard_energie_detail.json` (avec backup horodaté dans `dashboard_backup/`).
+  - **Ajustements visuels & ergonomie (v25.1)** :
+    - Formatage propre de l'axe des ordonnées en Watts entiers (`Math.round(val) + ' W'`) via fonction EVAL et `decimalsInFloat: 0` (suppression définitive des 15 décimales parasites `.000000000000000`).
+    - Résolution des chevauchements : déplacement de la légende cliquable en bas (`position: bottom`), libérant l'angle supérieur droit pour la barre d'outils de zoom/pan sans collision avec les états en en-tête.
+    - Élimination des lignes plates projetées dans le futur (`extend_to: false`) et ajout d'un repère temporel vertical dynamique « Maintenant » (`now: show: true`).
+
+### 2026-10-25 v26
+
+- 🎛️ **Dashboard Chauffage (/dashboard-chauffage) - Boutons de vitesse discrets** :
+  - Remplacement de la barre de pourcentage / curseur par une rangée de boutons de vitesse directs :
+    - **Ventilateur Chambre Arthur** : Boutons V1 (17%), V2 (33%), V3 (50%), V4 (67%), V5 (83%), V6 (100%) alignés sous la tuile.
+    - **Ventilateur Salon** : Boutons V1 (20%), V2 (40%), V3 (60%), V4 (80%), V5 (100%) alignés sous la tuile.
+  - Tuile compacte pour chaque ventilateur (1 ligne : nom, icône, toggle marche/arrêt et statut).
+
+- 🔄 **Ventilateur Chambre Arthur (Cecotec / WK-LC9011)** :
+  - Apprentissage et validation 100% des signaux RF 433 MHz sur Broadlink RM Pro (entilateur_arthur) :
+    - 6 vitesses distinctes validées (itesse_1 à itesse_6).
+    - Sens Forward Été (_r) et Reverse Hiver (
+everse).
+    - Arrêt ventilateur (an_toggle), extinction générale (ll_off).
+    - Éclairage indépendant (light_toggle) et silence touches (eep_mute).
+  - **Mise à jour du dashboard 4.Chauffage (/dashboard-chauffage)** :
+    - Tuile native Ventilateur Arthur (avec slider 6 vitesses 16.7% / cran).
+    - Tuile Lumière indépendante.
+    - Bouton **All-Off** (éteint physiquement le ventilateur + lumière via RF et réinitialise les états HA via rowser_mod.sequence).
+    - Boutons séparés **Sens Été (Forward)** et **Sens Hiver (Reverse)**.
+    - Bouton **Bips Télécommande** (eep_mute).
+
+- 🆕 **Nouveau Dashboard "4.Chauffage" (`/dashboard-chauffage`)** :
+  - Création du dashboard Lovelace dédié au confort thermique (chauffage Tado + ventilation de plafond).
+  - Vue `sections` responsive avec 2 sections :
+    - **Ventilateur de plafond (Salon)** : Tuile complète native avec slider de vitesse, tuile switch pour le sens de rotation F/R (Été / Hiver), rangée de boutons d'accès direct (Arrêt, V1 20%, V2 40%, V3 60%, V4 80%, V5 100%) et température locale.
+    - **Chauffage & Thermostats (Tado)** : Cartes thermostats pour `climate.salon` et `climate.chambres`, mode Tado global et température extérieure.
+  - Sauvegarde locale dans `dashboard_chauffage.json` et déploiement à chaud via WebSocket API (`lovelace/config/save`).
+
+- 🆕 **Ventilateur de plafond LEDS C4 (Salon) & Switch F/R** :
+  - **Matériel identifié** : Ventilateur LEDS C4 avec moteur DC et télécommande Funpower FT1211R (étiquette FC989RS-BW / FCC ID 2ABUP-FT1211R) sur la fréquence 433.92 MHz (sans kit éclairage physique).
+  - **Apprentissage RF Broadlink** : Capture radio ciblée des 5 vitesses, de la commande an_on_off et de la commande d'inversion _r via le Broadlink RM Pro (
+emote.rm_pro). Zéro pollution radio et aucun appareil fantôme créé.
+  - **Entités créées** :
+    - an.ventilateur_salon : Entité Template Fan native avec gestion des 5 vitesses (paliers de 20%), marche/arrêt. Assignée à la pièce Salon.
+    - switch.ventilateur_salon_sens_f_r : Interrupteur Template pour basculer le sens de rotation Été / Hiver (Forward / Reverse). Assigné à la pièce Salon.
+    - Helpers d'état : input_boolean.ventilateur_salon_etat, input_number.ventilateur_salon_vitesse, input_boolean.ventilateur_salon_sens_rotation.
+  - **Nettoyage & Synchronisation** : Suppression de l'entité lumière inutile (light.lumiere_ventilateur_salon) et redémarrage de l'add-on Matterbridge pour actualiser Google Home.
+
+- 🛡️ **Assainissement RFXtrx & Déconnexion des 121 appareils fantômes de Matterbridge / Google Home** :
+  - **Origine identifiée** : Clé USB RFXCOM RFXtrx433 (`ttyUSB0`) qui recevait les signaux non chiffrés du voisinage sur 433.92 MHz (PT2262, Kangtai, RM174RF Smoke Detector, Byron SX, BBSB, TFA, ELEC4). L'option "Ajout automatique" de l'intégration RFXtrx générait automatiquement des appareils dans HA (121 appareils et 518 entités créés au fil du temps).
+  - **Relais Matterbridge** : L'add-on Matterbridge (plugin `matterbridge-hass`) synchronisait l'ensemble de ces appareils (interrupteurs, sirènes) vers Google Home via Matter.
+  - **Étape 1 (Option B)** : Désactivation de l'option `automatic_add` (passée à `false`) dans l'intégration RFXtrx via l'API Options Flow. Aucun nouvel appareil 433 MHz inconnu ne sera plus créé automatiquement.
+  - **Étape 2** : Suppression en bloc via l'API WebSocket (`config/device_registry/remove_config_entry`) des 121 appareils fantômes et 518 entités associées de Home Assistant.
+  - **Redémarrage Matterbridge** : Add-on Matterbridge redémarré avec succès. Les nœuds fantômes sont retirés de la fabrique Matter et Google Home est assaini.
+
+### 2026-10-10 v24
+
+- 🔋 **Dashboard Énergie — Prise en compte du 2ème boîtier SolarFlow 800 Plus dans la distribution d'énergie** (§2quater, §5, `zendure-entities-reference.md` §5) :
+  - **Symptôme** : Malgré la mise en place du second boîtier (`SolarFlow 800 Plus n°2`), le Dashboard Énergie natif (`/energy`) et son diagramme de flux "Distribution d'énergie" ne comptabilisaient que le premier boîtier historique.
+  - **Solution appliquée** : Déclaration de la deuxième batterie dans les sources d'énergie (`energy_sources`) de Home Assistant via l'API WebSocket (`energy/save_prefs`) :
+    - Énergie entrant dans la batterie (charge) : `sensor.solarflow_800_plus_n2_aggr_charge`
+    - Énergie sortant de la batterie (décharge) : `sensor.solarflow_800_plus_n2_aggr_discharge`
+  - **Validation & Rétroactivité** : Validation immédiate sans erreur via `energy/validate`. Les 71+ heures d'historique statistique déjà collectées en base de données SQLite/recorder pour le second boîtier sont automatiquement intégrées dans les flux et calculs journaliers du Dashboard Énergie.
+
+### 2026-10-03 v23
+
+- 🆕 **Intégration d'un 2ème boîtier Zendure SolarFlow 800 Plus** :
+  - **Résolution du bug multi-appareils (Unique ID Collision)** (§2quater.8) : Identification de la cause racine du blocage de l'intégration `zendure_ha` v1.4.4 (collision des `unique_id` causée par le nom par défaut identique `"SolarFlow 800 Plus"`). Résolution propre et pérenne aux MAJ HACS par renommage du 2nd appareil dans l'application Zendure en `SolarFlow 800 Plus n°2`.
+  - **Déploiement des 64 entités** : Le second SolarFlow dispose désormais de son jeu complet de 64 entités (`*_solarflow_800_plus_n2_*`) et de sa batterie AB2000 dédiée (`AB2000 06018`). Le 1er SolarFlow historique et sa batterie (`AB2000 06618`) restent à 100% intacts.
+- 🎛 **Refonte de la carte SolarFlow dans le Dashboard Aperçu** (§2quater.5) :
+  - Empilement vertical unifié des deux SolarFlow (glance 4 colonnes chacun : Batterie %, Puissance W, Temp. SolarFlow, Temp. Batterie).
+  - Suppression des sélecteurs manuels de charge et décharge qui encombraient la carte principale.
+  - Déploiement à chaud via WebSocket API et sauvegarde dans `lovelace.json`.
+
+### 2026-10-01 v22
+
+- 🆕 **Bouton & Script Contrôle Écran(s) PC Bureau (Dashboard 1.Mobile)** :
+  - **Script de bascule sécurisée** : Création de `script.pc_bureau_ecrans_toggle` (`scripts.yaml`) pour commander de manière synchrone et sécurisée les deux sorties écrans (`switch.switch_1` et `switch.switch_2` de la multiprise Meross). Si au moins un écran est `on`, le script éteint les deux ; sinon, il les allume.
+  - **Bouton dédié Dashboard 1.Mobile** : Ajout d'une carte Mushroom Template "Écran(s) PC" dans `dashboard-mobile` (Section 1), positionnée immédiatement sous le bouton de commande à distance "PC Bureau" dans une `vertical-stack`.
+  - **Retour visuel dynamique** : Icône `mdi:monitor` verte si au moins un écran est allumé, rouge si éteint, avec bascule en 1 tap (`tap_action: toggle script`).
+  - 🧠 **Diagnostic REX surtension / rebond WOL** (§3quinquies.3) : Identification de la cause pour laquelle les écrans restaient parfois allumés lors d'un réveil distant (la coupure temporaire du ping WOL pendant le boot de Windows faisait retomber le switch `pc_bureau` à `off`, ce qui déclenchait l'automation de secours `automation.pc_bureau_ecrans_on_apres_arret_ha`).
+
+### 2026-09-20 (v23bis)
 
 - ⚡ **Chauffe-eau principal — Adaptation de puissance 3000 W → 2000 W** (§3.ter.2, §5.2) :
-  - **Seuil de détection de chauffe** : Abaissement du seuil de `binary_sensor.chauffe_eau_principal_actif` de `> 3000 W` à `> 1700 W` sur `sensor.atelier_ph1_power_minute_average` via l'options flow de HA. Rétablit le déclenchement de l'extinction automatique (`automation.extinction_chauffe_eau_principal`) et du bilan de cycle.
+  - **Seuil de détection de chauffe** : Abaissement du seuil de `binary_sensor.chauffe_eau_principal_actif` de `> 3000 W` à `> 1700 W` sur `sensor.atelier_ph1_power_minute_average` via l'options flow de HA.
   - **Capteur de puissance instantanée** : Mise à jour du template helper `sensor.puissance_chauffe_eau_principal` de 3000 W à 2000 W.
-  - **Bilan de fin de cycle** : Dans `automation.chauffe_eau_principal_bilan_fin_de_cycle` ([automations.yaml line 1305](file:///c:/Users/kriko/GitHub/HomeAssistant_RD/automations.yaml#L1305)), remplacement du multiplicateur `3.0` par `2.0` pour les calculs de `kwh_cycle` et `cout_estime`.
-  - **Dashboard Lovelace** : Mise à jour de la carte Markdown conditionnelle dans la sous-vue `/lovelace/programmation_principal` (`kwh = 2 * ... / 3600`).
-  - **Discrimination des charges PH1 (Lave-linge / Sèche-linge)** : Intégration dans le template de `binary_sensor.chauffe_eau_principal_actif` du verrou d'état contacteur (`is_state('switch.0x00124b0024c79699', 'on')`) et du calcul de puissance nette déduisant la prise connectée lave-linge/sèche-linge (`sensor.atelier_ph1_power_minute_average - sensor.lave_linge_seche_linge_power > 1700`). Élimine les faux démarrages lors des pointes de chauffe eau du lave-linge (~2 200 W pendant <10 min) et permet la détection immédiate de coupure même en cas de fonctionnement simultané.
-  - **Refonte enchaînement cycle complet (`automation.cycle_complet_chauffes_eaux`)** : Remplacement de l'ancien mécanisme bloquant par une architecture à armement passif (`trigger: switch.chauffe_eau_cuisine off`, `condition: input_boolean.cycle_chauffes_eaux on`). Le bouton n'allume jamais la cuisine de force. Il arme simplement la relève automatique du chauffe-eau principal dès que la cuisine coupera (qu'elle soit lancée manuellement ou par planning). Annulable immédiatement et à tout moment en repassant le bouton à `off`.
-  - **Déploiement & validation** : Synchronisation sur `/config/automations.yaml` avec sauvegarde horodatée, validation de syntaxe (`check-config`: valid), rechargement à chaud des automatisations et mise à jour live du dashboard via WebSocket.
-
-### 2026-09-04 v22
-
-- ⚡ **Smart Meter Zendure 3CT — Dépannage blocage MQTT local** (§2quater.8, §5.2, §7 `zendure-entities-reference.md`) :
-  - **Symptôme** : Suite au redémarrage de Home Assistant la veille, le boîtier 3CT s'était figé en émission locale MQTT, laissant les phases L1/L2/L3 (`sensor.te31njn8n386922_l*_p`) à l'état `unknown` et la carte du dashboard mobile `sensor.puissance_3ct` bloquée à plat (0 W).
-  - **Diagnostic & Résolution** : Intégration Zendure vérifiée à jour (v1.4.4). Rétablissement complet opéré par un cycle d'extinction/rallumage matériel (redémarrage électrique physique secteur) du boîtier Zendure 3CT.
+  - **Bilan de fin de cycle** : Dans `automation.chauffe_eau_principal_bilan_fin_de_cycle`, remplacement du multiplicateur `3.0` par `2.0` pour les calculs de `kwh_cycle` et `cout_estime`.
+  - **Refonte enchaînement cycle complet (`automation.cycle_complet_chauffes_eaux`)** : Architecture à armement passif (`trigger: switch.chauffe_eau_cuisine off`, `condition: input_boolean.cycle_chauffes_eaux on`).
 
 ### 2026-08-14 v21
 

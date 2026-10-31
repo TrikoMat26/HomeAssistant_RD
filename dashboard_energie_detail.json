@@ -281,6 +281,289 @@
           }
         },
         {
+          "type": "custom:apexcharts-card",
+          "graph_span": "24h",
+          "span": {
+            "start": "day"
+          },
+          "now": {
+            "show": true,
+            "label": "Maintenant",
+            "color": "#e53935"
+          },
+          "header": {
+            "show": true,
+            "title": "⚡ Charge & Évolution des 3 Phases (24h)",
+            "show_states": true,
+            "colorize_states": true
+          },
+          "all_series_config": {
+            "stroke_width": 2,
+            "type": "line",
+            "curve": "smooth",
+            "extend_to": false,
+            "group_by": {
+              "func": "avg",
+              "duration": "2m"
+            }
+          },
+          "yaxis": [
+            {
+              "decimals": 0,
+              "apex_config": {
+                "tickAmount": 5,
+                "title": {
+                  "text": "Puissance (W)",
+                  "style": {
+                    "fontSize": "12px",
+                    "fontWeight": 500,
+                    "color": "#757575"
+                  }
+                }
+              }
+            }
+          ],
+          "series": [
+            {
+              "entity": "sensor.te31njn8n386922_l1_p",
+              "name": "Phase 1",
+              "color": "#1e88e5",
+              "extend_to": false,
+              "show": {
+                "legend_value": false
+              }
+            },
+            {
+              "entity": "sensor.te31njn8n386922_l2_p",
+              "name": "Phase 2",
+              "color": "#fb8c00",
+              "extend_to": false,
+              "show": {
+                "legend_value": false
+              }
+            },
+            {
+              "entity": "sensor.te31njn8n386922_l3_p",
+              "name": "Phase 3",
+              "color": "#43a047",
+              "extend_to": false,
+              "show": {
+                "legend_value": false
+              }
+            }
+          ],
+          "apex_config": {
+            "chart": {
+              "height": "380px",
+              "zoom": {
+                "enabled": true,
+                "type": "x",
+                "autoScaleYaxis": true
+              },
+              "toolbar": {
+                "show": true,
+                "tools": {
+                  "zoom": true,
+                  "zoomin": true,
+                  "zoomout": true,
+                  "pan": true,
+                  "reset": true
+                }
+              }
+            },
+            "stroke": {
+              "width": 2,
+              "curve": "smooth"
+            },
+            "yaxis": {
+              "decimalsInFloat": 0,
+              "labels": {
+                "formatter": "EVAL:function(val) { return val !== null && val !== undefined ? Math.round(val) + ' W' : ''; }",
+                "style": {
+                  "fontSize": "11px",
+                  "colors": "#757575"
+                }
+              }
+            },
+            "xaxis": {
+              "labels": {
+                "format": "HH:mm",
+                "style": {
+                  "fontSize": "11px",
+                  "colors": "#757575"
+                }
+              }
+            },
+            "annotations": {
+              "yaxis": [
+                {
+                  "y": 0,
+                  "borderColor": "#b0bec5",
+                  "strokeDashArray": 4,
+                  "label": {
+                    "text": "0 W (Équilibre)",
+                    "position": "right",
+                    "textAnchor": "end",
+                    "style": {
+                      "color": "#546e7a",
+                      "background": "#eceff1",
+                      "fontSize": "11px"
+                    }
+                  }
+                }
+              ]
+            },
+            "tooltip": {
+              "shared": true,
+              "intersect": false,
+              "y": {
+                "formatter": "EVAL:function(val) { return val !== null && val !== undefined ? Math.round(val) + ' W' : ''; }"
+              }
+            },
+            "legend": {
+              "show": true,
+              "position": "bottom",
+              "horizontalAlign": "center",
+              "itemMargin": {
+                "horizontal": 15,
+                "vertical": 6
+              }
+            }
+          },
+          "view_layout": {
+            "position": "main"
+          }
+        },
+        {
+          "type": "entities",
+          "title": "🔍 Répartition & Identification des Appareils par Phase",
+          "show_header_toggle": false,
+          "entities": [
+            {
+              "type": "section",
+              "label": "🔵 Phase 1 — Soutirage & Appareils identifiés"
+            },
+            {
+              "entity": "sensor.te31njn8n386922_l1_p",
+              "name": "Total Phase 1 (3CT)",
+              "icon": "mdi:numeric-1-circle"
+            },
+            {
+              "entity": "sensor.conso_phase_1",
+              "name": "Énergie cumulée Phase 1"
+            },
+            {
+              "entity": "sensor.puissance_chauffe_eau_principal",
+              "name": "Chauffe-eau principal"
+            },
+            {
+              "entity": "sensor.pompe_piscine_ph1_1_1min",
+              "name": "VMC & Lumière Hall cuisine (Ph 1)"
+            },
+            {
+              "entity": "sensor.atelier_ph1_power_minute_average",
+              "name": "Atelier Ph 1 (Lave-linge)"
+            },
+            {
+              "entity": "sensor.surpresseur_ph1_4_1min",
+              "name": "Surpresseur Ph 1"
+            },
+            {
+              "type": "section",
+              "label": "🟠 Phase 2 — Soutirage/Injection & Appareils identifiés"
+            },
+            {
+              "entity": "sensor.te31njn8n386922_l2_p",
+              "name": "Flux Net Phase 2 (3CT)",
+              "icon": "mdi:numeric-2-circle"
+            },
+            {
+              "entity": "sensor.conso_phase_2",
+              "name": "Énergie cumulée soutenue Phase 2"
+            },
+            {
+              "entity": "sensor.surpresseur_ph2_5_1min",
+              "name": "Atelier Ph 2"
+            },
+            {
+              "entity": "sensor.hms_1600_power",
+              "name": "Solaire HMS-1600 (Production)"
+            },
+            {
+              "entity": "sensor.solarflow_800_plus_grid_input_power",
+              "name": "SolarFlow 800 Plus (Charge AC)"
+            },
+            {
+              "entity": "sensor.solarflow_800_plus_n2_grid_input_power",
+              "name": "SolarFlow n°2 (Charge AC)"
+            },
+            {
+              "type": "section",
+              "label": "🟢 Phase 3 — Soutirage & Appareils identifiés"
+            },
+            {
+              "entity": "sensor.te31njn8n386922_l3_p",
+              "name": "Total Phase 3 (3CT)",
+              "icon": "mdi:numeric-3-circle"
+            },
+            {
+              "entity": "sensor.conso_phase_3",
+              "name": "Énergie cumulée Phase 3"
+            },
+            {
+              "entity": "sensor.pompe_piscine_ph3_3_1min",
+              "name": "Pompe piscine (Ph 3)"
+            },
+            {
+              "entity": "sensor.surpresseur_ph3_6_1min",
+              "name": "Surpresseur Ph 3"
+            },
+            {
+              "type": "section",
+              "label": "⚡ Circuits en cours de repérage (observer le saut sur L1, L2 ou L3)"
+            },
+            {
+              "entity": "sensor.cuisine_plaque_induction_11_1min",
+              "name": "Cuisine — Plaque induction"
+            },
+            {
+              "entity": "sensor.cuisine_four_12_1min",
+              "name": "Cuisine — Four"
+            },
+            {
+              "entity": "sensor.cuisine_lave_vaisselle_13_1min",
+              "name": "Cuisine — Lave-vaisselle"
+            },
+            {
+              "entity": "sensor.cuisine_chauffe_eau_8_1min",
+              "name": "Cuisine — Chauffe-eau"
+            },
+            {
+              "entity": "sensor.cuisine_frigo_micro_onde_7_1min",
+              "name": "Cuisine — Frigo & Micro-ondes"
+            },
+            {
+              "entity": "sensor.salon_clim_14_1min",
+              "name": "Salon — Climatisation"
+            },
+            {
+              "entity": "sensor.hall_chambre_clim_10_1min",
+              "name": "Hall chambres — Climatisation"
+            },
+            {
+              "entity": "sensor.salle_de_bain_chauffe_eau_15_1min",
+              "name": "Salle de bain — Chauffe-eau"
+            },
+            {
+              "entity": "sensor.zone_reseau_home_cinema_16_1min",
+              "name": "Zone Réseau & Home Cinéma"
+            }
+          ],
+          "view_layout": {
+            "position": "main"
+          }
+        },
+        {
           "type": "energy-usage-graph"
         },
         {
