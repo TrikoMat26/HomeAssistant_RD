@@ -579,14 +579,19 @@ Pour la liste exacte et à jour : `ha_search_entities(query="", domain_filter="a
 
 #### 3.ter.2bis Détection Chauffe-eau Principal & Suivi des Charges PH1 (Atelier)
 
-- **Principe de détection actuelle (2000 W)** : Le chauffe-eau principal ne dispose pas d'un compteur d'énergie propre. Sa consommation est déduite de `sensor.atelier_ph1_power_minute_average` via le template helper `binary_sensor.chauffe_eau_principal_actif`.
-- **Formule active (Verrou contacteur + Puissance Nette)** :
+- **Principe de détection actuelle (2000 W nominal / ~1870 W réel)** : Le chauffe-eau principal ne dispose pas d'un compteur d'énergie propre. Sa consommation est déduite de `sensor.atelier_ph1_power_minute_average` via le template helper `binary_sensor.chauffe_eau_principal_actif`.
+- **Formule active (Verrou contacteur + Puissance Nette avec seuil 1200 W - màj 2026-10-31)** :
   ```jinja
   {% set ph1 = states('sensor.atelier_ph1_power_minute_average') | float(0) %}
   {% set ll_sl = states('sensor.lave_linge_seche_linge_power') | float(0) %}
   {% set puissance_nette = ph1 - ll_sl %}
-  {{ is_state('switch.0x00124b0024c79699', 'on') and (puissance_nette > 1700) }}
+  {{ is_state('switch.0x00124b0024c79699', 'on') and (puissance_nette > 1200) }}
   ```
+- **⚡ REX & Justification du seuil 1200 W (Résolution parasitage Sèche-linge)** :
+  - *Déphasage temporel des capteurs* : `atelier_ph1` est une moyenne glissante 1 min Emporia Vue (actualisée toutes les 120 s), alors que `lave_linge_seche_linge_power` est une prise instantanée (30 s).
+  - *Creux transitoire* : Lors de l'enclenchement du compresseur du sèche-linge (+350 W à 540 W), la prise réagit immédiatement alors qu'Emporia garde temporairement la moyenne basse précédente. La puissance nette plongeait transitoirement à 1675–1698 W pendant 30 s, coupant le capteur sous l'ancien seuil de 1700 W.
+  - *Zone franche [814 W ; 1675 W]* : À 1200 W, on dispose d'une marge de sécurité de +475 W au-dessus du pire creux en chauffe (1675 W) et de +386 W au-dessus du pire pic fantôme en veille (814 W = 234 W bruit atelier + 580 W sèche-linge à l'arrêt).
+  - *Anti-rebond dans les automatisations* : `automation.chauffe_eau_principal_bilan_fin_de_cycle` intègre un délai de confirmation `for: minutes: 2`, un verrouillage de début de cycle (`below: 1`) et une remise à 0 automatique du timestamp.
 - **📌 Consigne pour les interventions futures (Roadmap charges PH1)** :
   - *Contexte* : D'autres équipements consommateurs sont branchés sur la Phase 1 de l'atelier sans être encore identifiés ni équipés de compteurs d'énergie.
   - *Action requise dès que l'utilisateur les aura identifiés* :
@@ -690,6 +695,7 @@ Foobot, Statistics, Wake-on-LAN, KEF. *(Bloc `aarlo:` commenté.)*
 
 | Problème | Résolution | Date |
 |---|---|---|
+| Notifications parasites de bilan du chauffe-eau principal lors du fonctionnement nocturne du sèche-linge (8 faux bilans par nuit) | Détection d'un déphasage temporel entre la moyenne glissante 1-2 min d'Emporia Vue (`atelier_ph1`) et la prise instantanée (30 s) du sèche-linge créant des creux transitoires à ~1675 W. Abaissement du seuil de `binary_sensor.chauffe_eau_principal_actif` de 1700 W à 1200 W (marge de +475 W en chauffe, +386 W en veille). Sécurisation dans `automations.yaml` : temporisation `for: minutes: 2` sur le bilan de fin de cycle, horodatage exact via `trigger.to_state.last_changed`, verrouillage de début de cycle et remise à 0 automatique du timestamp. | 2026-10-31 |
 | Détection de chauffe & extinction automatique inopérantes suite au passage du chauffe-eau principal à 2000 W | Réduction de la puissance résistive de 3 kW à 2 kW. Ajustement du seuil de détection du template helper `binary_sensor.chauffe_eau_principal_actif` (`> 1700 W` au lieu de `> 3000 W`), mise à jour de `sensor.puissance_chauffe_eau_principal` (2000 W), révision du calcul de bilan d'énergie/coût (multiplicateur `2.0` kW) dans `automation.chauffe_eau_principal_bilan_fin_de_cycle` et de la carte Markdown dans le dashboard `/lovelace/programmation_principal`. | 2026-09-20 |
 | Blocage d'actualisation de la puissance 3CT (`sensor.puissance_3ct` figé à 0 W) sur le dashboard mobile | Le Smart Meter 3CT Zendure s'était à nouveau figé en émission locale MQTT suite à un redémarrage de HA (phases L1/L2/L3 en `unknown`). Résolu par un cycle électrique matériel (reboot physique) du boîtier 3CT. | 2026-09-04 |
 | Bloquage de la puissance instantanée 3CT (`sensor.puissance_3ct`) à 111 W suite à une micro-coupure Wi-Fi | Le Smart Meter 3CT Zendure s'était figé en émission locale (épuisement de ses 30 essais de connexion MQTT après micro-coupure Wi-Fi du routeur le 9 août à 09:20:10). Résolu par un redémarrage électrique physique du boîtier 3CT. | 2026-08-10 |
@@ -858,6 +864,26 @@ Un skill personnalisé `home-assistant-management` est disponible localement :
 ---
 
 ## 9. Changelog
+
+### 2026-10-31 v24
+
+- ⚡ **Chauffe-eau principal — Élimination des notifications parasites & déphasage Sèche-linge** (§3.ter.2bis, §5.2) :
+  - **Symptôme** : Lors du fonctionnement simultané du sèche-linge et du chauffe-eau principal durant la nuit, 9 notifications de fin de cycle étaient émises par nuit au lieu d'une seule, générant des bilans tronqués (cycles fictifs de 30 secondes à quelques minutes) et faussant la durée totale de chauffe.
+  - **Diagnostic & Corrélation identifiée** :
+    - La ligne Atelier Phase 1 alimente à la fois le chauffe-eau (nominal 2000 W / réel ~1870 W) et le lave-linge/sèche-linge (pompe à chaleur ~520 W en compresseur, 160 W en tambour, bruit de fond atelier ~234 W).
+    - Asynchronisme technologique : `sensor.atelier_ph1_power_minute_average` (Emporia Vue) calcule une moyenne glissante 1 min actualisée toutes les 120 s, tandis que `sensor.lave_linge_seche_linge_power` (prise connectée) est instantané (30 s).
+    - Lors de l'allumage du compresseur du sèche-linge, la prise grimpe instantanément à ~540 W alors qu'Emporia a 30 à 60 s de retard. La soustraction temps réel `ph1 - ll_sl` s'effondrait transitoirement entre 1674,8 W et 1698 W, franchissant vers le bas l'ancien seuil strict de 1700 W.
+  - **Ajustement du seuil de détection (1200 W au lieu de 1700 W)** :
+    - Mise à jour à chaud via l'API Options Flow de HA sur `binary_sensor.chauffe_eau_principal_actif`.
+    - Le seuil de 1200 W se situe exactement au centre de la zone franche [814 W ; 1675 W] : il offre une marge de sécurité de +475 W en chauffe (au-dessus du pire creux de 1675 W) et de +386 W en veille (au-dessus du pic fantôme maximal théorique de 814 W lors d'un arrêt compresseur).
+    - Validation par rejeu/simulation sur les données brutes des 48h précédentes : 0 micro-coupure, 1 seul cycle complet et continu de 2h53.
+  - **Sécurisation des automatisations dans `automations.yaml`** :
+    - *Anti-rebond sur fin de cycle (`automation.chauffe_eau_principal_bilan_fin_de_cycle`)* : Ajout d'une clause `for: minutes: 2` sur le déclencheur `to: 'off'`. Filtre définitivement toute fluctuation inférieure à 2 minutes.
+    - *Précision horaire* : Recalcul de l'heure et de la durée du bilan basé sur `as_timestamp(trigger.to_state.last_changed)` (moment exact où la chauffe a cessé, sans décalage des 2 min de temporisation).
+    - *Garde de durée minimale* : Condition empêchant la notification pour les cycles de moins de 3 minutes.
+    - *Verrouillage début de cycle (`automation.chauffe_eau_principal_debut_de_cycle`)* : Condition `input_number.chauffe_eau_principal_timestamp_debut_de_cycle below: 1` pour sanctuariser l'heure de démarrage et empêcher tout écrasement en cas d'oscillation.
+    - *Remise à zéro automatique* : Réinitialisation à 0 de `timestamp_debut_de_cycle` à la fin de la notification de bilan et lors de l'extinction du contacteur (`automation.extinction_chauffe_eau_principal`).
+  - **Déploiement & validation** : Sauvegarde horodatée `/config/automations.yaml.bak.20261031_090428`, validation syntaxique `check-config` (0 erreur), rechargement à chaud `automation.reload`, et réinitialisation de `input_number.chauffe_eau_principal_timestamp_debut_de_cycle` à `0.0`.
 
 ### 2026-09-20 v23
 
